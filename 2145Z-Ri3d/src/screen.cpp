@@ -1,9 +1,8 @@
-/*
-
+#include "liblvgl/misc/lv_anim.h"
 #include "main.h"
 #include "pros/rtos.hpp"
 #include "gif-pros/gifclass.hpp"
-#include "display/lvgl.h"
+#include "liblvgl/lvgl.h"
 #include "pros/apix.h"
 #include "screen.hpp"
 #include "autons.hpp"
@@ -109,7 +108,7 @@ void calibrationScreen() {
         pros::delay(25);
     }
 
-    caliGif->clean(); 
+    delete caliGif; // Properly delete the dynamically allocated Gif object
 }
 
 
@@ -164,12 +163,12 @@ void setSelectorOptions(lv_obj_t *roller, size_t autonCount, AutonFunction auton
     }
     *(currentPosition - 1) = '\0'; // Replace the last newline character with a null terminator
 
-    if (selectedAuton < autonCount) {
-        lv_roller_set_selected(roller, selectedAuton, false);
-    }
-
     // Set the roller options
-    lv_roller_set_options(roller, options);
+    lv_roller_set_options(roller, options, LV_ROLLER_MODE_NORMAL);
+
+    if (selectedAuton < autonCount) {
+        lv_roller_set_selected(roller, selectedAuton, LV_ANIM_OFF);
+    }
 
     // Free the memory for the options string
     free(options);
@@ -178,46 +177,28 @@ void setSelectorOptions(lv_obj_t *roller, size_t autonCount, AutonFunction auton
 void autonList(lv_obj_t *scr, lv_color_t color_scheme, AutonFunction autonFunctions[], size_t autonCount) {
     // Create a style for the roller background
     static lv_style_t style_bg;
-    lv_style_copy(&style_bg, &lv_style_plain);
-    style_bg.body.main_color = LV_COLOR_BLACK; // Background color
-    style_bg.body.grad_color = LV_COLOR_BLACK; // Background color
-    style_bg.body.shadow.color = LV_COLOR_SILVER; // Shadow effect for cool look
-    style_bg.body.shadow.width = 5; // Set the shadow width
-    style_bg.body.radius = LV_DPI / 30; // Rounded corners for the background
-    style_bg.body.padding.hor = LV_DPI / 12; // Horizontal padding
-    style_bg.body.padding.ver = LV_DPI / 12; // Vertical padding
-    style_bg.text.font = &lv_font_dejavu_20;
-    style_bg.text.color = color_scheme; // text color
-    style_bg.text.opa = LV_OPA_COVER; // Ensure full opacity for the text
+    lv_style_init(&style_bg);
+    lv_style_set_bg_color(&style_bg, lv_color_black());
+    lv_style_set_text_color(&style_bg, color_scheme);
 
     // Create a style for the roller's selected item
     static lv_style_t style_sel;
-    lv_style_copy(&style_sel, &lv_style_plain);
-    style_sel.body.main_color = LV_COLOR_BLACK; // Background color for selected item
-    style_sel.body.grad_color = LV_COLOR_BLACK; // Background color for selected item
-    style_sel.body.border.color = LV_COLOR_WHITE; // Border color for the selection
-    style_sel.body.border.width = 2; // Set the border width
-    style_sel.body.radius = LV_DPI / 30; // Rounded corners for the selection
-    style_sel.text.color = color_scheme; // text color
-    style_sel.text.opa = LV_OPA_COVER; // Ensure full opacity for the text
-    
+    lv_style_init(&style_sel);
+    lv_style_set_bg_color(&style_sel, lv_color_black());
+    lv_style_set_border_color(&style_sel, lv_color_white());
+    lv_style_set_text_color(&style_sel, color_scheme);
+
     // Create the roller
-    roller = lv_roller_create(scr, NULL);
+    roller = lv_roller_create(scr);
     setSelectorOptions(roller, autonCount, autonFunctions);
 
     // Apply the styles to the roller
-    lv_roller_set_style(roller, LV_ROLLER_STYLE_BG, &style_bg); // Apply the background style
-    lv_roller_set_style(roller, LV_ROLLER_STYLE_SEL, &style_sel); // Apply the style for the selected item
+    lv_obj_add_style(roller, &style_bg, LV_PART_MAIN);
+    lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
 
-    // Calculate the width and height for the roller with padding
-    int roller_width = lv_obj_get_width(scr) / 3 - (style_bg.body.padding.hor * 2);
-    int roller_height = lv_obj_get_height(scr) - (style_bg.body.padding.ver * 2);
-
-    // Set the size of the roller
-    lv_obj_set_size(roller, roller_width, roller_height);
-
-    // Align the roller with padding from the left side of the screen
-    lv_obj_align(roller, NULL, LV_ALIGN_IN_LEFT_MID, style_bg.body.padding.hor, 0);
+    // Set the size and alignment of the roller
+    lv_obj_set_size(roller, lv_obj_get_width(scr) / 3, lv_obj_get_height(scr) - 20);
+    lv_obj_align(roller, LV_ALIGN_LEFT_MID, 10, 0);
 }
 
 // Function to be called when the confirm button is pressed
@@ -230,7 +211,7 @@ static lv_res_t confirm_btn_action(lv_obj_t *btn) {
     
 
     // Create a new screen
-    lv_obj_t *new_scr = lv_obj_create(NULL, NULL);
+    lv_obj_t *new_scr = lv_obj_create(NULL);
 
 
     // Load the new screen
@@ -241,127 +222,89 @@ static lv_res_t confirm_btn_action(lv_obj_t *btn) {
     return LV_RES_OK;
 }
 
-lv_obj_t confirmButton(lv_obj_t *scr, lv_color_t color_scheme) { 
+lv_obj_t* confirmButton(lv_obj_t *scr, lv_color_t color_scheme) { 
     // Create a style for the confirm button
     static lv_style_t style_btn;
-    lv_style_copy(&style_btn, &lv_style_btn_rel); // Copy a base button style to start with
-    style_btn.body.main_color = color_scheme; // Use the passed color
-    style_btn.body.grad_color = color_shade(color_scheme, -10); // Make the gradient slightly darker
-    style_btn.body.radius = 10; // Round the corners a bit
-    style_btn.text.color = LV_COLOR_WHITE; // White text on the button
-    style_btn.body.border.color = LV_COLOR_WHITE; // White border for cool effect
-    style_btn.body.border.width = 2; // Set the border width
-    style_btn.body.shadow.color = LV_COLOR_SILVER; // Shadow effect for cool look
-    style_btn.body.shadow.width = 5; // Set the shadow width
-    style_btn.text.font = &lv_font_dejavu_20; // Set the font for the text
+    lv_style_init(&style_btn);
+    lv_style_set_bg_color(&style_btn, color_scheme);
+    lv_style_set_text_color(&style_btn, lv_color_white());
 
-    // Create a style for the confirm button when it's pressed
-    static lv_style_t style_btn_pr;
-    lv_style_copy(&style_btn_pr, &style_btn); // Start with the released style
-    style_btn_pr.body.main_color = color_shade(color_scheme, -30); // Darker color for pressed state
-    style_btn_pr.body.grad_color = color_shade(color_scheme, -40); // Even darker for gradient
-    style_btn_pr.text.color = color_shade(color_scheme, 50); // Lighter color for the text
-    style_btn_pr.body.border.color = LV_COLOR_WHITE; // Keep the border color
-    style_btn_pr.body.shadow.width = 3; // Smaller shadow for a "pressed" effect
-
-    // Confirm button setup
-    lv_obj_t *confirmBtn = lv_btn_create(scr, NULL);
-    lv_btn_set_style(confirmBtn, LV_BTN_STYLE_REL, &style_btn); // Apply the released style to the button
-    lv_btn_set_style(confirmBtn, LV_BTN_STYLE_PR, &style_btn_pr); // Apply the pressed style to the button
-    lv_obj_set_size(confirmBtn, 120, 50); // Set the button size
-    lv_obj_align(confirmBtn, scr, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10); // Align to the bottom-right with some margin
-
-    // Assign the event handler to the confirm button
-    lv_btn_set_action(confirmBtn, LV_BTN_ACTION_CLICK, confirm_btn_action);
+    // Create the confirm button
+    lv_obj_t *confirmBtn = lv_btn_create(scr);
+    lv_obj_add_style(confirmBtn, &style_btn, LV_PART_MAIN);
+    lv_obj_set_size(confirmBtn, 120, 50);
+    lv_obj_align(confirmBtn, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
 
     // Add a label to the confirm button
-    lv_obj_t *confirmLabel = lv_label_create(confirmBtn, NULL);
+    lv_obj_t *confirmLabel = lv_label_create(confirmBtn);
     lv_label_set_text(confirmLabel, "Confirm");
-    lv_label_set_style(confirmLabel, &style_btn); 
 
-    return *confirmBtn;
+    return confirmBtn;
 }
 
-lv_obj_t editPortsButton(lv_obj_t *scr, lv_color_t color_scheme) { 
-    // Create a style for the confirm button
+lv_obj_t* editPortsButton(lv_obj_t *scr, lv_color_t color_scheme) { 
+    // Create a style for the button
     static lv_style_t style_btn;
-    lv_style_copy(&style_btn, &lv_style_btn_rel); // Copy a base button style to start with
-    style_btn.body.main_color = color_scheme; // Use the passed color
-    style_btn.body.grad_color = color_shade(color_scheme, -10); // Make the gradient slightly darker
-    style_btn.body.radius = 10; // Round the corners a bit
-    style_btn.text.color = LV_COLOR_WHITE; // White text on the button
-    style_btn.body.border.color = LV_COLOR_WHITE; // White border for cool effect
-    style_btn.body.border.width = 2; // Set the border width
-    style_btn.body.shadow.color = LV_COLOR_SILVER; // Shadow effect for cool look
-    style_btn.body.shadow.width = 5; // Set the shadow width
-    style_btn.text.font = &lv_font_dejavu_20; // Set the font for the text
+    lv_style_init(&style_btn);
+    lv_style_set_bg_color(&style_btn, color_scheme); // Use the passed color
+    lv_style_set_bg_grad_color(&style_btn, color_shade(color_scheme, -10)); // Make the gradient slightly darker
+    lv_style_set_radius(&style_btn, 10); // Round the corners a bit
+    lv_style_set_text_color(&style_btn, lv_color_white()); // White text on the button
+    lv_style_set_border_color(&style_btn, lv_color_white()); // White border for cool effect
+    lv_style_set_border_width(&style_btn, 2); // Set the border width
+    lv_style_set_shadow_color(&style_btn, lv_color_hex(0xC0C0C0)); // Shadow effect for cool look
+    lv_style_set_shadow_width(&style_btn, 5); // Set the shadow width
+    lv_style_set_text_font(&style_btn, &lv_font_montserrat_20); // Set the font for the text
 
-    // Create a style for the confirm button when it's pressed
+    // Create a style for the button when it's pressed
     static lv_style_t style_btn_pr;
-    lv_style_copy(&style_btn_pr, &style_btn); // Start with the released style
-    style_btn_pr.body.main_color = color_shade(color_scheme, -30); // Darker color for pressed state
-    style_btn_pr.body.grad_color = color_shade(color_scheme, -40); // Even darker for gradient
-    style_btn_pr.text.color = color_shade(color_scheme, 50); // Lighter color for the text
-    style_btn_pr.body.border.color = LV_COLOR_WHITE; // Keep the border color
-    style_btn_pr.body.shadow.width = 3; // Smaller shadow for a "pressed" effect
+    lv_style_init(&style_btn_pr);
+    lv_style_set_bg_color(&style_btn_pr, color_shade(color_scheme, -30)); // Darker color for pressed state
+    lv_style_set_bg_grad_color(&style_btn_pr, color_shade(color_scheme, -40)); // Even darker for gradient
+    lv_style_set_text_color(&style_btn_pr, color_shade(color_scheme, 50)); // Lighter color for the text
+    lv_style_set_border_color(&style_btn_pr, lv_color_white()); // Keep the border color
+    lv_style_set_shadow_width(&style_btn_pr, 3); // Smaller shadow for a "pressed" effect
 
-    // Confirm button setup
-    lv_obj_t *confirmBtn = lv_btn_create(scr, NULL);
-    lv_btn_set_style(confirmBtn, LV_BTN_STYLE_REL, &style_btn); // Apply the released style to the button
-    lv_btn_set_style(confirmBtn, LV_BTN_STYLE_PR, &style_btn_pr); // Apply the pressed style to the button
-    lv_obj_set_size(confirmBtn, 120, 50); // Set the button size
-    lv_obj_align(confirmBtn, scr, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10); // Align to the bottom-right with some margin
+    // Create the button
+    lv_obj_t *editBtn = lv_btn_create(scr);
+    lv_obj_add_style(editBtn, &style_btn, LV_PART_MAIN); // Apply the released style to the button
+    lv_obj_add_style(editBtn, &style_btn_pr, LV_PART_MAIN | LV_STATE_PRESSED); // Apply the pressed style to the button
+    lv_obj_set_size(editBtn, 120, 50); // Set the button size
+    lv_obj_align(editBtn, LV_ALIGN_BOTTOM_RIGHT, -140, -10); // Align to the bottom-right with some margin
 
-    // Assign the event handler to the confirm button
-    lv_btn_set_action(confirmBtn, LV_BTN_ACTION_CLICK, confirm_btn_action);
+    // Add a label to the button
+    lv_obj_t *editLabel = lv_label_create(editBtn);
+    lv_label_set_text(editLabel, "Edit Ports");
 
-    // Add a label to the confirm button
-    lv_obj_t *confirmLabel = lv_label_create(confirmBtn, NULL);
-    lv_label_set_text(confirmLabel, "Confirm");
-    lv_label_set_style(confirmLabel, &style_btn); 
-
-    return *confirmBtn;
+    return editBtn;
 }
 
 Gif* gifContainer(lv_obj_t *scr) {
     // Create an outer container for positioning
-    lv_obj_t *outer_gif_cont = lv_cont_create(scr, NULL);
+    lv_obj_t *outer_gif_cont = lv_obj_create(scr);
     lv_obj_set_size(outer_gif_cont, LV_HOR_RES / 1.6, LV_VER_RES / 1.55);
-    lv_obj_align(outer_gif_cont, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
+    lv_obj_align(outer_gif_cont, LV_ALIGN_TOP_RIGHT, -10, 10);
 
-    // Set the outer container's layout to off so its children can be freely moved
-    lv_cont_set_layout(outer_gif_cont, LV_LAYOUT_OFF);
-
-    // Now create and place the GIF inside the inner container
-    textGif = new Gif("/usd/2145shake.gif", outer_gif_cont); // The Gif class constructor takes the file path and parent object
+    // Create and place the GIF inside the container
+    textGif = new Gif("/usd/2145shake.gif", outer_gif_cont);
+    textGif->resume(); // Start playing the GIF
     return textGif;
 }
 
 void autonSelectorScreenInit(AutonFunction autonFunctions[], size_t autonCount, lv_color_t color_scheme) {
     chassisCalibrated = true;
     readSelectedAutonFromFile();
-    // Create a style for the screen
-    static lv_style_t style_scr;
-    lv_style_copy(&style_scr, &lv_style_plain); // Start with a plain style
-    style_scr.body.main_color = LV_COLOR_BLACK; // Set the main color to black
-    style_scr.body.grad_color = LV_COLOR_BLACK; // Set the gradient color to black as well for a solid fill
 
     // Create a screen object
-    lv_obj_t *scr = lv_obj_create(NULL, NULL);
-    lv_obj_set_style(scr, &style_scr); // Apply the style to the screen object
-    lv_scr_load(scr); // Load the screen
+    lv_obj_t *scr = lv_obj_create(NULL);
+    lv_scr_load(scr);
 
     autonList(scr, color_scheme, autonFunctions, autonCount);
     confirmButton(scr, color_scheme);
-
-    // Load the screen
-    lv_scr_load(scr);
 }
 
 void runSelectedAuton(AutonFunction autonFunctions[], size_t autonCount) {
-    if(selectedAuton >= 0 && selectedAuton < autonCount) {
+    if (selectedAuton >= 0 && selectedAuton < autonCount) {
         autonFunctions[selectedAuton].function();
-    } 
+    }
 }
-
-*/

@@ -2,6 +2,7 @@
 #include "EZ-Template/util.hpp"
 #include "main.h"
 #include "pros/rtos.hpp"
+#include "screen.hpp"
 #include "subsystems.hpp"
 
 // ** @file controls.cpp
@@ -13,8 +14,10 @@
 // @brief Initializes the robot's subsystems
 void initAll() {
     // Initializes the chassis and brain screen
+    //calibrationScreenInit();
     chassis.initialize();
-    ez::as::initialize();
+    default_constants();
+    //ez::as::initialize();
     // add more init functions when more subsystems are added
 }
 

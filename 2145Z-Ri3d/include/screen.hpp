@@ -7,9 +7,10 @@
 
 
 
-/*#pragma once
+#pragma once
 
 #include <string>
+#include "liblvgl/lvgl.h"
 
 struct AutonFunction {
     const char* name;
@@ -29,4 +30,4 @@ void calibrationScreen();
 void particlesjs();
 void calibrationScreenInit();
 void autonSelectorScreenInit(AutonFunction autonFunctions[], size_t autonCount, lv_color_t color_scheme);
-void runSelectedAuton(AutonFunction autonFunctions[], size_t autonCount); */
+void runSelectedAuton(AutonFunction autonFunctions[], size_t autonCount); 
