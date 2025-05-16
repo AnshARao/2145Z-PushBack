@@ -2,7 +2,6 @@
 #include "EZ-Template/util.hpp"
 #include "main.h"
 #include "pros/rtos.hpp"
-#include "screen.hpp"
 #include "subsystems.hpp"
 
 // ** @file controls.cpp
@@ -17,7 +16,7 @@ void initAll() {
     //calibrationScreenInit();
     chassis.initialize();
     default_constants();
-    //ez::as::initialize();
+    ez::as::initialize();
     // add more init functions when more subsystems are added
 }
 
@@ -80,6 +79,33 @@ void intake_t() {
     while (true) {
         control_intake();
         motor_intake.move_velocity(intake_vltg);
+        pros::delay(ez::util::DELAY_TIME);
+    }
+}
+#pragma endregion
+
+#pragma region rollers
+// @brief Sets the rollers voltage
+// @param vltg The voltage to set the rollers to
+// @details This function sets the voltage of the rollers motor to the specified value.
+void set_rollers(int vltg) { rollers_vltg = vltg; }
+
+// @brief Controls the rollers based on button presses
+// @details This function checks if the rollers button is pressed and sets the rollers motor to the max voltage.
+// If the outrollers button is pressed, it sets the rollers motor to the negative max voltage. If neither button is pressed, it sets the rollers motor to 0.
+// @note This function is called in a loop to continuously check for button presses and control the rollers motor accordingly.
+void control_rollers() {
+    if (isAuto) {return;}
+    else if (controlla.get_digital_new_press(BUTTON_ROLLERS)) {set_rollers(12000);}   
+    else if (controlla.get_digital_new_press(BUTTON_OUTROLLERS)) {set_rollers(-12000);}
+    else {set_rollers(0);}
+}
+
+void rollers_t() {
+    pros::delay(100);
+    while (true) {
+        control_rollers();
+        motor_rollers.move_velocity(rollers_vltg);
         pros::delay(ez::util::DELAY_TIME);
     }
 }

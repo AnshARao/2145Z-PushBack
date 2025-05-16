@@ -21,3 +21,12 @@ inline int intake_vltg = 0;
 void set_intake(int vltg);
 void control_intake();
 void intake_t();
+
+// declaring rollers variables
+inline int rollers_vltg = 0;
+
+// declaring rollers functions
+void set_rollers(int vltg);
+void control_rollers();
+void rollers_t();
+
