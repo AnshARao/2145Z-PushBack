@@ -10,6 +10,7 @@
 // ** @author Ansh Rao - 2145Z
 
 #pragma region global
+
 // @brief Initializes the robot's subsystems
 void initAll() {
     // Initializes the chassis and brain screen
@@ -105,7 +106,8 @@ void rollers_t() {
     pros::delay(100);
     while (true) {
         control_rollers();
-        motor_rollers.move_velocity(rollers_vltg);
+        motor_roller1.move_voltage(rollers_vltg);
+        motor_roller2.move_voltage(rollers_vltg);
         pros::delay(ez::util::DELAY_TIME);
     }
 }

@@ -11,7 +11,7 @@ inline bool isRed = true;
 inline bool isPto = false;
 
 // declaring global functions
-void default_constants();\
+void default_constants();
 void initAll();
 
 // declaring intake variables

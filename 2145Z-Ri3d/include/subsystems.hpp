@@ -2,13 +2,6 @@
 
 #include "EZ-Template/api.hpp"
 #include "api.h"
-#include "pros/adi.hpp"
-#include "pros/link.h"
-#include "pros/link.hpp"
-#include "pros/misc.h"
-#include "pros/motors.h"
-#include "pros/rotation.hpp"
-#include "subsystems.hpp"
 
 // ** @file subsystems.hpp
 // ** @brief This file contains the definitions and constructors for the robot's subsystems.
@@ -23,29 +16,24 @@
 #define PORT_RF 4
 #define PORT_RM 5
 #define PORT_RB 6
-// Defining pto drive motor ports
-/**
-#define PORT_LPTO 7
-#define PORT_RPTO 8
-*/
 
 // Defining subsystem motor ports
-#define PORT_INTAKE 7
-#define PORT_ROLLERS 8  //placeholder for future subsystem
+#define PORT_PREROLLER 7
+#define PORT_ROLLER1 8
+#define PORT_ROLLER2 9
 
 // Defining smartwire device ports
-#define PORT_IMU 9
-#define PORT_VEXNET 10
-#define PORT_ODOM_HORIZ 11
-#define PORT_ODOM_VERT 12
-#define PORT_DISTANCE 13
+#define PORT_IMU 10
+#define PORT_VEXNET 11
+#define PORT_ODOM_HORIZ 12
+#define PORT_ODOM_VERT 13
+#define PORT_OPTICAL 14
 
 // Defining three wire ports
-#define PORT_PTO 'A'
 
 // Defining robot constants
 #define DRIVE_DIAMETER 3.25
-#define DRIVE_RPM 600
+#define DRIVE_RPM 450
 #define ODOM_DIAMETER 2.125
 #define OFFSET_VERT 0
 #define OFFSET_HORI 0
@@ -73,26 +61,26 @@ inline pros::Motor motor_LB     (PORT_LB, pros::v5::MotorGears::blue);
 inline pros::Motor motor_RF     (PORT_RF, pros::v5::MotorGears::blue);
 inline pros::Motor motor_RM     (PORT_RM, pros::v5::MotorGears::blue);
 inline pros::Motor motor_RB     (PORT_RB, pros::v5::MotorGears::blue);
-//inline pros::Motor motor_LPTO   (PORT_LPTO, pros::v5::MotorGears::blue);
-//inline pros::Motor motor_RPTO   (PORT_RPTO, pros::v5::MotorGears::blue);
+
     
 // Drive motorgroup constructors
 inline pros::MotorGroup motorgroup_L({PORT_LF, PORT_LM, PORT_LB, /*PORT_LPTO*/});
 inline pros::MotorGroup motorgroup_R({PORT_RF, PORT_RM, PORT_RB, /*PORT_RPTO*/});
 
 // Subsystem motor constructors
-inline pros::Motor motor_intake     (PORT_INTAKE, pros::v5::MotorGears::blue);
-inline pros::Motor motor_rollers    (PORT_ROLLERS, pros::v5::MotorGears::blue);
+inline pros::Motor motor_intake     (PORT_PREROLLER, pros::v5::MotorGears::blue);
+inline pros::Motor motor_roller1    (PORT_ROLLER1, pros::v5::MotorGears::green);
+inline pros::Motor motor_roller2    (PORT_ROLLER2, pros::v5::MotorGears::green);
 
 // smartwire device constructors
-inline pros::Imu      imu       (PORT_IMU);
-inline pros::Link     vexnet    (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);  // This is the VEXnet radio
-inline pros::Rotation odom_horiz(PORT_ODOM_HORIZ);  // This is the horizontal tracking wheel
-inline pros::Rotation odom_vert (PORT_ODOM_VERT);   // This is the vertical tracking wheel
-inline pros::Distance distance_1(PORT_DISTANCE);  // This is the distance sensor
+inline pros::Imu      imu        (PORT_IMU);
+inline pros::Link     vexnet     (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);  // This is the VEXnet radio
+inline pros::Rotation odom_horiz (PORT_ODOM_HORIZ);  // This is the horizontal tracking wheel
+inline pros::Rotation odom_vert  (PORT_ODOM_VERT);   // This is the vertical tracking wheel
+inline pros::Distance opticalSort(PORT_OPTICAL);  // This is the distance sensor
 
 // three wire port constructors
-inline pros::adi::DigitalOut piston_pto(PORT_PTO);
+
 
 // Chassis constructor
 inline ez::Drive chassis(
@@ -107,7 +95,7 @@ inline ez::Drive chassis(
 //  - you should get positive values on the encoders going FORWARD and RIGHT
 // - `2.75` is the wheel diameter
 // - `4.0` is the distance from the center of the wheel to the center of the robot
- inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
- inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
+//inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
+//inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
 
 #pragma endregion

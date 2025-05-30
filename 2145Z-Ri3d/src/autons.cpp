@@ -1,26 +1,15 @@
 #include "main.h"
 
-// ** @file autons.cpp
-// ** @brief This file contains the autonomous functions for the robot.
-// ** @details This includes both competition and example/testing functions.
-// ** @author Ansh Rao - 2145Z
+/**
+ * @file main.cpp
+ * @brief This file contains the autonomous functions for the robot.
+ * @details This includes both competition and example/testing functions.* 
+ * @author Ansh Rao - 2145Z
+ */
 
-void doNothing() {}
+#pragma region example_autos
 
-void soloAwpLeft() {}
-
-void soloAwpRight() {}
-
-void leftRed() {}
-
-void leftBlue() {}
-
-void rightRed() {}
-
-void rightBlue() {}
-
-#pragma region Example Autos
-///
+//
 // Drive Example
 ///
 void drive_example() {
@@ -344,4 +333,5 @@ void measure_offsets() {
   if (chassis.odom_tracker_back != nullptr) chassis.odom_tracker_back->distance_to_center_set(b_offset);
   if (chassis.odom_tracker_front != nullptr) chassis.odom_tracker_front->distance_to_center_set(f_offset);
 }
+
 #pragma endregion

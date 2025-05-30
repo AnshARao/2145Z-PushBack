@@ -1,12 +1,18 @@
 #include "main.h"
 
-// ** @file main.cpp
-// ** @brief This file contains the main function and the initialization code for the robot.
-// ** @details This includes the initialization of the robot's subsystems and the main loop for the robot.
-// ** @author Ansh Rao - 2145Z
+/**
+ * @file main.cpp
+ * @brief This file contains the main function and the initialization code for the robot.
+ * @details It sets up the robot's subsystems, initializes them, and configures the autonomous selector.
+ * @author Ansh Rao - 2145Z
+ */
 
-
-/** Runs initialization code at program start.*/
+/**
+ * Runs initialization code. This occurs as soon as the program is started.
+ *
+ * All other competition modes are blocked by initialize; it is recommended
+ * to keep execution time for this mode under a few seconds.
+ */
 void initialize() {
   // Print our branding over your terminal :D
   ez::ez_template_print();
@@ -18,12 +24,7 @@ void initialize() {
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(0.0, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
-  // Set the drive to your own constants from autons.cpp!
   default_constants();
-
-  // These are already defaulted to these buttons, but you can change the left/right curve buttons here!
-  // chassis.opcontrol_curve_buttons_left_set(pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT);  // If using tank, only the left side is used.
-  // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
@@ -44,24 +45,44 @@ void initialize() {
   });
 
   // Initialize chassis and auton selector
-  initAll();
-
-  pros::Task intake_task(intake_t);  // Start the intake task
-
+  chassis.initialize();
+  ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
-/** Runs while the robot is disabled. Exits when enabled. */
+/**
+ * Runs while the robot is in the disabled state of Field Management System or
+ * the VEX Competition Switch, following either autonomous or opcontrol. When
+ * the robot is enabled, this task will exit.
+ */
 void disabled() {
   // . . .
 }
 
-/** Runs after initialize() and before autonomous in competition mode. */
+/**
+ * Runs after initialize(), and before autonomous when connected to the Field
+ * Management System or the VEX Competition Switch. This is intended for
+ * competition-specific initialization routines, such as an autonomous selector
+ * on the LCD.
+ *
+ * This task will exit when the robot is enabled and autonomous or opcontrol
+ * starts.
+ */
 void competition_initialize() {
   // . . .
 }
 
-/** Runs user autonomous code in its own task during autonomous mode. Stops if disabled or communication is lost. */
+/**
+ * Runs the user autonomous code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the autonomous
+ * mode. Alternatively, this function may be called in initialize or opcontrol
+ * for non-competition testing purposes.
+ *
+ * If the robot is disabled or communications is lost, the autonomous task
+ * will be stopped. Re-enabling the robot will restart the task, not re-start it
+ * from where it left off.
+ */
 void autonomous() {
   chassis.pid_targets_reset();                // Resets PID targets to 0
   chassis.drive_imu_reset();                  // Reset gyro position to 0
@@ -176,8 +197,17 @@ void ez_template_extras() {
 }
 
 /**
- * Runs operator control code when the robot is enabled in operator control mode.
- * Restarts if the robot is disabled or communication is lost.
+ * Runs the operator control code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the operator
+ * control mode.
+ *
+ * If no competition control is connected, this function will run immediately
+ * following initialize().
+ *
+ * If the robot is disabled or communications is lost, the
+ * operator control task will be stopped. Re-enabling the robot will restart the
+ * task, not resume it from where it left off.
  */
 void opcontrol() {
   // This is preference to what you like to drive on
@@ -188,14 +218,6 @@ void opcontrol() {
     ez_template_extras();
 
     chassis.opcontrol_tank();  // Tank control
-    // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
-    // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
-    // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
-    // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
-
-    // . . .
-    // Put more user control code here!
-    // . . .
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
