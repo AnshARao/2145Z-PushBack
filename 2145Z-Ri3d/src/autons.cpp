@@ -1,4 +1,4 @@
-#include "main.h"
+#include "main.h"  // IWYU pragma: keep
 
 /**
  * @file main.cpp
@@ -335,3 +335,4 @@ void measure_offsets() {
 }
 
 #pragma endregion
+

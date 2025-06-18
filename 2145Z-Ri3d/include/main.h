@@ -34,19 +34,21 @@
  */
 #define PROS_USE_LITERALS
 
-#include "api.h"
+#include "api.h"  // IWYU pragma: keep
 
 /**
  * You should add more #includes here
  */
 //#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
-#include "EZ-Template/api.hpp"
+#include "EZ-Template/api.hpp"  // IWYU pragma: keep
 
 // More includes here...
-#include "autons.hpp"
-#include "subsystems.hpp"
-#include "controls.hpp"
+#include "autons.hpp"  // IWYU pragma: keep
+#include "subsystems.hpp"  // IWYU pragma: keep   
+#include "controls.hpp"  // IWYU pragma: keep
+#include "driveAndScreen.hpp"  // IWYU pragma: keep
+
 
 
 /**

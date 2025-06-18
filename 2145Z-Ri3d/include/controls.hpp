@@ -6,27 +6,64 @@
 // ** @author Ansh Rao - 2145Z
 
 // declaring global variables
-inline bool isAuto = false;
-inline bool isRed = true;
-inline bool isPto = false;
+enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
+inline MatchStates matchState = DISABLED;
+enum Alliances {NONE = 0, RED = 1, BLUE = 2};
+inline Alliances allianceColor = NONE;
+
+inline bool ctrlLock = false;
 
 // declaring global functions
 void default_constants();
 void initAll();
 
-// declaring intake variables
-inline int intake_vltg = 0;
+// declaring roller variables
+inline int roller_front_vltg = 0;
+inline int roller_top_vltg = 0;
+inline int roller_back_vltg = 0;
 
-// declaring intake functions
-void set_intake(int vltg);
-void control_intake();
-void intake_t();
-
-// declaring rollers variables
-inline int rollers_vltg = 0;
-
-// declaring rollers functions
+// declaring roller functions
 void set_rollers(int vltg);
-void control_rollers();
-void rollers_t();
+void set_rollers(int frontAndBackVltg, int topVltg);
+void set_rollers(int frontVltg, int topVltg, int backVltg);
+void control_roller();
+void roller_t();
+
+//declaring color sort variables
+inline bool doColorSort = true;
+inline int colorSortTime = 0;
+inline const int MAXCOLORSORTTIME = 1000;  // 1 second
+inline bool doIntakeUntilTop = false;
+inline int intakeUntilTime = 0;  // Time to wait until the top block is detected
+inline const int MAXINTAKEUNTILTIME = 1000;  // 1 second
+
+// declaring color sort functions
+Alliances getTopBlockColor();
+Alliances getBottomBlockColor();
+bool rightBlockDetected(Alliances blockColor);
+bool wrongBlockDetected(Alliances blockColor);
+void colorSortLoop();
+void colorSort_t();
+
+// declaring misc variables
+inline bool loaderState = false;
+inline bool hoodState = false;
+inline bool ptoState = false;
+
+// declaring misc functions
+
+void setPto(bool state);
+void setPtoRpm(bool state);
+void controlPto();
+
+void setLoader(bool state);
+void controlLoader();
+
+void setHood(bool state);
+void controlHood();
+
+void misc_t();
+
+
+enum WaitTypes {WAIT_NONE = 0, WAIT_NORMAL = 1, WAIT_QUICK = 2, WAIT_CHAIN = 3};
 

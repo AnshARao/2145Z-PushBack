@@ -45,8 +45,14 @@ void initialize() {
   });
 
   // Initialize chassis and auton selector
-  chassis.initialize();
-  ez::as::initialize();
+    chassis.initialize();
+    default_constants();
+    ez::as::initialize();
+
+    pros::Task rollerTask(roller_t);
+    pros::Task colorSortTask(colorSort_t);
+    pros::Task miscTask(misc_t);
+
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -102,7 +108,7 @@ void autonomous() {
   You can do cool curved motions, but you have to give your robot the best chance
   to be consistent
   */
-
+  matchState = MatchStates::AUTO_PID;
   ez::as::auton_selector.selected_auton_call();  // Calls selected auton from autonomous selector
 }
 
@@ -210,6 +216,7 @@ void ez_template_extras() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+  matchState = MatchStates::DRIVER;  // Set the match state to driver
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
@@ -218,6 +225,7 @@ void opcontrol() {
     ez_template_extras();
 
     chassis.opcontrol_tank();  // Tank control
+    pros::lcd::print(1, "offset: %d", horiz_tracker.distance_to_center_get());
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

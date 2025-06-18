@@ -1,25 +1,14 @@
 #include "controls.hpp"
+#include <sys/types.h>
+#include <cstdlib>  // IWYU pragma: keep
 #include "EZ-Template/util.hpp"
-#include "main.h"
+#include "main.h"  // IWYU pragma: keep
 #include "pros/rtos.hpp"
-#include "subsystems.hpp"
 
 // ** @file controls.cpp
 // ** @brief This file contains the control functions for the robot.
 // ** @details This includes the driver and autonomous controls, as well as the tasks connecting both
 // ** @author Ansh Rao - 2145Z
-
-#pragma region global
-
-// @brief Initializes the robot's subsystems
-void initAll() {
-    // Initializes the chassis and brain screen
-    //calibrationScreenInit();
-    chassis.initialize();
-    default_constants();
-    ez::as::initialize();
-    // add more init functions when more subsystems are added
-}
 
 // @brief Sets the default constants for the robot, including PID constants, exit conditions, and slew rates
 void default_constants() {
@@ -56,59 +45,240 @@ void default_constants() {
   
     chassis.pid_angle_behavior_set(ez::shortest);  // Changes the default behavior for turning, this defaults it to the shortest path there
 }
-#pragma endregion
 
-#pragma region intake
-// @brief Sets the intake voltage
-// @param vltg The voltage to set the intake to
-// @details This function sets the voltage of the intake motor to the specified value.
-void set_intake(int vltg) { intake_vltg = vltg; }
+#pragma region roller
 
-// @brief Controls the intake based on button presses
-// @details This function checks if the intake button is pressed and sets the intake motor to the max voltage.
-// If the outtake button is pressed, it sets the intake motor to the negative max voltage. If neither button is pressed, it sets the intake motor to 0.
-// @note This function is called in a loop to continuously check for button presses and control the intake motor accordingly.
-void control_intake() {
-    if (isAuto) {return;}
-    else if (controlla.get_digital_new_press(BUTTON_INTAKE)) {set_intake(12000);}   
-    else if (controlla.get_digital_new_press(BUTTON_OUTTAKE)) {set_intake(-12000);}
-    else {set_intake(0);}
+void set_roller_front(int vltg) {
+    roller_front_vltg = vltg;
 }
 
-void intake_t() {
-    pros::delay(100);
-    while (true) {
-        control_intake();
-        motor_intake.move_velocity(intake_vltg);
-        pros::delay(ez::util::DELAY_TIME);
-    }
+void set_roller_top(int vltg) {
+    roller_top_vltg = vltg;
 }
-#pragma endregion
 
-#pragma region rollers
-// @brief Sets the rollers voltage
-// @param vltg The voltage to set the rollers to
-// @details This function sets the voltage of the rollers motor to the specified value.
-void set_rollers(int vltg) { rollers_vltg = vltg; }
+void set_roller_back(int vltg) {
+    roller_back_vltg = vltg;
+}
 
-// @brief Controls the rollers based on button presses
-// @details This function checks if the rollers button is pressed and sets the rollers motor to the max voltage.
-// If the outrollers button is pressed, it sets the rollers motor to the negative max voltage. If neither button is pressed, it sets the rollers motor to 0.
-// @note This function is called in a loop to continuously check for button presses and control the rollers motor accordingly.
-void control_rollers() {
-    if (isAuto) {return;}
-    else if (controlla.get_digital_new_press(BUTTON_ROLLERS)) {set_rollers(12000);}   
-    else if (controlla.get_digital_new_press(BUTTON_OUTROLLERS)) {set_rollers(-12000);}
+void set_rollers(int vltg) {
+    set_roller_front(vltg);
+    set_roller_top(vltg);
+    set_roller_back(vltg);
+}
+
+void set_rollers(int frontAndBackVltg, int topVltg) {
+    set_roller_front(frontAndBackVltg);
+    set_roller_top(topVltg);
+    set_roller_back(frontAndBackVltg);
+}
+
+void set_rollers(int frontVltg, int topVltg, int backVltg) {
+    set_roller_front(frontVltg);
+    set_roller_top(topVltg);
+    set_roller_back(backVltg);
+}
+
+void rollers_intake() {
+    set_rollers(12000, 12000, -12000);
+}
+
+void rollers_outtake() {
+    set_rollers(-12000);
+}
+
+void rollers_score_middle() {
+    set_rollers(12000, -12000);
+}
+
+void rollers_score_top() {
+    hoodState = false;
+    set_rollers(12000);
+}
+
+void control_roller() {
+    if (matchState != DRIVER) {return;}
+    if (ctrlLock /*&& !overridestate()*/) {return;}
+    if (controlla.get_digital(BUTTON_ROLLER)) {set_rollers(12000);}
+    else if (controlla.get_digital(BUTTON_OUTROLLER)) {set_rollers(-12000);}
+    else if (controlla.get_digital(BUTTON_ROLLER_CENTER)) {set_rollers(12000, -12000);}
+    else if (controlla.get_digital(BUTTON_ROLLER_PEZ)) {set_rollers(12000, 12000, -12000);}
     else {set_rollers(0);}
 }
 
-void rollers_t() {
-    pros::delay(100);
+void roller_t() {
+
+    motor_roller_front.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    motor_roller_top.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
     while (true) {
-        control_rollers();
-        motor_roller1.move_voltage(rollers_vltg);
-        motor_roller2.move_voltage(rollers_vltg);
+        control_roller();
+        motor_roller_front.move_voltage(roller_front_vltg);
+        motor_roller_top.move_voltage(roller_top_vltg);
+        motor_roller_back.move_voltage(roller_back_vltg);
         pros::delay(ez::util::DELAY_TIME);
     }
 }
+
 #pragma endregion
+
+#pragma region colorSort
+
+Alliances getTopBlockColor() {
+    if (optical_top.get_proximity() > 100) {
+        int topColor = optical_top.get_hue();
+        if (topColor >= 340 || topColor <= 20) {
+            return Alliances::RED;
+        } else if (topColor >= 210 && topColor <= 240) {
+            return Alliances::BLUE;
+        } else {
+            return Alliances::NONE;
+        }
+    }
+    return Alliances::NONE;
+}
+
+Alliances getBottomBlockColor() {
+    if (optical_top.get_proximity() > 100) {
+        int bottomColor = optical_bottom.get_hue();
+        if (bottomColor >= 340 && bottomColor <= 20) {
+            return Alliances::RED;
+        } else if (bottomColor >= 210 && bottomColor <= 240) {
+            return Alliances::BLUE;
+        } else {
+            return Alliances::NONE;
+        
+        }
+    }
+    return Alliances::NONE;
+}
+
+bool rightBlockDetected(Alliances blockColor) {
+    if (blockColor == Alliances::NONE) {return false;}
+    if (allianceColor == Alliances::RED && blockColor == Alliances::RED) {return true;}
+    else if (allianceColor == Alliances::BLUE && blockColor == Alliances::BLUE) {return true;}
+    return false;
+}
+
+bool wrongBlockDetected(Alliances blockColor) {
+    if (blockColor == Alliances::NONE) {return false;}
+    if (allianceColor == Alliances::RED && blockColor == Alliances::BLUE) {return true;}
+    else if (allianceColor == Alliances::BLUE && blockColor == Alliances::RED) {return true;}
+    return false;
+}
+
+void colorSortLoop() {
+    Alliances topBlockColor = getTopBlockColor();
+    Alliances bottomBlockColor = getBottomBlockColor();
+    if (matchState != MatchStates::DISABLED) {
+        int temp_roller_front_vltg = roller_front_vltg;
+        int temp_roller_top_vltg = roller_top_vltg;
+        int temp_roller_back_vltg = roller_back_vltg;
+        if (wrongBlockDetected(bottomBlockColor)) {
+            ctrlLock = true;  // Lock the controls
+            set_rollers(12000);
+            hoodState = true;
+            while (!rightBlockDetected(topBlockColor) && colorSortTime < MAXCOLORSORTTIME) {
+                pros::delay(ez::util::DELAY_TIME);
+                colorSortTime += ez::util::DELAY_TIME;
+            }
+            set_rollers(temp_roller_front_vltg, temp_roller_top_vltg, temp_roller_back_vltg);
+            ctrlLock = false;
+            colorSortTime = 0;  // Reset the color sort time
+        }
+        if (doIntakeUntilTop) {
+            while (!rightBlockDetected(topBlockColor) && intakeUntilTime < MAXINTAKEUNTILTIME) {
+                pros::delay(ez::util::DELAY_TIME);
+                intakeUntilTime += ez::util::DELAY_TIME;
+            }
+            doIntakeUntilTop = false;  // Reset the intake until top flag
+            intakeUntilTime = 0;  // Reset the intake until time
+            set_rollers(0);  // Stop the rollers
+        }
+    }
+}
+
+void colorSort_t() {
+
+    optical_bottom.set_integration_time(5);
+    optical_top.set_integration_time(5);
+    optical_bottom.set_led_pwm(100);
+    optical_top.set_led_pwm(100);
+
+    while (true) {
+        if (doColorSort) {
+            void colorSortLoop();
+        }
+        pros::delay(ez::util::DELAY_TIME);
+    }
+
+}
+
+#pragma endregion
+
+#pragma region pto
+
+void setPto(bool state) {
+    if (state == true) {
+        chassis.drive_rpm_set(90);
+    } else if (state == false) {
+        chassis.drive_rpm_set(DRIVE_RPM); //450rpm
+    }
+    ptoState = state;
+}
+
+void control_pto() {
+    if (matchState != MatchStates::DRIVER) {return;}
+    else if (controlla.get_digital_new_press(BUTTON_PTO)) {
+        ptoState = !ptoState;
+        setPto(ptoState);
+    }
+}
+
+#pragma endregion
+
+#pragma region loader
+void setLoader(bool state) {
+    loaderState = state;
+}
+
+void control_loader() {
+    if (matchState != MatchStates::DRIVER) {return;}
+    if (controlla.get_digital_new_press(BUTTON_LOADER)) {
+        loaderState = !loaderState;
+    }
+}
+
+#pragma endregion
+
+#pragma region hood
+
+void setHood(bool state) {
+    hoodState = state;
+}
+
+void control_hood() {
+    if (matchState != MatchStates::DRIVER) {return;}
+    if (controlla.get_digital_new_press(BUTTON_HOOD)) {
+        hoodState = !hoodState;
+    }
+    piston_hood.set_value(hoodState);
+}
+
+#pragma endregion
+
+void misc_t() {
+
+    piston_pto.set_value(false);
+    piston_hood.set_value(false);
+    piston_loader.set_value(false);
+
+    while (true) {
+        control_pto();
+        control_loader();
+        control_hood();
+        piston_hood.set_value(hoodState);
+        piston_loader.set_value(loaderState);
+        piston_pto.set_value(ptoState);
+        pros::delay(ez::util::DELAY_TIME);
+    }           }

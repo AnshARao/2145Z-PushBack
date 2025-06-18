@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <type_traits>
 #include "EZ-Template/api.hpp"
 #include "api.h"
 
@@ -10,26 +12,31 @@
 
 #pragma region constants
 // Defining drive motor ports
-#define PORT_LF 1
-#define PORT_LM 2
-#define PORT_LB 3
-#define PORT_RF 4
-#define PORT_RM 5
-#define PORT_RB 6
+#define PORT_LF 18
+#define PORT_LM -19
+#define PORT_LB 20
+#define PORT_RF 6
+#define PORT_RM 7
+#define PORT_RB -9
 
 // Defining subsystem motor ports
-#define PORT_PREROLLER 7
-#define PORT_ROLLER1 8
-#define PORT_ROLLER2 9
+#define PORT_ROLLER_FRONT -13
+#define PORT_ROLLER_TOP   1
+#define PORT_ROLLER_BACK  -2
 
 // Defining smartwire device ports
-#define PORT_IMU 10
-#define PORT_VEXNET 11
-#define PORT_ODOM_HORIZ 12
-#define PORT_ODOM_VERT 13
-#define PORT_OPTICAL 14
+#define PORT_IMU            3
+#define PORT_VEXNET         11
+#define PORT_ODOM_HORIZ     5
+#define PORT_ODOM_VERT      13
+#define PORT_OPTICAL_BOTTOM 14
+#define PORT_OPTICAL_TOP    15
 
 // Defining three wire ports
+#define PORT_PTO        'A'
+#define PORT_TRAPDOOR   'B'
+#define PORT_HOOD       'C'
+#define PORT_LOADER     'D'
 
 // Defining robot constants
 #define DRIVE_DIAMETER 3.25
@@ -42,10 +49,15 @@
 #define SWING_SPEED 110
 
 // Defining controller buttons
-#define BUTTON_INTAKE  pros::E_CONTROLLER_DIGITAL_L1
-#define BUTTON_OUTTAKE pros::E_CONTROLLER_DIGITAL_L2
-#define BUTTON_ROLLERS pros::E_CONTROLLER_DIGITAL_R1
-#define BUTTON_OUTROLLERS    pros::E_CONTROLLER_DIGITAL_R2
+#define BUTTON_ROLLER        pros::E_CONTROLLER_DIGITAL_L1
+#define BUTTON_OUTROLLER     pros::E_CONTROLLER_DIGITAL_L2
+#define BUTTON_ROLLER_CENTER pros::E_CONTROLLER_DIGITAL_R1
+#define BUTTON_ROLLER_PEZ    pros::E_CONTROLLER_DIGITAL_R2
+#define BUTTON_PTO           pros::E_CONTROLLER_DIGITAL_A
+#define BUTTON_TRAPDOOR      pros::E_CONTROLLER_DIGITAL_B
+#define BUTTON_HOOD          pros::E_CONTROLLER_DIGITAL_X
+#define BUTTON_LOADER        pros::E_CONTROLLER_DIGITAL_Y
+#define BUTTON_OVERRIDE      pros::E_CONTROLLER_DIGITAL_UP
 
 #pragma endregion
 
@@ -64,23 +76,27 @@ inline pros::Motor motor_RB     (PORT_RB, pros::v5::MotorGears::blue);
 
     
 // Drive motorgroup constructors
-inline pros::MotorGroup motorgroup_L({PORT_LF, PORT_LM, PORT_LB, /*PORT_LPTO*/});
-inline pros::MotorGroup motorgroup_R({PORT_RF, PORT_RM, PORT_RB, /*PORT_RPTO*/});
+inline pros::MotorGroup motorgroup_L({PORT_LF, PORT_LM, PORT_LB,});
+inline pros::MotorGroup motorgroup_R({PORT_RF, PORT_RM, PORT_RB,});
 
 // Subsystem motor constructors
-inline pros::Motor motor_intake     (PORT_PREROLLER, pros::v5::MotorGears::blue);
-inline pros::Motor motor_roller1    (PORT_ROLLER1, pros::v5::MotorGears::green);
-inline pros::Motor motor_roller2    (PORT_ROLLER2, pros::v5::MotorGears::green);
+inline pros::Motor motor_roller_front   (PORT_ROLLER_FRONT, pros::v5::MotorGears::green);
+inline pros::Motor motor_roller_top     (PORT_ROLLER_TOP, pros::v5::MotorGears::green);
+inline pros::Motor motor_roller_back    (PORT_ROLLER_BACK, pros::v5::MotorGears::blue);
 
 // smartwire device constructors
-inline pros::Imu      imu        (PORT_IMU);
-inline pros::Link     vexnet     (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);  // This is the VEXnet radio
-inline pros::Rotation odom_horiz (PORT_ODOM_HORIZ);  // This is the horizontal tracking wheel
-inline pros::Rotation odom_vert  (PORT_ODOM_VERT);   // This is the vertical tracking wheel
-inline pros::Distance opticalSort(PORT_OPTICAL);  // This is the distance sensor
+inline pros::Imu      imu               (PORT_IMU);
+inline pros::Link     vexnet            (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);  // This is the VEXnet radio
+inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);  // This is the horizontal tracking wheel
+inline pros::Rotation odom_vert         (PORT_ODOM_VERT);   // This is the vertical tracking wheel
+inline pros::Optical  optical_bottom    (PORT_OPTICAL_BOTTOM);  // This is the distance sensor
+inline pros::Optical  optical_top       (PORT_OPTICAL_TOP);  // This is the top optical sensor
 
 // three wire port constructors
-
+inline pros::adi::DigitalOut piston_trapdoor  (PORT_TRAPDOOR, false);
+inline pros::adi::DigitalOut piston_pto       (PORT_PTO, false);  // This is the PTO for the drive
+inline pros::adi::DigitalOut piston_hood      (PORT_HOOD, false);  // This is the hood for the intake
+inline pros::adi::DigitalOut piston_loader    (PORT_LOADER, false);  // This is the loader for the intake
 
 // Chassis constructor
 inline ez::Drive chassis(
@@ -95,7 +111,7 @@ inline ez::Drive chassis(
 //  - you should get positive values on the encoders going FORWARD and RIGHT
 // - `2.75` is the wheel diameter
 // - `4.0` is the distance from the center of the wheel to the center of the robot
-//inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
+inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
 //inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
 
 #pragma endregion
