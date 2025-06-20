@@ -15,6 +15,7 @@
  */
 void initialize() {
   // Print our branding over your terminal :D
+  allianceColor = Alliances::RED;  // TEMP
   ez::ez_template_print();
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
@@ -50,8 +51,8 @@ void initialize() {
     ez::as::initialize();
 
     pros::Task rollerTask(roller_t);
-    pros::Task colorSortTask(colorSort_t);
     pros::Task miscTask(misc_t);
+    pros::Task colorSortTask(colorSort_t);
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
@@ -225,7 +226,14 @@ void opcontrol() {
     ez_template_extras();
 
     chassis.opcontrol_tank();  // Tank control
-    pros::lcd::print(1, "offset: %d", horiz_tracker.distance_to_center_get());
+    pros::lcd::print(2, "bottom proximity: %d", optical_bottom.get_proximity());
+    pros::lcd::print(3, "bottom hue: %d", optical_bottom.get_hue());
+    pros::lcd::print(4, "top proximity: %d", optical_top.get_proximity());
+    pros::lcd::print(5, "top hue: %d", optical_top.get_hue());
+
+    if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+      hoodState = !hoodState;
+    }
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

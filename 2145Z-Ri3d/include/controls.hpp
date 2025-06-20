@@ -9,7 +9,7 @@
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
 inline MatchStates matchState = DISABLED;
 enum Alliances {NONE = 0, RED = 1, BLUE = 2};
-inline Alliances allianceColor = NONE;
+inline Alliances allianceColor = Alliances::RED;
 
 inline bool ctrlLock = false;
 
@@ -49,18 +49,22 @@ void colorSort_t();
 inline bool loaderState = false;
 inline bool hoodState = false;
 inline bool ptoState = false;
+inline bool trapdoorState = false;
 
 // declaring misc functions
 
 void setPto(bool state);
 void setPtoRpm(bool state);
-void controlPto();
+void control_pto();
+
+void setTrapdoor(bool state);
+void control_trapdoor();
 
 void setLoader(bool state);
-void controlLoader();
+void control_loader();
 
 void setHood(bool state);
-void controlHood();
+void control_hood();
 
 void misc_t();
 

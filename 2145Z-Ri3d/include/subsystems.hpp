@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <type_traits>
 #include "EZ-Template/api.hpp"
+#include "EZ-Template/piston.hpp"
 #include "api.h"
 
 // ** @file subsystems.hpp
@@ -31,11 +32,12 @@
 #define PORT_ODOM_VERT      13
 #define PORT_OPTICAL_BOTTOM 14
 #define PORT_OPTICAL_TOP    15
+#define PORT_EXPANDER       4
 
 // Defining three wire ports
-#define PORT_PTO        'A'
-#define PORT_TRAPDOOR   'B'
-#define PORT_HOOD       'C'
+#define PORT_PTO        'C'
+#define PORT_TRAPDOOR   'A'
+#define PORT_HOOD       'B'
 #define PORT_LOADER     'D'
 
 // Defining robot constants
@@ -93,10 +95,15 @@ inline pros::Optical  optical_bottom    (PORT_OPTICAL_BOTTOM);  // This is the d
 inline pros::Optical  optical_top       (PORT_OPTICAL_TOP);  // This is the top optical sensor
 
 // three wire port constructors
-inline pros::adi::DigitalOut piston_trapdoor  (PORT_TRAPDOOR, false);
-inline pros::adi::DigitalOut piston_pto       (PORT_PTO, false);  // This is the PTO for the drive
-inline pros::adi::DigitalOut piston_hood      (PORT_HOOD, false);  // This is the hood for the intake
-inline pros::adi::DigitalOut piston_loader    (PORT_LOADER, false);  // This is the loader for the intake
+//inline pros::adi::DigitalOut piston_trapdoor  ({PORT_EXPANDER, PORT_TRAPDOOR});
+//inline pros::adi::DigitalOut piston_pto       ({PORT_EXPANDER, PORT_PTO});  // This is the PTO for the drive
+//inline pros::adi::DigitalOut piston_hood      ({PORT_EXPANDER, PORT_HOOD});  // This is the hood for the intake
+//inline pros::adi::DigitalOut piston_loader    ({PORT_EXPANDER, PORT_LOADER});  // This is the loader for the intake
+
+inline ez::Piston piston_trapdoor (PORT_TRAPDOOR, PORT_EXPANDER);
+inline ez::Piston piston_hood     (PORT_HOOD, PORT_EXPANDER);
+inline ez::Piston piston_pto      (PORT_PTO, PORT_EXPANDER);
+inline ez::Piston piston_loader   (PORT_LOADER, PORT_EXPANDER);
 
 // Chassis constructor
 inline ez::Drive chassis(

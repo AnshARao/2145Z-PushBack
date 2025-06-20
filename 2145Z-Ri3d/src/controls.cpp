@@ -83,7 +83,7 @@ void rollers_intake() {
 }
 
 void rollers_outtake() {
-    set_rollers(-12000);
+    set_rollers(-12000, -12000, 12000);
 }
 
 void rollers_score_middle() {
@@ -95,7 +95,7 @@ void rollers_score_top() {
     set_rollers(12000);
 }
 
-void control_roller() {
+void control_roller_legacy() {
     if (matchState != DRIVER) {return;}
     if (ctrlLock /*&& !overridestate()*/) {return;}
     if (controlla.get_digital(BUTTON_ROLLER)) {set_rollers(12000);}
@@ -103,6 +103,22 @@ void control_roller() {
     else if (controlla.get_digital(BUTTON_ROLLER_CENTER)) {set_rollers(12000, -12000);}
     else if (controlla.get_digital(BUTTON_ROLLER_PEZ)) {set_rollers(12000, 12000, -12000);}
     else {set_rollers(0);}
+}
+
+void control_roller() {
+    if (matchState != MatchStates::DRIVER) {return;}
+    if (ctrlLock /*&& !overridestate()*/) {return;}
+    if (controlla.get_digital(BUTTON_ROLLER)) {
+        rollers_intake();
+    } else if (controlla.get_digital(BUTTON_OUTROLLER)) {
+        rollers_outtake();
+    } else if (controlla.get_digital(BUTTON_ROLLER_CENTER)) {
+        rollers_score_middle();
+    } else if (controlla.get_digital(BUTTON_ROLLER_PEZ)) {
+        rollers_score_top();
+    } else {
+        set_rollers(0);
+    }
 }
 
 void roller_t() {
@@ -116,6 +132,7 @@ void roller_t() {
         motor_roller_front.move_voltage(roller_front_vltg);
         motor_roller_top.move_voltage(roller_top_vltg);
         motor_roller_back.move_voltage(roller_back_vltg);
+        
         pros::delay(ez::util::DELAY_TIME);
     }
 }
@@ -125,7 +142,7 @@ void roller_t() {
 #pragma region colorSort
 
 Alliances getTopBlockColor() {
-    if (optical_top.get_proximity() > 100) {
+    if (optical_top.get_proximity() > 75) {
         int topColor = optical_top.get_hue();
         if (topColor >= 340 || topColor <= 20) {
             return Alliances::RED;
@@ -139,7 +156,7 @@ Alliances getTopBlockColor() {
 }
 
 Alliances getBottomBlockColor() {
-    if (optical_top.get_proximity() > 100) {
+    if (optical_bottom.get_proximity() > 75) {
         int bottomColor = optical_bottom.get_hue();
         if (bottomColor >= 340 && bottomColor <= 20) {
             return Alliances::RED;
@@ -176,14 +193,17 @@ void colorSortLoop() {
         int temp_roller_back_vltg = roller_back_vltg;
         if (wrongBlockDetected(bottomBlockColor)) {
             ctrlLock = true;  // Lock the controls
+            setTrapdoor(true);
             set_rollers(12000);
-            hoodState = true;
+            setHood(true);
             while (!rightBlockDetected(topBlockColor) && colorSortTime < MAXCOLORSORTTIME) {
                 pros::delay(ez::util::DELAY_TIME);
                 colorSortTime += ez::util::DELAY_TIME;
             }
             set_rollers(temp_roller_front_vltg, temp_roller_top_vltg, temp_roller_back_vltg);
             ctrlLock = false;
+            setTrapdoor(false);
+            setHood(false);
             colorSortTime = 0;  // Reset the color sort time
         }
         if (doIntakeUntilTop) {
@@ -200,14 +220,14 @@ void colorSortLoop() {
 
 void colorSort_t() {
 
-    optical_bottom.set_integration_time(5);
-    optical_top.set_integration_time(5);
+    optical_bottom.set_integration_time(3);
+    optical_top.set_integration_time(3);
     optical_bottom.set_led_pwm(100);
     optical_top.set_led_pwm(100);
 
     while (true) {
         if (doColorSort) {
-            void colorSortLoop();
+            colorSortLoop();
         }
         pros::delay(ez::util::DELAY_TIME);
     }
@@ -238,6 +258,7 @@ void control_pto() {
 #pragma endregion
 
 #pragma region loader
+
 void setLoader(bool state) {
     loaderState = state;
 }
@@ -246,6 +267,21 @@ void control_loader() {
     if (matchState != MatchStates::DRIVER) {return;}
     if (controlla.get_digital_new_press(BUTTON_LOADER)) {
         loaderState = !loaderState;
+    }
+}
+
+#pragma endregion
+
+#pragma region trapdoor
+
+void setTrapdoor(bool state) {
+    loaderState = state;
+}
+
+void control_trapdoor() {
+    if (matchState != MatchStates::DRIVER) {return;}
+    if (controlla.get_digital_new_press(BUTTON_TRAPDOOR)) {
+        trapdoorState = !trapdoorState;
     }
 }
 
@@ -262,23 +298,18 @@ void control_hood() {
     if (controlla.get_digital_new_press(BUTTON_HOOD)) {
         hoodState = !hoodState;
     }
-    piston_hood.set_value(hoodState);
 }
 
 #pragma endregion
 
 void misc_t() {
 
-    piston_pto.set_value(false);
-    piston_hood.set_value(false);
-    piston_loader.set_value(false);
-
     while (true) {
         control_pto();
         control_loader();
         control_hood();
-        piston_hood.set_value(hoodState);
-        piston_loader.set_value(loaderState);
-        piston_pto.set_value(ptoState);
+        piston_hood.set(hoodState);
+        piston_loader.set(loaderState);
+        piston_pto.set(ptoState);
         pros::delay(ez::util::DELAY_TIME);
     }           }
