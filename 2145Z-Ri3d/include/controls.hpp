@@ -1,4 +1,5 @@
 #pragma once
+#include "liblvgl/lvgl.h"
 
 // ** @file controls.hpp
 // ** @brief This file contains the function headers for the robot's controls.
@@ -8,8 +9,8 @@
 // declaring global variables
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
 inline MatchStates matchState = DISABLED;
-enum Alliances {NONE = 0, RED = 1, BLUE = 2};
-inline Alliances allianceColor = Alliances::RED;
+enum Alliances {BLUE = 0, NONE = 1, RED = 2};
+inline Alliances allianceColor = Alliances::NONE;
 
 inline bool ctrlLock = false;
 
@@ -27,6 +28,13 @@ void set_rollers(int vltg);
 void set_rollers(int frontAndBackVltg, int topVltg);
 void set_rollers(int frontVltg, int topVltg, int backVltg);
 void control_roller();
+void set_roller_front(int vltg);
+void set_roller_top(int vltg);
+void set_roller_back(int vltg);
+void rollers_intake();
+void rollers_outtake();
+void rollers_score_middle();
+void rollers_score_top();
 void roller_t();
 
 //declaring color sort variables
@@ -44,6 +52,7 @@ bool rightBlockDetected(Alliances blockColor);
 bool wrongBlockDetected(Alliances blockColor);
 void colorSortLoop();
 void colorSort_t();
+void colorSet(Alliances color, lv_obj_t* object);
 
 // declaring misc variables
 inline bool loaderState = false;

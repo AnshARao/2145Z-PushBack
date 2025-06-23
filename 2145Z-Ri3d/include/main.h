@@ -47,7 +47,9 @@
 #include "autons.hpp"  // IWYU pragma: keep
 #include "subsystems.hpp"  // IWYU pragma: keep   
 #include "controls.hpp"  // IWYU pragma: keep
-#include "driveAndScreen.hpp"  // IWYU pragma: keep
+#include "drive.hpp"  // IWYU pragma: keep
+#include "screen.hpp"  // IWYU pragma: keep
+#include "liblvgl/lvgl.h"
 
 
 

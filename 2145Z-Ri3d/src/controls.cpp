@@ -4,6 +4,7 @@
 #include "EZ-Template/util.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "pros/rtos.hpp"
+#include "screen.hpp"
 
 // ** @file controls.cpp
 // ** @brief This file contains the control functions for the robot.
@@ -158,7 +159,7 @@ Alliances getTopBlockColor() {
 Alliances getBottomBlockColor() {
     if (optical_bottom.get_proximity() > 75) {
         int bottomColor = optical_bottom.get_hue();
-        if (bottomColor >= 340 && bottomColor <= 20) {
+        if (bottomColor >= 340 || bottomColor <= 20) {
             return Alliances::RED;
         } else if (bottomColor >= 210 && bottomColor <= 240) {
             return Alliances::BLUE;
@@ -187,6 +188,7 @@ bool wrongBlockDetected(Alliances blockColor) {
 void colorSortLoop() {
     Alliances topBlockColor = getTopBlockColor();
     Alliances bottomBlockColor = getBottomBlockColor();
+    colorSet( bottomBlockColor, colorInd);
     if (matchState != MatchStates::DISABLED) {
         int temp_roller_front_vltg = roller_front_vltg;
         int temp_roller_top_vltg = roller_top_vltg;

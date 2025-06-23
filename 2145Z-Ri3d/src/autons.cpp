@@ -1,4 +1,8 @@
+#include "controls.hpp"
+#include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
+#include "pros/motors.h"
+#include "subsystems.hpp"
 
 /**
  * @file main.cpp
@@ -295,7 +299,7 @@ void measure_offsets() {
     chassis.pid_targets_reset();
     chassis.drive_imu_reset();
     chassis.drive_sensor_reset();
-    chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
+    chassis.drive_brake_set(pros::E_MOTOR_BRAKE_HOLD);
     chassis.odom_xyt_set(0_in, 0_in, 0_deg);
     double imu_start = chassis.odom_theta_get();
     double target = i % 2 == 0 ? 90 : 270;  // Switch the turn target every run from 270 to 90
@@ -336,3 +340,79 @@ void measure_offsets() {
 
 #pragma endregion
 
+void move_forward() {
+  setPosition(72,20,0);
+  driveSet(24, 127);
+}
+
+void left9() {
+  setPosition(68, 20, -45);
+  driveSet(60, DRIVE_SPEED);
+  pidWaitUntil(50);
+  rollers_intake();
+  setLoader(true);
+  pidWait(WAIT);
+  driveSet(-24, DRIVE_SPEED);
+  pidWait(QUICK);
+  turnSet(45, TURN_SPEED);
+  pidWait(WAIT);
+  setLoader(false);
+  driveSet(24, DRIVE_SPEED);
+  rollers_score_middle();
+  delayMillis(2000);
+  driveSet(-52, DRIVE_SPEED);
+  pidWait(QUICK);
+  turnSet(180, TURN_SPEED);
+  setLoader(true);
+  pidWait(QUICK);
+  driveSet(20, DRIVE_SPEED);
+  pidWait(QUICK);
+  delayMillis(1500);
+  driveSet(-20, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(0, TURN_SPEED);
+  pidWait(WAIT);
+  driveSet(20, DRIVE_SPEED);
+  pidWait(QUICK);
+}
+
+void right9() {
+    setPosition(80, 20, 45);
+  driveSet(60, DRIVE_SPEED);
+  pidWaitUntil(50);
+  rollers_intake();
+  setLoader(true);
+  pidWait(WAIT);
+  driveSet(-24, DRIVE_SPEED);
+  pidWait(QUICK);
+  turnSet(-45, TURN_SPEED);
+  pidWait(WAIT);
+  setLoader(false);
+  driveSet(24, DRIVE_SPEED);
+  rollers_score_middle();
+  delayMillis(2000);
+  driveSet(-52, DRIVE_SPEED);
+  pidWait(QUICK);
+  turnSet(180, TURN_SPEED);
+  setLoader(true);
+  pidWait(QUICK);
+  driveSet(20, DRIVE_SPEED);
+  pidWait(QUICK);
+  delayMillis(1500);
+  driveSet(-20, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(0, TURN_SPEED);
+  pidWait(WAIT);
+  driveSet(20, DRIVE_SPEED);
+  pidWait(QUICK);
+}
+
+void sawpLeft() {
+  setPosition(68, 20, -45);
+  driveSet(60, DRIVE_SPEED);
+}
+
+void sawpRight() {
+  setPosition(82, 20, 45);
+  driveSet(60, DRIVE_SPEED);
+}
