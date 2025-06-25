@@ -24,3 +24,4 @@ void left9();
 void right9();
 void sawpLeft();
 void sawpRight();
+void skills();

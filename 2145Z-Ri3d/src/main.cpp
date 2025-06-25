@@ -34,12 +34,13 @@ void initialize() {
 
     auton_sel.selector_populate({
       {sawpLeft, "Sawp Left", "Solo Awp Left", red},
-      {sawpRight, "Sawp Right", "Solo Awp Right", blue},
-      {left9, "Left 9", "Elims 9 ball Left", pink},
+      {sawpRight, "Sawp Right", "Solo Awp Right", orange},
+      {left9, "Left 9", "Elims 9 ball Left", yellow},
       {right9, "Right 9", "Elims 9 ball Right", green},
-      {move_forward, "Move Forward", "Move Forward", gray},
-      {move_forward1, "Move Forward 1", "Move Forward 1", gray},
-      {move_forward2, "Move Forward 2", "Move Forward 2", gray},
+      {move_forward, "Move Forward", "Move Forward", blue},
+      {move_forward1, "Move Forward 1", "Move Forward 1", purple},
+      {move_forward2, "Move Forward 2", "Move Forward 2", pink},
+      {skills, "Skills", "Skills Challenge", black},
     });
 
     chassis.initialize();

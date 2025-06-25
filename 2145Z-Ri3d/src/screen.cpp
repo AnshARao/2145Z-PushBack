@@ -1,8 +1,15 @@
 #include <cstddef>
+#include "autons.hpp"
 #include "controls.hpp"
 #include "liblvgl/core/lv_obj.h"
+#include "liblvgl/core/lv_obj_pos.h"
 #include "liblvgl/core/lv_obj_style.h"
+#include "liblvgl/font/lv_font.h"
+#include "liblvgl/font/lv_symbol_def.h"
+#include "liblvgl/misc/lv_area.h"
+#include "liblvgl/widgets/lv_img.h"
 #include "main.h"  // IWYU pragma: keep
+#include "screen.hpp"
 
 /**
  * @file screen.cpp
@@ -19,6 +26,7 @@
 //
 
 lv_obj_t* autoSelector = lv_obj_create(NULL);
+lv_obj_t* logoImg = lv_img_create(autoSelector);
 lv_obj_t* colorInd = lv_obj_create(autoSelector);
 lv_obj_t* colorOverlay = lv_img_create(autoSelector);
 lv_obj_t* allianceInd = lv_obj_create(autoSelector);
@@ -40,6 +48,7 @@ LV_IMG_DECLARE(colorindOverlay);
 LV_IMG_DECLARE(pfp2145);
 LV_IMG_DECLARE(matchField);
 LV_IMG_DECLARE(skillsField);
+LV_IMG_DECLARE(logo);
 
 // // // // // // Tasks & Non-UI // // // // // //
 
@@ -108,6 +117,7 @@ void pathViewerTask() {
 			pros::delay(1000);
 			resetViewer(false);
 		}
+		
 		pros::delay(10);
 	}
 }
@@ -196,6 +206,12 @@ static void selectAuton(lv_event_t* e) {
 	//lv_obj_set_style_img_recolor(colorOverlay, lv_color_darken((*getAuton).color, 80), LV_PART_MAIN);
 	//lv_obj_set_style_img_recolor(allianceOverlay, lv_color_darken((*getAuton).color, 80), LV_PART_MAIN);
 	auton_sel.selector_callback = (*getAuton).callback;
+	// Set currentField based on selected auton
+	if ((*getAuton).callback.target<void(*)()>() && *(*getAuton).callback.target<void(*)()>() == skills) {
+		currentField = Fields::SKILLS;
+	} else {
+		currentField = Fields::MATCH;
+	}
 	resetViewer(true);
 }
 
@@ -234,21 +250,16 @@ static void colorEvent(lv_event_t* e) {
 	resetViewer(true);
 }
 
-static void fieldEvent(lv_event_t* e) {
-	currentField = (Fields)(((int)currentField + 1) % 2);
-	resetViewer(true);
-}
-
 lv_event_cb_t SelectAuton = selectAuton;
 lv_event_cb_t AutonUpEvent = autonUpEvent;
 lv_event_cb_t AutonDownEvent = autonDownEvent;
 lv_event_cb_t AngleCheckEvent = angleCheckEvent;
 lv_event_cb_t PauseEvent = pauseEvent;
 lv_event_cb_t ColorEvent = colorEvent;
-lv_event_cb_t FieldEvent = fieldEvent;
 
 void autoSelectorInit() {
 	// Add base styles
+	
 	lv_obj_add_style(autonTable, &pushback, LV_PART_MAIN);
 	lv_obj_add_style(autonTable, &pushback, LV_PART_ITEMS);
 	lv_obj_set_style_transform_angle(autonTable, 0, LV_PART_MAIN);  
@@ -261,33 +272,36 @@ void autoSelectorInit() {
 	lv_img_set_src(autonField, &matchField);
 	lv_img_set_angle(autonField, 900);
 	lv_img_set_src(autonRobot, &pfp2145);
-	lv_label_set_text(autonUp, LV_SYMBOL_UP "\n" LV_SYMBOL_UP "\n" LV_SYMBOL_UP "\n" LV_SYMBOL_UP "\n" LV_SYMBOL_UP);
-	lv_label_set_text(autonDown, LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN "\n" LV_SYMBOL_DOWN);
+	lv_img_set_src(logoImg, &logo);
+	lv_img_set_angle(logoImg, 900);
+	lv_label_set_text(autonUp, LV_SYMBOL_RIGHT LV_SYMBOL_RIGHT LV_SYMBOL_RIGHT);
+	lv_label_set_text(autonDown, LV_SYMBOL_LEFT LV_SYMBOL_LEFT LV_SYMBOL_LEFT);
 
 	// Set flags
 	lv_obj_add_flag(autonUp, LV_OBJ_FLAG_CLICKABLE);
 	lv_obj_add_flag(autonDown, LV_OBJ_FLAG_CLICKABLE);
 	lv_obj_add_flag(autonField, LV_OBJ_FLAG_CLICKABLE);
 	lv_obj_add_flag(allianceInd, LV_OBJ_FLAG_CLICKABLE);
-	 lv_obj_add_flag(colorInd, LV_OBJ_FLAG_CLICKABLE);
+	lv_obj_add_flag(colorInd, LV_OBJ_FLAG_CLICKABLE);
 	lv_obj_add_flag(allianceOverlay, LV_OBJ_FLAG_CLICKABLE);
 	lv_obj_add_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
 
 	// Set sizes of objects
-	lv_obj_set_size(autonTable, 160, 206);
+	lv_obj_set_size(logoImg, 51, 51);
+	lv_obj_set_size(autonTable, 160, 220);
 	lv_obj_set_size(autonField, 240, 240);
 
 	// Align and set positions of objects
+	lv_obj_set_pos(logoImg, 173, 5);
 	lv_obj_align(autonTable, LV_ALIGN_LEFT_MID, 5, 0);
 	lv_obj_align(autonField, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
-	lv_obj_align(autonUp, LV_ALIGN_CENTER, -64, -75);
-	lv_obj_align(autonDown, LV_ALIGN_CENTER, -64, 75);
+	lv_obj_align(autonUp, LV_ALIGN_CENTER, -40, 69);
+	lv_obj_align(autonDown, LV_ALIGN_CENTER, -40, 98);
 
 	// Modify styles
 
 	lv_obj_set_style_text_opa(autonUp, 128, LV_STATE_PRESSED);
-	lv_obj_set_style_text_opa(autonDown, 128, 
-		LV_STATE_PRESSED);
+	lv_obj_set_style_text_opa(autonDown, 128, LV_STATE_PRESSED);
 	lv_obj_set_style_bg_opa(autonRobot, 0, LV_PART_MAIN);
 
 	lv_obj_set_style_outline_width(autonTable, 1, LV_PART_ITEMS);
@@ -296,8 +310,8 @@ void autoSelectorInit() {
 	lv_obj_set_style_outline_width(autonUp, 0, LV_PART_MAIN);
 	lv_obj_set_style_outline_width(autonDown, 0, LV_PART_MAIN);
 
-	lv_obj_set_style_text_font(autonUp, &lv_font_montserrat_16, LV_PART_MAIN);
-	lv_obj_set_style_text_font(autonDown, &lv_font_montserrat_16, LV_PART_MAIN);
+	lv_obj_set_style_text_font(autonUp, &lv_font_montserrat_24, LV_PART_MAIN);
+	lv_obj_set_style_text_font(autonDown, &lv_font_montserrat_24, LV_PART_MAIN);
 	lv_obj_set_style_text_line_space(autonUp, -12, LV_PART_MAIN);
 	lv_obj_set_style_text_line_space(autonDown, -12, LV_PART_MAIN);
 	lv_obj_set_style_pad_hor(autonTable, 0, LV_PART_MAIN);
@@ -310,13 +324,12 @@ void autoSelectorInit() {
 	lv_obj_add_event_cb(autonField, AngleCheckEvent, LV_EVENT_SHORT_CLICKED, NULL);
 	lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_CLICKED, NULL);
 	lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_PRESSING, NULL);
-lv_obj_add_event_cb(allianceInd, colorEvent, LV_EVENT_CLICKED, NULL);
+	lv_obj_add_event_cb(allianceInd, colorEvent, LV_EVENT_CLICKED, NULL);
 	lv_obj_add_event_cb(allianceOverlay, colorEvent, LV_EVENT_CLICKED, NULL);
-	 lv_obj_add_event_cb(colorInd, FieldEvent, LV_EVENT_CLICKED, NULL);
 
 	// Set up list
 	for(int i = 0; i < auton_sel.autons.size(); i++) {
-		lv_obj_t* new_auto = lv_list_add_btn(autonTable, NULL, (auton_sel.autons[i].name).c_str());
+		lv_obj_t* new_auto = lv_list_add_btn(autonTable, NULL, (" " + auton_sel.autons[i].name).c_str());
 		lv_obj_add_style(new_auto, &pushback, LV_PART_MAIN);
 		lv_obj_set_style_text_font(new_auto, &pros_font_dejavu_mono_18, LV_PART_MAIN);
 		lv_obj_set_style_bg_color(new_auto, auton_sel.autons[i].color, LV_PART_MAIN);
@@ -325,7 +338,7 @@ lv_obj_add_event_cb(allianceInd, colorEvent, LV_EVENT_CLICKED, NULL);
 		lv_obj_set_style_outline_width(new_auto, 6, LV_STATE_PRESSED);
 		lv_obj_set_style_bg_opa(new_auto, 220, LV_STATE_CHECKED);
 		lv_obj_set_style_bg_opa(new_auto, 180, LV_STATE_PRESSED);
-		lv_obj_set_style_pad_hor(new_auto, 8, LV_PART_MAIN);
+		lv_obj_set_style_pad_hor(new_auto, 0, LV_PART_MAIN);
 		lv_obj_add_event_cb(new_auto, SelectAuton, LV_EVENT_CLICKED, &auton_sel.autons[i]);
 	}
 }

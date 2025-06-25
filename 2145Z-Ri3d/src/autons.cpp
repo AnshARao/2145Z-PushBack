@@ -2,6 +2,7 @@
 #include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "pros/motors.h"
+#include "screen.hpp"
 #include "subsystems.hpp"
 
 /**
@@ -356,7 +357,7 @@ void move_forward2() {
 }
 
 void left9() {
-  setPosition(68, 20, -45);
+  allianceColor == Alliances::BLUE ? setPosition(46, -36, -45) : setPosition(76, 36, 135);
   driveSet(60, DRIVE_SPEED);
   pidWaitUntil(50);
   rollers_intake();
@@ -425,4 +426,9 @@ void sawpLeft() {
 void sawpRight() {
   setPosition(82, 20, 45);
   driveSet(60, DRIVE_SPEED);
+}
+
+void skills () {
+  setPosition(0,0,0);
+  driveSet(24, DRIVE_SPEED);
 }
