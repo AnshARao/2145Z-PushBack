@@ -18,6 +18,8 @@ void odom_boomerang_injected_pure_pursuit_example();
 void measure_offsets();
 
 void move_forward();
+void move_forward1();
+void move_forward2();
 void left9();
 void right9();
 void sawpLeft();

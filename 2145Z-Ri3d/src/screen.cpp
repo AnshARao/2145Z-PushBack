@@ -1,4 +1,7 @@
+#include <cstddef>
 #include "controls.hpp"
+#include "liblvgl/core/lv_obj.h"
+#include "liblvgl/core/lv_obj_style.h"
 #include "main.h"  // IWYU pragma: keep
 
 /**
@@ -248,8 +251,7 @@ void autoSelectorInit() {
 	// Add base styles
 	lv_obj_add_style(autonTable, &pushback, LV_PART_MAIN);
 	lv_obj_add_style(autonTable, &pushback, LV_PART_ITEMS);
-	lv_obj_set_style_transform_angle(autonTable, 0, LV_PART_MAIN);
-	lv_obj_set_style_transform_angle(autonTable, 0, LV_PART_ITEMS);
+	lv_obj_set_style_transform_angle(autonTable, 0, LV_PART_MAIN);  
 	lv_obj_add_style(autonField, &pushback, LV_PART_MAIN);
 	lv_obj_add_style(autonRobot, &pushback, LV_PART_MAIN);
 	lv_obj_add_style(autonUp, &pushback, LV_PART_MAIN);
@@ -317,7 +319,7 @@ lv_obj_add_event_cb(allianceInd, colorEvent, LV_EVENT_CLICKED, NULL);
 		lv_obj_t* new_auto = lv_list_add_btn(autonTable, NULL, (auton_sel.autons[i].name).c_str());
 		lv_obj_add_style(new_auto, &pushback, LV_PART_MAIN);
 		lv_obj_set_style_text_font(new_auto, &pros_font_dejavu_mono_18, LV_PART_MAIN);
-		lv_obj_set_style_bg_color(new_auto, lv_color_darken(auton_sel.autons[i].color, 80), LV_PART_MAIN);
+		lv_obj_set_style_bg_color(new_auto, auton_sel.autons[i].color, LV_PART_MAIN);
 		lv_obj_set_style_outline_width(new_auto, 1, LV_PART_MAIN);
 		lv_obj_set_style_outline_width(new_auto, 4, LV_STATE_CHECKED);
 		lv_obj_set_style_outline_width(new_auto, 6, LV_STATE_PRESSED);

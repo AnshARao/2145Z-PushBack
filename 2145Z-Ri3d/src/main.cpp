@@ -38,6 +38,8 @@ void initialize() {
       {left9, "Left 9", "Elims 9 ball Left", pink},
       {right9, "Right 9", "Elims 9 ball Right", green},
       {move_forward, "Move Forward", "Move Forward", gray},
+      {move_forward1, "Move Forward 1", "Move Forward 1", gray},
+      {move_forward2, "Move Forward 2", "Move Forward 2", gray},
     });
 
     chassis.initialize();

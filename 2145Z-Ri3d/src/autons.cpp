@@ -345,6 +345,16 @@ void move_forward() {
   driveSet(24, 127);
 }
 
+void move_forward1() {
+  setPosition(72,20,0);
+  driveSet(24, 127);
+}
+
+void move_forward2() {
+  setPosition(72,20,0);
+  driveSet(24, 127);
+}
+
 void left9() {
   setPosition(68, 20, -45);
   driveSet(60, DRIVE_SPEED);

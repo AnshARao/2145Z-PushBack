@@ -19,7 +19,6 @@ const lv_color32_t gray = lv_color_hex(0x575757);
 const lv_color32_t black = lv_color_hex(0x000000);
 const lv_color32_t white = lv_color_hex(0xffffff);
 
-
 enum Fields {MATCH = 1, SKILLS = 2};
 inline int currentField = Fields::MATCH;
 
