@@ -13,17 +13,17 @@
 
 #pragma region constants
 // Defining drive motor ports
-#define PORT_LF 18
+#define PORT_LF -18
 #define PORT_LM -19
 #define PORT_LB 20
-#define PORT_RF 6
+#define PORT_RF -6
 #define PORT_RM 7
 #define PORT_RB -9
 
 // Defining subsystem motor ports
-#define PORT_ROLLER_FRONT -13
-#define PORT_ROLLER_TOP   1
-#define PORT_ROLLER_BACK  -2
+#define PORT_ROLLER_FRONT 1
+#define PORT_ROLLER_TOP   2
+#define PORT_ROLLER_BACK  13
 
 // Defining smartwire device ports
 #define PORT_IMU            3
@@ -35,10 +35,10 @@
 #define PORT_EXPANDER       4
 
 // Defining three wire ports
-#define PORT_PTO        'C'
-#define PORT_TRAPDOOR   'A'
-#define PORT_HOOD       'B'
-#define PORT_LOADER     'D'
+#define PORT_PTO        3
+#define PORT_TRAPDOOR   1
+#define PORT_HOOD       2
+#define PORT_LOADER     4
 
 // Defining robot constants
 #define DRIVE_DIAMETER 2.75
@@ -50,6 +50,8 @@
 #define DRIVE_SPEED 110
 #define TURN_SPEED 90
 #define SWING_SPEED 110
+#define DRIVE_CURVE_THROTTLE 0.0
+#define DRIVE_CURVE_TURN     0.0
 
 // Defining controller buttons
 #define BUTTON_ROLLER        pros::E_CONTROLLER_DIGITAL_L1

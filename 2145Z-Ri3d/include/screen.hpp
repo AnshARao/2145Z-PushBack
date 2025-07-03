@@ -28,16 +28,15 @@ void pathViewerTask();
 
 class AutonObj {
     public:
-        function<void()> callback = move_forward;
+        function<void()> callback = doNothing;
         string name = "no name";
-        string desc = "no description";
-        lv_color32_t color = theme_color;
+        lv_color32_t color = pink;
 };
 
 class AutonSel {
     public:
         vector<AutonObj> autons = {};
-        function<void()> selector_callback = move_forward;
+        function<void()> selector_callback = doNothing;
         void selector_populate(vector<AutonObj> auton_list);
 };
 
@@ -47,8 +46,23 @@ extern AutonSel auton_sel;
 // Main UI
 extern lv_obj_t* colorInd;
 extern lv_obj_t* autoSelector;
+extern lv_obj_t* autonTable;
+extern lv_obj_t* autonField;
+extern lv_obj_t* autonRobot;
+extern lv_obj_t* autonUp;
+extern lv_obj_t* autonDown;
+extern lv_obj_t* logoImg;
+extern lv_obj_t* console_container;
+extern lv_obj_t* console_label;
+extern lv_obj_t* angleViewer;
+extern lv_obj_t* angleText;
+extern lv_obj_t* allianceInd;
+extern lv_obj_t* allianceOverlay;
+
 
 void uiInit();
 
 // Auton Selector UI
 void autoSelectorInit();
+
+void print(const std::string& msg);

@@ -1,5 +1,9 @@
 #include "main.h"
 #include "autons.hpp"
+#include "controls.hpp"
+#include "liblvgl/core/lv_obj.h"
+#include "liblvgl/core/lv_obj_style.h"
+#include "liblvgl/widgets/lv_label.h"
 #include "pros/rtos.h"
 #include "screen.hpp"
 
@@ -24,23 +28,23 @@ void initialize() {
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
-  chassis.opcontrol_curve_default_set(0.0, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
+  chassis.opcontrol_curve_default_set(DRIVE_CURVE_THROTTLE, DRIVE_CURVE_TURN);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
   default_constants();
 
   // Initialize chassis and auton selector
     default_constants();
 
-
     auton_sel.selector_populate({
-      {sawpLeft, "Sawp Left", "Solo Awp Left", red},
-      {sawpRight, "Sawp Right", "Solo Awp Right", orange},
-      {left9, "Left 9", "Elims 9 ball Left", yellow},
-      {right9, "Right 9", "Elims 9 ball Right", green},
-      {move_forward, "Move Forward", "Move Forward", blue},
-      {move_forward1, "Move Forward 1", "Move Forward 1", purple},
-      {move_forward2, "Move Forward 2", "Move Forward 2", pink},
-      {skills, "Skills", "Skills Challenge", black},
+      {doNothing, "Auton Selector", pink},
+      {sawpLeft, "Sawp Left", green},
+      {sawpRight, "Sawp Right", green},
+      {left9, "Left 9", red},
+      {right9, "Right 9", red},
+      {move_forward, "Move Forward", blue},
+      {move_forward1, "Move Forward 1", blue},
+      {move_forward2, "Move Forward 2", blue},
+      {skills, "Skills", black},
     });
 
     chassis.initialize();
@@ -52,7 +56,8 @@ void initialize() {
     pros::Task RollerTask(roller_t);
     pros::Task MiscTask(misc_t);
     pros::Task ColorSortTask(colorSort_t);
-
+  
+  print("Robot Initalized");
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -224,15 +229,11 @@ void opcontrol() {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
-    chassis.opcontrol_tank();  // Tank control
-    pros::lcd::print(2, "bottom proximity: %d", optical_bottom.get_proximity());
-    pros::lcd::print(3, "bottom hue: %d", optical_bottom.get_hue());
-    pros::lcd::print(4, "top proximity: %d", optical_top.get_proximity());
-    pros::lcd::print(5, "top hue: %d", optical_top.get_hue());
+    chassis.opcontrol_arcade_standard(ez::SPLIT);
 
-    if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
-      hoodState = !hoodState;
-    }
+    hoodState = !hoodState;
+    trapdoorState = !trapdoorState;  // Toggle the hood and trapdoor states
+    loaderState = !loaderState;  // Toggle the loader state
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

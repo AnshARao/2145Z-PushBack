@@ -81,7 +81,7 @@
 
 /*Color settings*/
 #define LV_COLOR_DEPTH 32 /*Color depth: 1/8/16/24*/
-#define LV_COLOR_TRANSP                                                        \
+#define LV_COLOR_TRANSP 1                                                      \
   LV_COLOR_LIME /*Images pixels with this color will not be drawn (with chroma \
                    keying)*/
 

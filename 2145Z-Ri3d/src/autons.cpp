@@ -1,3 +1,4 @@
+#include "EZ-Template/util.hpp"
 #include "controls.hpp"
 #include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
@@ -341,50 +342,31 @@ void measure_offsets() {
 
 #pragma endregion
 
+void doNothing() {
+  // This is a placeholder function that does nothing
+  // It can be used to test the robot's movement without doing anything
+  setPosition(120, 120, 0);
+  driveSet(0.001, 1);
+}
+
 void move_forward() {
-  setPosition(72,20,0);
-  driveSet(24, 127);
+    setPosition(0,0,0);
+    turnSet(359,1);
 }
 
 void move_forward1() {
   setPosition(72,20,0);
-  driveSet(24, 127);
+  driveSet(24,  127);
 }
 
 void move_forward2() {
-  setPosition(72,20,0);
+  setPosition(144,20,0);
   driveSet(24, 127);
 }
 
 void left9() {
-  allianceColor == Alliances::BLUE ? setPosition(46, -36, -45) : setPosition(76, 36, 135);
-  driveSet(60, DRIVE_SPEED);
-  pidWaitUntil(50);
-  rollers_intake();
-  setLoader(true);
-  pidWait(WAIT);
-  driveSet(-24, DRIVE_SPEED);
-  pidWait(QUICK);
-  turnSet(45, TURN_SPEED);
-  pidWait(WAIT);
-  setLoader(false);
-  driveSet(24, DRIVE_SPEED);
-  rollers_score_middle();
-  delayMillis(2000);
-  driveSet(-52, DRIVE_SPEED);
-  pidWait(QUICK);
-  turnSet(180, TURN_SPEED);
-  setLoader(true);
-  pidWait(QUICK);
-  driveSet(20, DRIVE_SPEED);
-  pidWait(QUICK);
-  delayMillis(1500);
-  driveSet(-20, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(0, TURN_SPEED);
-  pidWait(WAIT);
-  driveSet(20, DRIVE_SPEED);
-  pidWait(QUICK);
+
+
 }
 
 void right9() {
@@ -419,8 +401,9 @@ void right9() {
 }
 
 void sawpLeft() {
-  setPosition(68, 20, -45);
-  driveSet(60, DRIVE_SPEED);
+  allianceColor == Alliances::RED ? setPosition(-46, 12.5, 68) : setPosition(46, -12.5, 68-180);
+  allianceColor == Alliances::RED ? moveToPoint({-22, 22, 68}, ez::fwd, 127) : 
+  moveToPoint({22, -22, 68-180}, ez::fwd, 127);
 }
 
 void sawpRight() {

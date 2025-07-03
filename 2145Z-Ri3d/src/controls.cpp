@@ -3,8 +3,11 @@
 #include <cstdlib>  // IWYU pragma: keep
 #include "EZ-Template/util.hpp"
 #include "main.h"  // IWYU pragma: keep
+#include "pros/device.h"
+#include "pros/device.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"
+#include "subsystems.hpp"
 
 // ** @file controls.cpp
 // ** @brief This file contains the control functions for the robot.
@@ -84,11 +87,11 @@ void rollers_intake() {
 }
 
 void rollers_outtake() {
-    set_rollers(-12000, -12000, 12000);
+    set_rollers(-12000);
 }
 
 void rollers_score_middle() {
-    set_rollers(12000, -12000);
+    set_rollers(-6000, 12000, 12000);
 }
 
 void rollers_score_top() {
@@ -144,6 +147,10 @@ void roller_t() {
 
 Alliances getTopBlockColor() {
     if (optical_top.get_proximity() > 75) {
+        if (optical_top.get_plugged_type() == pros::DeviceType::none) {
+            // If the optical sensor is not plugged in, return NONE
+            return Alliances::NONE;
+        }
         int topColor = optical_top.get_hue();
         if (topColor >= 340 || topColor <= 20) {
             return Alliances::RED;
@@ -158,6 +165,10 @@ Alliances getTopBlockColor() {
 
 Alliances getBottomBlockColor() {
     if (optical_bottom.get_proximity() > 75) {
+                if (optical_bottom.get_plugged_type() == pros::DeviceType::none) {
+            // If the optical sensor is not plugged in, return NONE
+            return Alliances::NONE;
+        }
         int bottomColor = optical_bottom.get_hue();
         if (bottomColor >= 340 || bottomColor <= 20) {
             return Alliances::RED;
@@ -314,4 +325,5 @@ void misc_t() {
         piston_loader.set(loaderState);
         piston_pto.set(ptoState);
         pros::delay(ez::util::DELAY_TIME);
-    }           }
+    }           
+}
