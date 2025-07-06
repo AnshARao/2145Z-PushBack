@@ -82,19 +82,19 @@ void set_rollers(int frontVltg, int topVltg, int backVltg) {
     set_roller_back(backVltg);
 }
 
-void rollers_intake() {
+void set_rollers_intake() {
     set_rollers(12000, 12000, -12000);
 }
 
-void rollers_outtake() {
+void set_rollers_outtake() {
     set_rollers(-12000);
 }
 
-void rollers_score_middle() {
+void set_rollers_score_middle() {
     set_rollers(-6000, 12000, 12000);
 }
 
-void rollers_score_top() {
+void set_rollers_score_top() {
     hoodState = false;
     set_rollers(12000);
 }
@@ -113,13 +113,13 @@ void control_roller() {
     if (matchState != MatchStates::DRIVER) {return;}
     if (ctrlLock /*&& !overridestate()*/) {return;}
     if (controlla.get_digital(BUTTON_ROLLER)) {
-        rollers_intake();
+        set_rollers_intake();
     } else if (controlla.get_digital(BUTTON_OUTROLLER)) {
-        rollers_outtake();
+        set_rollers_outtake();
     } else if (controlla.get_digital(BUTTON_ROLLER_CENTER)) {
-        rollers_score_middle();
+        set_rollers_score_middle();
     } else if (controlla.get_digital(BUTTON_ROLLER_PEZ)) {
-        rollers_score_top();
+        set_rollers_score_top();
     } else {
         set_rollers(0);
     }

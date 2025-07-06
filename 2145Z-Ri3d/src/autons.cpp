@@ -3,6 +3,7 @@
 #include "drive.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "pros/motors.h"
+#include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "subsystems.hpp"
 
@@ -371,39 +372,35 @@ void left9() {
 
 void right9() {
     setPosition(80, 20, 45);
-  driveSet(60, DRIVE_SPEED);
-  pidWaitUntil(50);
-  rollers_intake();
-  setLoader(true);
-  pidWait(WAIT);
-  driveSet(-24, DRIVE_SPEED);
-  pidWait(QUICK);
-  turnSet(-45, TURN_SPEED);
-  pidWait(WAIT);
-  setLoader(false);
-  driveSet(24, DRIVE_SPEED);
-  rollers_score_middle();
-  delayMillis(2000);
-  driveSet(-52, DRIVE_SPEED);
-  pidWait(QUICK);
-  turnSet(180, TURN_SPEED);
-  setLoader(true);
-  pidWait(QUICK);
-  driveSet(20, DRIVE_SPEED);
-  pidWait(QUICK);
-  delayMillis(1500);
-  driveSet(-20, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(0, TURN_SPEED);
-  pidWait(WAIT);
-  driveSet(20, DRIVE_SPEED);
-  pidWait(QUICK);
+
 }
 
 void sawpLeft() {
-  allianceColor == Alliances::RED ? setPosition(-46, 12.5, 68) : setPosition(46, -12.5, 68-180);
-  allianceColor == Alliances::RED ? moveToPoint({-22, 22, 68}, ez::fwd, 127) : 
-  moveToPoint({22, -22, 68-180}, ez::fwd, 127);
+  setPosition(-55, 18, 0);
+  driveSet(30, 127);
+  turnSet(270, TURN_SPEED);
+  driveSet(6, DRIVE_SPEED);
+  setLoader(true);
+  // set_rollers_intake();
+  // // add color sensing and waiting logic here
+  // delayMillis(1000); //delay will suffice for now
+  // driveSet(-6, DRIVE_SPEED);
+  // setLoader(false);
+  // allianceColor == Alliances::RED ? turnSet(90, TURN_SPEED) : turnSet(90-180, TURN_SPEED);
+  // driveSet(26, DRIVE_SPEED);
+  // set_rollers_score_top();
+  // // add score until and color sensing logic here
+  // delayMillis(1000); // delay will suffice for now
+  // driveSet(-20, DRIVE_SPEED);
+  // allianceColor == RED ? turnSet(135, TURN_SPEED) : turnSet(135-180, TURN_SPEED);
+  // set_rollers_intake();
+  // driveSet(40, DRIVE_SPEED);
+  // set_rollers_score_middle();
+  // // add score until and color sensing logic here
+  // delayMillis(1000); // delay will suffice for now
+  // driveSet(-12, DRIVE_SPEED);
+  // allianceColor == RED ? turnSet(0, TURN_SPEED) : turnSet(0-180, TURN_SPEED);
+
 }
 
 void sawpRight() {
@@ -411,7 +408,6 @@ void sawpRight() {
   driveSet(60, DRIVE_SPEED);
 }
 
-void skills () {
-  setPosition(0,0,0);
-  driveSet(24, DRIVE_SPEED);
+void skills() {
+  
 }

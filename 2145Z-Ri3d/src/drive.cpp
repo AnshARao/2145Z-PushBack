@@ -1,3 +1,4 @@
+#include "controls.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "okapi/api/units/QAngle.hpp"
 #include "subsystems.hpp"
@@ -144,6 +145,9 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 //
 
 void setPosition(double x, double y, double t) {
+	// allianceColor != RED ? x = x : x = -x;
+	// allianceColor != RED ? y = y : y = -y;
+	// allianceColor != RED ? t = t : t = t - 180;	// auto flip based on color
 	currentPoint.x = x;
 	currentPoint.y = y;
 	currentPoint.t = t;
@@ -280,12 +284,12 @@ void driveSet(double distance, int speed, bool slew) {
 	drive_directions direction = distance < 0 ? rev : fwd;
 	switch(matchState) {
 		case MatchStates::AUTO_PID:
-			chassis.pid_drive_set(distance * okapi::inch, speed, false);
+			chassis.pid_drive_set(distance * okapi::inch, speed, slew);
 			currentPoint.x = chassis.odom_x_get();
 			currentPoint.y = chassis.odom_y_get();
 			break;
 		case MatchStates::AUTO_ODOM:
-			chassis.pid_odom_set(distance * okapi::inch, speed, false);
+			chassis.pid_odom_set(distance * okapi::inch, speed, slew);
 			currentPoint.x = chassis.odom_x_get();
 			currentPoint.y = chassis.odom_y_get();
 			break;
@@ -311,6 +315,7 @@ void turnSet(double theta, int speed, e_angle_behavior behavior) {
 	switch(matchState) {
 		case MatchStates::AUTO_PID:
 		case MatchStates::AUTO_ODOM:
+			//allianceColor == RED ? theta = theta : theta = theta - 180; // auto flip based on color
 			chassis.pid_turn_set(theta * okapi::degree, speed, behavior);
 			break;
 		default:

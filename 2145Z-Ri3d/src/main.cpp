@@ -37,6 +37,7 @@ void initialize() {
 
     auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
+      {skills, "Skills", black},
       {sawpLeft, "Sawp Left", green},
       {sawpRight, "Sawp Right", green},
       {left9, "Left 9", red},
@@ -44,7 +45,7 @@ void initialize() {
       {move_forward, "Move Forward", blue},
       {move_forward1, "Move Forward 1", blue},
       {move_forward2, "Move Forward 2", blue},
-      {skills, "Skills", black},
+
     });
 
     chassis.initialize();

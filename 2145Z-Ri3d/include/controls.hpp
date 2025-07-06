@@ -31,10 +31,10 @@ void control_roller();
 void set_roller_front(int vltg);
 void set_roller_top(int vltg);
 void set_roller_back(int vltg);
-void rollers_intake();
-void rollers_outtake();
-void rollers_score_middle();
-void rollers_score_top();
+void set_rollers_intake();
+void set_rollers_outtake();
+void set_rollers_score_middle();
+void set_rollers_score_top();
 void roller_t();
 
 //declaring color sort variables
