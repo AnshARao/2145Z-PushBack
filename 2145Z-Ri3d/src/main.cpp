@@ -6,6 +6,7 @@
 #include "liblvgl/widgets/lv_label.h"
 #include "pros/rtos.h"
 #include "screen.hpp"
+#include "subsystems.hpp"
 
 /**
  * @file main.cpp
@@ -49,6 +50,7 @@ void initialize() {
     });
 
     chassis.initialize();
+    chassis.odom_theta_set(90);
     uiInit();
     
     pros::Task PathViewerTask(pathViewerTask);
@@ -230,7 +232,7 @@ void opcontrol() {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
-    chassis.opcontrol_arcade_standard(ez::SPLIT);
+    chassis.opcontrol_tank();
 
     hoodState = !hoodState;
     trapdoorState = !trapdoorState;  // Toggle the hood and trapdoor states

@@ -2,7 +2,6 @@
 #include <string>
 #include "autons.hpp"
 #include "controls.hpp"
-#include "liblvgl/core/lv_event.h"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
 #include "liblvgl/core/lv_obj_scroll.h"
@@ -141,10 +140,8 @@ void colorSet(Alliances color, lv_obj_t* object) {
 	lv_color32_t color_use = theme_accent;
 	if(color == Alliances::RED) {
 		color_use = red;
-		chassis.drive_angle_set(90);
 	}	else if(color == Alliances::BLUE) {
 		color_use = blue;
-		chassis.drive_angle_set(270);
 	}
 	lv_obj_set_style_bg_color(object, color_use, LV_PART_MAIN);
 }
@@ -279,7 +276,9 @@ static void pauseEvent(lv_event_t* e) {
 static void colorEvent(lv_event_t* e) {
 	allianceColor = (Alliances)(((int)allianceColor + 1) % 3);
 	colorSet(allianceColor, allianceInd);
-    allianceColor != BLUE ? chassis.odom_theta_flip(false) : chassis.odom_theta_flip(true);
+    if (allianceColor == RED) chassis.drive_angle_set(chassis.odom_theta_get() + 90);
+    if (allianceColor == BLUE) chassis.drive_angle_set(chassis.odom_theta_get() + 180);
+    if (allianceColor == NONE) chassis.drive_angle_set(chassis.odom_theta_get() - 270);
 	resetViewer(true);
     print(std::string("Alliance: ") + allianceColorNames[(int)allianceColor]);
 }

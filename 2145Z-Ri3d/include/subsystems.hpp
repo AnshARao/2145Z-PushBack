@@ -22,7 +22,7 @@
 
 // Defining subsystem motor ports
 #define PORT_ROLLER_FRONT 1
-#define PORT_ROLLER_TOP   2
+#define PORT_ROLLER_TOP   -2
 #define PORT_ROLLER_BACK  13
 
 // Defining smartwire device ports

@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "EZ-Template-Example",
+    "project_name": "2145Z-MoA",
     "target": "v5",
     "templates": {
       "EZ-Template": {
@@ -424,8 +424,9 @@
       }
     },
     "upload_options": {
-      "description": "roboticsisez.com",
-      "slot": 3
+      "description": "Ansh is him",
+      "slot": 1,
+      "icon": "X"
     },
     "use_early_access": false
   }

@@ -244,7 +244,6 @@ void colorSort_t() {
         }
         pros::delay(ez::util::DELAY_TIME);
     }
-
 }
 
 #pragma endregion
