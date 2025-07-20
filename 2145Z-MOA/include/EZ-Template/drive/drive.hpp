@@ -8,7 +8,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <functional>
 #include <iostream>
-#include <tuple>
+#include <tuple>  // IWYU pragma: keep
 
 #include "EZ-Template/PID.hpp"
 #include "EZ-Template/slew.hpp"
@@ -17,7 +17,7 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "okapi/api/units/QAngle.hpp"
 #include "okapi/api/units/QLength.hpp"
 #include "okapi/api/units/QTime.hpp"
-#include "pros/motor_group.hpp"
+#include "pros/motor_group.hpp" // IWYU pragma: keep
 #include "pros/motors.h"
 
 using namespace ez;

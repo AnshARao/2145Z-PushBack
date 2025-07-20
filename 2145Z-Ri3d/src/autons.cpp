@@ -409,5 +409,110 @@ void sawpRight() {
 }
 
 void skills() {
-  
+  allianceColor = RED;
+  setPosition(-62.5,-18,0); // start
+  driveSet(42, DRIVE_SPEED); // clear out zone
+  pidWait(CHAIN);
+  turnSet(90,TURN_SPEED); // turn to 4 stack
+  pidWait(CHAIN);
+  // intake
+  driveSet(36, DRIVE_SPEED); // drive to 4 stack
+  pidWait(CHAIN);
+  turnSet(135, TURN_SPEED); // turn to center goal
+  pidWait(CHAIN);
+  driveSet(16, DRIVE_SPEED);  // drive to center goal
+  pidWait(CHAIN);
+  // score center goal
+  delayMillis(500); // *TEMP*
+
+  moveToPoint({-48, 48, 135}, ez::rev, DRIVE_SPEED);
+  pidWait(CHAIN);
+
+  turnSet(270, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(10, DRIVE_SPEED);
+  pidWait(CHAIN);
+  setLoader(true);
+  pidWait(WAIT);
+  delayMillis(1000);
+  driveSet(-10,DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(90, TURN_SPEED, ez::ccw);
+  pidWait(CHAIN);
+  driveSet(14, DRIVE_SPEED);
+  pidWait(CHAIN);
+  // score + logic
+  delayMillis(1000); /*TEMP*/
+  moveToPoint({-44, 48}, rev, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(180, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(98, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(270, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(14, DRIVE_SPEED);
+  pidWait(CHAIN);
+  setLoader(true);
+  pidWait(WAIT);
+  delayMillis(1000);
+  driveSet(-14,DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(90, TURN_SPEED, ez::cw);
+  pidWait(CHAIN);
+  driveSet(10, DRIVE_SPEED);
+  pidWait(CHAIN);
+  delayMillis(1000); /*TEMP*/
+  driveSet(-12, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(0, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(14, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(90, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(70, DRIVE_SPEED);
+  pidWait(CHAIN);
+  //turnSet(135, TURN_SPEED);
+  moveToPoint({48, -51}, fwd, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(90, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(8, DRIVE_SPEED);
+  pidWait(CHAIN);
+  delayMillis(1000);  
+  driveSet(-8, DRIVE_SPEED);
+  pidWait(CHAIN);
+  // turnSet(30, TURN_SPEED);
+  // pidWait(CHAIN);
+  // driveSet(76, DRIVE_SPEED);
+  // pidWait(CHAIN);
+
+
+  swingSet(ez::RIGHT_SWING, 0, SWING_SPEED, 60, ccw);
+  pidWait(CHAIN);
+
+  driveSet(30, DRIVE_SPEED);
+  pidWait(CHAIN);
+
+
+  // chassis.drive_set(-60, -60);
+  // delayMillis(250);
+  // setPosition(62.5, 18, 0);
+  // driveSet(8, DRIVE_SPEED);
+  // pidWait(CHAIN);
+  turnSet(270, TURN_SPEED);
+  pidWait(CHAIN);
+  moveToPoint({24, 24}, fwd, DRIVE_SPEED);
+  pidWait(CHAIN);
+  turnSet(225, TURN_SPEED);
+  pidWait(CHAIN);
+  driveSet(14, DRIVE_SPEED);
+  pidWait(CHAIN);
+  delayMillis(1000);
+  driveSet(-4, DRIVE_SPEED);
+  pidWait(CHAIN);
+  moveToPoint({62, 0}, fwd, DRIVE_SPEED);
+  pidWait(CHAIN);
+
 }

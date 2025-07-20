@@ -2,6 +2,7 @@
 #include "EZ-Template/util.hpp"
 #include "drive.hpp"
 #include "main.h"
+#include "pros/abstract_motor.hpp"
 #include "pros/adi.hpp"
 #include "pros/device.hpp"
 #include "pros/misc.h"
@@ -84,9 +85,12 @@ void set_rollers(Rollers situation) {
         case INTAKE:
             set_rollers(12000);
             stateHopper = false;
+            doColorSort = true;
             break;
         case HOPPER_BOTTOM:
             set_rollers(12000, 12000, -12000);
+            stateBlocker_bot = false;
+            doColorSort = false;
             break;
         case HOPPER_TOP:
             set_rollers(12000);
@@ -97,8 +101,11 @@ void set_rollers(Rollers situation) {
             break;
         case SCORE_MID:
             set_rollers(12000, -12000);
+            stateBlocker_top = true;
+            stateHopper = true;
             break;
         case SCORE_TOP:
+            stateBlocker_top = true;
             stateHopper = true;
             stateHood = true;
             set_rollers(12000);
@@ -123,13 +130,17 @@ void control_rollers() {
         set_rollers(SCORE_TOP);
     }   else {
         set_rollers(STOP);
+        stateBlocker_top = false;
+        //stateBlocker_bot = true;
+        stateHood = false;
+        stateHopper = false;
     }
 }
 
 void control_rollers_old() {
     if (matchState != DRIVER) return;
     if (controlla.get_digital(BUTTON_INTAKE)) {
-        set_rollers(12000);
+        set_rollers(12000, vltg_top, -12000);
     } else if (controlla.get_digital(BUTTON_OUTTAKE)) {
         set_rollers(-12000);
     } else if (controlla.get_digital(BUTTON_SCORE_MID)) {
@@ -148,10 +159,12 @@ void roller_t() {
     motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
     while (true) {
-        control_rollers();
+        control_rollers/*_old*/();
         motor_roller_front.move_voltage(vltg_front);
         motor_roller_top.move_voltage(vltg_top);
         motor_roller_back.move_voltage(vltg_back);
+        piston_hood.set_value(stateHood);
+        piston_hopper.set_value(stateHopper);
         pros::delay(ez::util::DELAY_TIME);
     }
 }
@@ -238,21 +251,25 @@ void colorSortLoop() {
     if (matchState != DISABLED) {
         Rollers temp_roller = curRoller;
         if (wrongBlockDetected(blockColor_bot)) {
-            //print("wrong color detected");
             ctrlLock = true;
-            stateBlocker = false;
+            motor_roller_top.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+            set_rollers(STOP);
+            pros::delay(500);
             set_rollers(HOPPER_BOTTOM);
+            int MAXSORTTIME = 1000;
             while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
                 pros::delay(ez::util::DELAY_TIME);
                 sortTime += ez::util::DELAY_TIME;
             }
-            stateBlocker = true;
+            motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             set_rollers(temp_roller);
+            //stateBlocker_bot = true;
             ctrlLock = false;
             sortTime = 0; 
         }
         else if (rightBlockDetected(blockColor_bot)) {
             //print("right color detected");
+            int MAXSORTTIME = 2000;
             ctrlLock = true;
             set_rollers(HOPPER_TOP);
             while (!wrongBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
@@ -263,6 +280,7 @@ void colorSortLoop() {
             ctrlLock = false;
         }
     }
+    //stateBlocker_bot = false;
 }
 
 // TODO: might changed to prox based depending on consistency of color sort and skills
@@ -344,8 +362,9 @@ void colorSort_t() {
     optical_bot.set_led_pwm(100);
 
     while (true) {
-            colorSortLoop();
-        piston_blocker.set_value(stateBlocker);
+        colorSortLoop();
+        piston_blocker_top.set_value(stateBlocker_top);
+        piston_blocker_bot.set_value(stateBlocker_bot);
         pros::delay(5);
     }
 }
@@ -409,8 +428,11 @@ void control_punchers() {
 
 #pragma endregion
 
-void pistons_t() {
+void misc_t() {
     while (true) {
+        control_loader();
+        control_punchers();
+        controlPto();
         piston_loader.set_value(stateLoader);
         piston_puncher_mid.set_value(statePuncherMid);
         piston_puncher_top.set_value(statepuncherTop);

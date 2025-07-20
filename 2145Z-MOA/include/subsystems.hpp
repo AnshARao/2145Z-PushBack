@@ -7,47 +7,48 @@
 * @author Ansh Rao - 2145Z
 */
 
-#include <cstdint>
+#include <cstdint>  // IWYU pragma: keep
 #include "pros/adi.hpp"
 #include "pros/optical.hpp"
-#include "api.h"
-#include "EZ-Template/api.hpp"
+#include "api.h"    // IWYU pragma: keep
+#include "EZ-Template/api.hpp"  // IWYU pragma: keep
 #pragma region constants
 
 // Defining drive motor ports
-#define PORT_LF 0
-#define PORT_LM 0
-#define PORT_LB 0
-#define PORT_RF 0
-#define PORT_RM 0
-#define PORT_RB 0
+#define PORT_LF -15
+#define PORT_LM -11
+#define PORT_LB 13
+#define PORT_RF -14
+#define PORT_RM 16
+#define PORT_RB -17
 
 // Defining subsystem motor ports
-#define PORT_ROLLER_FRONT -18
-#define PORT_ROLLER_TOP   -19
-#define PORT_ROLLER_BACK  20
+#define PORT_ROLLER_FRONT -6
+#define PORT_ROLLER_TOP   -7
+#define PORT_ROLLER_BACK  4
 
 // Defining smartwire device ports
-#define PORT_IMU            15
+#define PORT_IMU            20
 #define PORT_VEXNET         21
 #define PORT_ODOM_HORIZ     0
 #define PORT_ODOM_VERT      0
-#define PORT_OPTICAL_TOP    17
-#define PORT_OPTICAL_MID    10
-#define PORT_OPTICAL_BOT    16
+#define PORT_OPTICAL_TOP    0
+#define PORT_OPTICAL_MID    5
+#define PORT_OPTICAL_BOT    19
 
 // Defining three wire ports
-#define PORT_PTO            'A'
-#define PORT_BLOCKER        'B'
-#define PORT_HOPPER         'C'
-#define PORT_LOADER         'D'
-#define PORT_HOOD           'E'
+#define PORT_PTO            '0'
+#define PORT_BLOCKER_TOP    'F'
+#define PORT_BLOCKER_BOT    'A'
+#define PORT_HOPPER         'H'
+#define PORT_LOADER         'C'
+#define PORT_HOOD           'B'
 #define PORT_PUNCHER_MID    'F'
 #define PORT_PUNCHER_TOP    'G'
 
 // Defining robot constants
 #define DRIVE_DIAMETER      2.75
-#define TRACK_WIDTH         27/2.0
+#define TRACK_WIDTH         13.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.125
 #define OFFSET_VERT         0
@@ -103,7 +104,8 @@ inline pros::Optical  optical_bot       (PORT_OPTICAL_BOT);
 
 //three wire port constructors
 inline pros::adi::DigitalOut piston_pto       ( PORT_PTO);  // This is the PTO for the drive
-inline pros::adi::DigitalOut piston_blocker   (PORT_BLOCKER);
+inline pros::adi::DigitalOut piston_blocker_top   (PORT_BLOCKER_TOP);
+inline pros::adi::DigitalOut piston_blocker_bot   (PORT_BLOCKER_BOT);
 inline pros::adi::DigitalOut piston_hopper    (PORT_HOPPER);  // This is the hood for the intake
 inline pros::adi::DigitalOut piston_loader    (PORT_LOADER);  // This is the loader for the intake
 inline pros::adi::DigitalOut piston_hood      (PORT_HOOD);

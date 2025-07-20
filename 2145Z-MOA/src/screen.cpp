@@ -128,7 +128,6 @@ void pathViewerTask() {
 			pros::delay(1000);
 			resetViewer(false);
 		}
-		
 		pros::delay(10);
 	}
 }

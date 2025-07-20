@@ -1,7 +1,7 @@
 #pragma once
 
-#include "EZ-Template/api.hpp"
-#include "api.h"
+#include "EZ-Template/api.hpp"  // IWYU pragma: keep
+#include "api.h"    // IWYU pragma: keep
 #include "autons.hpp"
 #include "controls.hpp"
 

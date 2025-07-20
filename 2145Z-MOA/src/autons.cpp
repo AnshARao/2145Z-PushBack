@@ -1,7 +1,7 @@
 #include "autons.hpp"
 #include "controls.hpp"
 #include "drive.hpp"
-#include "main.h"
+#include "main.h" // IWYU pragma: keep
 #include "pros/motors.h"
 #include "subsystems.hpp"
 
@@ -335,6 +335,14 @@ void measure_offsets() {
 // . . .
 
 void doNothing() {}
+
+void sawpLeft() {
+  setPosition(-55, 18, 0);
+  driveSet(30, 127);
+  turnSet(270, TURN_SPEED);
+  driveSet(6, DRIVE_SPEED);
+  set_loader(true);
+}
 
 void skills () {
   allianceColor = RED;

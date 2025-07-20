@@ -5,60 +5,42 @@
 #include "controls.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"
+#include "subsystems.hpp"
 
-/////
-// For installation, upgrading, documentations, and tutorials, check out our website!
-// https://ez-robotics.github.io/EZ-Template/
-/////
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
 void initialize() {
-  // Print our branding over your terminal :D
+  allianceColor = Alliances::NONE;
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
-
-  // Look at your horizontal tracking wheel and decide if it's in front of the midline of your robot or behind it
-  //  - change `back` to `front` if the tracking wheel is in front of the midline
-  //  - ignore this if you aren't using a horizontal tracker
-  // chassis.odom_tracker_back_set(&horiz_tracker);
-  // Look at your vertical tracking wheel and decide if it's to the left or right of the center of the robot
-  //  - change `left` to `right` if the tracking wheel is to the right of the centerline
-  //  - ignore this if you aren't using a vertical tracker
-  // chassis.odom_tracker_left_set(&vert_tracker);
 
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
-  chassis.opcontrol_curve_default_set(0.0, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
+  chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
-  // Set the drive to your own constants from autons.cpp!
   default_constants();
 
-  // These are already defaulted to these buttons, but you can change the left/right curve buttons here!
-  // chassis.opcontrol_curve_buttons_left_set(pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT);  // If using tank, only the left side is used.
-  // chassis.opcontrol_curve_buttons_right_set(pros::E_CONTROLLER_DIGITAL_Y, pros::E_CONTROLLER_DIGITAL_A);
+  // Initialize chassis and auton selector
+    default_constants();
 
-auton_sel.selector_populate({
+    auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
       {skills, "Skills", black},
+      {sawpLeft, "Sawp Left", green},
+
     });
 
-  // Initialize chassis and auton selector
-  chassis.initialize();
+    chassis.initialize();
+    uiInit();
+    
+    pros::Task PathViewerTask(pathViewerTask);
+    pros::Task AngleCheckTask(angleCheckTask);
 
-  uiInit();
+    pros::Task RollerTask(roller_t);
+    pros::Task MiscTask(misc_t);
+    pros::Task ColorSortTask(colorSort_t);
   
-  pros::Task task_roller(roller_t);
-  pros::Task task_colorSort(colorSort_t);
-  pros::Task task_pistons(pistons_t);
-  pros::Task task_pathViewer(pathViewerTask);
-  pros::Task task_angleCheck(angleCheckTask);
-
+  print("Robot Initalized");
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -115,7 +97,7 @@ void autonomous() {
   to be consistent
   */
   matchState = AUTO_PID;
-  ez::as::auton_selector.selected_auton_call();  // Calls selected auton from autonomous selector
+  auton_sel.selector_callback();
 }
 
 /**
@@ -230,7 +212,7 @@ void opcontrol() {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
 
-    chassis.opcontrol_tank();  // Tank control
+    if (!chassis.pid_tuner_enabled()) chassis.opcontrol_tank();
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade

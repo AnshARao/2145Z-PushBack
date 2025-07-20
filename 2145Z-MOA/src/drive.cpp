@@ -1,3 +1,4 @@
+#include "controls.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "okapi/api/units/QAngle.hpp"
 #include "subsystems.hpp"

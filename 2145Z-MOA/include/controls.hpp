@@ -2,7 +2,6 @@
 
 // declaring global variables
 inline bool doColorSort = true;
-inline const int MAXSORTTIME = 1000;
 inline int sortTime = 0;
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
 inline MatchStates matchState = DISABLED;
@@ -20,7 +19,8 @@ inline Rollers curRoller = STOP;
 
 inline bool statePto =     false;
 inline bool stateLoader =  false;
-inline bool stateBlocker = false;
+inline bool stateBlocker_top = false;
+inline bool stateBlocker_bot = false;
 inline bool stateHopper =  false;
 inline bool stateHood =    false;
 inline bool statePuncherMid = false;
@@ -33,4 +33,4 @@ void set_loader(bool state);
 
 void roller_t();
 void colorSort_t();
-void pistons_t();
+void misc_t();
