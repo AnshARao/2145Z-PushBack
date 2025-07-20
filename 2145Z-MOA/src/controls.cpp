@@ -68,9 +68,7 @@ void set_rollers(int front, int top, int back) {
 }
 
 void set_rollers(int main, int top) {
-    set_roller_front(main);
-    set_roller_top(top);
-    set_roller_back(main);
+    set_rollers(main, top, main);
 }
 
 void set_rollers(int vltg) {
@@ -316,7 +314,7 @@ void score_until(Rollers situation, int blocks) {
         case SCORE_MID:
             set_rollers(SCORE_MID);
             while (!rightBlockDetected(get_color_mid()) && scoreTime < 250) {
-                delayMillis(ez::util::DELAY_TIME);
+                wait(ez::util::DELAY_TIME);
                 scoreTime += ez::util::DELAY_TIME;
             }
             scoreTime = 0;
@@ -373,17 +371,17 @@ void colorSort_t() {
 
 #pragma region pto
 
-void set_Pto(bool state) {
+void set_pto(bool state) {
     statePto = state;
     state == true ? chassis.drive_rpm_set(90) : chassis.drive_rpm_set(DRIVE_RPM);
 }
 
-void controlPto() {
+void control_pto() {
     if (matchState != DRIVER ) return;
     if (controlla.get_digital_new_press(BUTTON_PTO)) {
         statePto = !statePto;
     }
-    set_Pto(statePto);
+    set_pto(statePto);
 }
 
 #pragma endregion
@@ -432,7 +430,7 @@ void misc_t() {
     while (true) {
         control_loader();
         control_punchers();
-        controlPto();
+        control_pto();
         piston_loader.set_value(stateLoader);
         piston_puncher_mid.set_value(statePuncherMid);
         piston_puncher_top.set_value(statepuncherTop);

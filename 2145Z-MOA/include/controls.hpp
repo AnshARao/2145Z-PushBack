@@ -1,6 +1,7 @@
 #pragma once
 
 // declaring global variables
+#include "controls.hpp"
 inline bool doColorSort = true;
 inline int sortTime = 0;
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
@@ -26,10 +27,34 @@ inline bool stateHood =    false;
 inline bool statePuncherMid = false;
 inline bool statepuncherTop = false;
 
+void set_roller_front(int vltg);
 void set_roller_top(int vltg);
+void set_roller_back(int vltg);
+void set_rollers(int front, int top, int back);
+void set_rollers(int main, int top);
+void set_rollers(int vltg);
+void set_rollers(Rollers situation);
 
-
+void set_pto(bool state);
 void set_loader(bool state);
+void set_puncher_mid(bool state);
+void set_puncher_top(bool state);
+
+void control_rollers();
+void control_pto();
+void control_loader();
+void control_punchers();
+
+Alliances get_color_top();
+Alliances get_color_mid();
+Alliances get_color_bot();
+
+bool rightBlockDetected(Alliances blockColor);
+bool wrongBlockDetected(Alliances blockColor);
+
+void colorSortLoop();
+void load_until(int blocks);
+void score_until(Rollers situation, int blocks);
 
 void roller_t();
 void colorSort_t();

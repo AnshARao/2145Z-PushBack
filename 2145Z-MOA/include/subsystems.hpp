@@ -48,7 +48,7 @@
 
 // Defining robot constants
 #define DRIVE_DIAMETER      2.75
-#define TRACK_WIDTH         13.5
+#define TRACK_WIDTH         12.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.125
 #define OFFSET_VERT         0

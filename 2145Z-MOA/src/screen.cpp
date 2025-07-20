@@ -2,6 +2,7 @@
 #include <string>
 #include "autons.hpp"
 #include "controls.hpp"
+#include "drive.hpp"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
 #include "liblvgl/core/lv_obj_scroll.h"
@@ -117,9 +118,9 @@ void pathViewerTask() {
 				if(pathDisplay[pathIter].left == KEY)
 					pros::delay(pathDisplay[pathIter].right);
 				else {
-					double velocity = getVelocity(pathDisplay[pathIter].left) + getVelocity(pathDisplay[pathIter].right) / 2;
-					if(velocity == 0) velocity = getVelocity(pathDisplay[pathIter].left);
-					pros::delay(1000 * abs(getTimeToPoint(1, velocity)));
+					double velocity = get_velocity(pathDisplay[pathIter].left) + get_velocity(pathDisplay[pathIter].right) / 2;
+					if(velocity == 0) velocity = get_velocity(pathDisplay[pathIter].left);
+					pros::delay(1000 * abs(get_time_point(1, velocity)));
 				}
 			}
 			if(pathIter == 1) pros::delay(500);

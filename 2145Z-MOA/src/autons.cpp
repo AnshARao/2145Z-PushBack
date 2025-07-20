@@ -337,118 +337,138 @@ void measure_offsets() {
 void doNothing() {}
 
 void sawpLeft() {
-  setPosition(-55, 18, 0);
-  driveSet(30, 127);
-  turnSet(270, TURN_SPEED);
-  driveSet(6, DRIVE_SPEED);
+  set_position(-57, 18, 0);
+  set_drive(29, 127);
+  set_turn(270, TURN_SPEED);
+  set_drive(3, DRIVE_SPEED);
   set_loader(true);
+  load_until(3);  //maybe 6 if time permits
+  
 }
 
-void skills () {
+void skills() {
   allianceColor = RED;
-  setPosition(-62.5,-18,0); // start
-  driveSet(42, DRIVE_SPEED); // clear out zone
-  pidWait(CHAIN);
-  turnSet(90,TURN_SPEED); // turn to 4 stack
-  pidWait(CHAIN);
-  // intake
-  driveSet(36, DRIVE_SPEED); // drive to 4 stack
-  pidWait(CHAIN);
-  turnSet(135, TURN_SPEED); // turn to center goal
-  pidWait(CHAIN);
-  driveSet(16, DRIVE_SPEED);  // drive to center goal
-  pidWait(CHAIN);
-  // score center goal
-  delayMillis(500); // *TEMP*
+  set_position(-62.5, -18, 0); // start
 
-  moveToPoint({-48, 48, 135}, ez::rev, DRIVE_SPEED);
-  pidWait(CHAIN);
+  set_drive(42, DRIVE_SPEED); // clear out zone
+  wait(CHAIN);
 
-  turnSet(270, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(10, DRIVE_SPEED);
-  pidWait(CHAIN);
+  set_turn(90, TURN_SPEED); // turn to 4 stack
+  wait(CHAIN);
+
+  set_drive(36, DRIVE_SPEED); // drive to 4 stack
+  wait(CHAIN);
+
+  set_turn(135, TURN_SPEED); // turn to center goal
+  wait(CHAIN);
+
+  set_drive(16, DRIVE_SPEED); // drive to center goal
+  wait(CHAIN);
+
+  wait(500); // *TEMP* score center goal
+
+  move_point({-48, 48, 135}, ez::rev, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(270, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(10, DRIVE_SPEED);
+  wait(CHAIN);
+
   set_loader(true);
-  pidWait(WAIT);
-  delayMillis(1000);
-  driveSet(-10,DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(90, TURN_SPEED, ez::ccw);
-  pidWait(CHAIN);
-  driveSet(14, DRIVE_SPEED);
-  pidWait(CHAIN);
-  // score + logic
-  delayMillis(1000); /*TEMP*/
-  moveToPoint({-44, 48}, rev, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(180, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(98, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(270, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(14, DRIVE_SPEED);
-  pidWait(CHAIN);
+  wait(WAIT);
+  wait(1000);
+
+  set_drive(-10, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(90, TURN_SPEED, ez::ccw);
+  wait(CHAIN);
+
+  set_drive(14, DRIVE_SPEED);
+  wait(CHAIN);
+
+  wait(1000); // *TEMP*
+  move_point({-44, 48}, rev, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(180, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(98, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(270, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(14, DRIVE_SPEED);
+  wait(CHAIN);
+
   set_loader(true);
-  pidWait(WAIT);
-  delayMillis(1000);
-  driveSet(-14,DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(90, TURN_SPEED, ez::cw);
-  pidWait(CHAIN);
-  driveSet(10, DRIVE_SPEED);
-  pidWait(CHAIN);
-  delayMillis(1000); /*TEMP*/
-  driveSet(-12, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(0, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(14, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(90, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(70, DRIVE_SPEED);
-  pidWait(CHAIN);
-  //turnSet(135, TURN_SPEED);
-  moveToPoint({48, -51}, fwd, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(90, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(8, DRIVE_SPEED);
-  pidWait(CHAIN);
-  delayMillis(1000);  
-  driveSet(-8, DRIVE_SPEED);
-  pidWait(CHAIN);
-  // turnSet(30, TURN_SPEED);
-  // pidWait(CHAIN);
-  // driveSet(76, DRIVE_SPEED);
-  // pidWait(CHAIN);
+  wait(WAIT);
+  wait(1000);
 
+  set_drive(-14, DRIVE_SPEED);
+  wait(CHAIN);
 
-  swingSet(ez::RIGHT_SWING, 0, SWING_SPEED, 60, ccw);
-  pidWait(CHAIN);
+  set_turn(90, TURN_SPEED, ez::cw);
+  wait(CHAIN);
 
-  driveSet(30, DRIVE_SPEED);
-  pidWait(CHAIN);
+  set_drive(10, DRIVE_SPEED);
+  wait(CHAIN);
 
+  wait(1000); // *TEMP*
+  set_drive(-12, DRIVE_SPEED);
+  wait(CHAIN);
 
-  // chassis.drive_set(-60, -60);
-  // delayMillis(250);
-  // setPosition(62.5, 18, 0);
-  // driveSet(8, DRIVE_SPEED);
-  // pidWait(CHAIN);
-  turnSet(270, TURN_SPEED);
-  pidWait(CHAIN);
-  moveToPoint({24, 24}, fwd, DRIVE_SPEED);
-  pidWait(CHAIN);
-  turnSet(225, TURN_SPEED);
-  pidWait(CHAIN);
-  driveSet(14, DRIVE_SPEED);
-  pidWait(CHAIN);
-  delayMillis(1000);
-  driveSet(-4, DRIVE_SPEED);
-  pidWait(CHAIN);
-  moveToPoint({62, 0}, fwd, DRIVE_SPEED);
-  pidWait(CHAIN);
+  set_turn(0, TURN_SPEED);
+  wait(CHAIN);
 
+  set_drive(14, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(90, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(70, DRIVE_SPEED);
+  wait(CHAIN);
+
+  move_point({48, -51}, fwd, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(90, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(8, DRIVE_SPEED);
+  wait(CHAIN);
+
+  wait(1000);
+  set_drive(-8, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_swing(ez::RIGHT_SWING, 0, SWING_SPEED, 60, ccw);
+  wait(CHAIN);
+
+  set_drive(30, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(270, TURN_SPEED);
+  wait(CHAIN);
+
+  move_point({24, 24}, fwd, DRIVE_SPEED);
+  wait(CHAIN);
+
+  set_turn(225, TURN_SPEED);
+  wait(CHAIN);
+
+  set_drive(14, DRIVE_SPEED);
+  wait(CHAIN);
+
+  wait(1000);
+  set_drive(-4, DRIVE_SPEED);
+  wait(CHAIN);
+
+  move_point({62, 0}, fwd, DRIVE_SPEED);
+  wait(CHAIN);
 }
