@@ -14,6 +14,21 @@
 Coordinate currentPoint = {0, 0, 0};
 vector<Coordinate> autonPath = {};
 
+void flip() {
+	currentPoint.x = -currentPoint.x;
+	currentPoint.y = -currentPoint.y;
+	currentPoint.t = 360 -currentPoint.t;
+	if (currentPoint.t == 0) {
+		currentPoint.t = 180;
+		return;
+	}
+	if (currentPoint.t == 180) {
+		currentPoint.t = 0;
+		return;
+	}
+	return;
+}
+
 //
 // Internal math
 //
@@ -146,12 +161,10 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 //
 
 void set_position(double x, double y, double t) {
-	// allianceColor != RED ? x = x : x = -x;
-	// allianceColor != RED ? y = y : y = -y;
-	// allianceColor != RED ? t = t : t = t - 180;	// auto flip based on color
 	currentPoint.x = x;
 	currentPoint.y = y;
 	currentPoint.t = t;
+	
 	if(matchState != MatchStates::DISABLED) chassis.odom_xyt_set(currentPoint.x, currentPoint.y, t);
 	autonPath.push_back(currentPoint);
 }

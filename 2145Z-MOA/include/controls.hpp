@@ -1,7 +1,6 @@
 #pragma once
 
 // declaring global variables
-#include "controls.hpp"
 inline bool doColorSort = true;
 inline int sortTime = 0;
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
@@ -15,7 +14,7 @@ inline int vltg_front = 0;
 inline int vltg_top   = 0;
 inline int vltg_back  = 0;
 
-enum Rollers {STOP = 0, INTAKE = 1, HOPPER_BOTTOM = 2, HOPPER_TOP = 3, OUTTAKE = 4, SCORE_MID = 5, SCORE_TOP = 6};
+enum Rollers {STOP = 0, INTAKE = 1, HOPPER_BOTTOM = 2, HOPPER_TOP = 3, OUTTAKE = 4, SCORE_BOT = 5, SCORE_MID = 6, SCORE_TOP = 7};
 inline Rollers curRoller = STOP;
 
 inline bool statePto =     false;

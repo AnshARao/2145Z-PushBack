@@ -97,17 +97,21 @@ void set_rollers(Rollers situation) {
         case OUTTAKE:
             set_rollers(-12000);
             break;
-        case SCORE_MID:
-            set_rollers(12000, -12000);
-            stateBlocker_top = true;
-            stateHopper = true;
-            break;
         case SCORE_TOP:
             stateBlocker_top = true;
             stateHopper = true;
             stateHood = true;
             set_rollers(12000);
             break;
+        case SCORE_MID:
+            set_rollers(12000, -12000);
+            stateBlocker_top = true;
+            stateHopper = true;
+            break;
+        case SCORE_BOT:
+            stateHopper = true;
+            stateBlocker_top = true;
+            set_rollers(-12000);
         default:
             set_rollers(0);
             break;
@@ -285,6 +289,10 @@ void colorSortLoop() {
 // TODO: might change delayMillies to pros::delay if the screen work or not
 void load_until(int blocks) {
     const int MAXLOADTIME = blocks * 500;
+    if (matchState == DISABLED) {
+        wait(MAXLOADTIME);
+        return;
+    }
     int loadTime = 0;
     int loadedBlocks = 0;
     set_rollers(INTAKE);
@@ -295,11 +303,18 @@ void load_until(int blocks) {
     loadTime = 0;
     while (loadedBlocks < blocks && loadTime < MAXLOADTIME) {
         if (get_color_bot() == allianceColor) {
+            int timer = 0;
             while (get_color_bot() == allianceColor) {
                 pros::delay(ez::util::DELAY_TIME);
+                timer += ez::util::DELAY_TIME;
+                if (timer > 3000) {
+                    return;
+                }
             }
             loadedBlocks++;
         }
+        loadTime += ez::util::DELAY_TIME;
+        pros::delay(ez::util::DELAY_TIME);
     }
     set_rollers(STOP);
 }
@@ -308,6 +323,10 @@ void load_until(int blocks) {
 // TODO: might change delayMillies to pros::delay if the screen work or not
 void score_until(Rollers situation, int blocks) {
     const int MAXSCORETIME = blocks * 500;
+    if (matchState == DISABLED) {
+        wait(MAXSCORETIME);
+        return;
+    }
     int scoreTime = 0;
     int scoredBlocks = 0;
     switch (situation) {
@@ -320,8 +339,13 @@ void score_until(Rollers situation, int blocks) {
             scoreTime = 0;
             while (scoredBlocks < blocks && scoreTime < MAXSCORETIME) {
                 if (get_color_mid() == allianceColor) {
+                    int timer = 0;
                     while (get_color_mid() == allianceColor) {
                         pros::delay(ez::util::DELAY_TIME);
+                        timer += ez::util::DELAY_TIME;
+                        if (timer > 3000) {
+                            return;
+                        }
                     }
                     scoredBlocks++;
                 }

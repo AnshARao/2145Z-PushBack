@@ -3,6 +3,7 @@
 #include "autons.hpp"
 #include "controls.hpp"
 #include "drive.hpp"
+#include "liblvgl/core/lv_event.h"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
 #include "liblvgl/core/lv_obj_scroll.h"
@@ -110,9 +111,19 @@ void resetViewer(bool full) {
 
 void pathViewerTask() {
 	while(true) {
+        if (allianceColor == BLUE) {
+            pathDisplay[pathIter].x = -pathDisplay[pathIter].x;
+            pathDisplay[pathIter].y = -pathDisplay[pathIter].y;
+            pathDisplay[pathIter].t = 360 - pathDisplay[pathIter].t;
+            if (pathDisplay[pathIter].t == 0) {
+                pathDisplay[pathIter].t = 180;
+            } else if (pathDisplay[pathIter].t == 180) {
+                pathDisplay[pathIter].t = 0;
+            }
+        }
 		if(pathIter < pathDisplay.size() && pathDisplay.size() > 1 && playing) {
 			lv_obj_clear_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
-			lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 98, 93 - (1.5 * pathDisplay[pathIter].y));
+			lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 97, 95 - (1.5 * pathDisplay[pathIter].y));
 			if(pathIter < pathDisplay.size() - 1) {
 				lv_img_set_angle(autonRobot, 10 * (pathDisplay[pathIter].t));
 				if(pathDisplay[pathIter].left == KEY)
@@ -236,7 +247,7 @@ static void selectAuton(lv_event_t* e) {
 		currentField = Fields::MATCH;
 	}
 	resetViewer(true);
-	print(getAuton->name + " has been selected");
+	print(1, "Auton: " + getAuton->name);
 }
 
 static void autonUpEvent(lv_event_t* e) {
@@ -280,15 +291,42 @@ static void colorEvent(lv_event_t* e) {
     if (allianceColor == BLUE) chassis.drive_angle_set(chassis.odom_theta_get() + 180);
     if (allianceColor == NONE) chassis.drive_angle_set(chassis.odom_theta_get() - 270);
 	resetViewer(true);
-    print(std::string("Alliance: ") + allianceColorNames[(int)allianceColor]);
+    print(2, std::string("Alliance: ") + allianceColorNames[(int)allianceColor]);
+}
+
+static void refreshConsoleEvent(lv_event_t* e) {
+    unstructured_log.clear();
+}
+
+void refresh_console_label() {
+    std::string output;
+
+    // Add structured lines
+    for (int i = 0; i < STRUCTURED_LINES; i++) {
+        output += structured_log[i] + "\n";
+    }
+
+    // Add unstructured lines
+    for (const std::string& line : unstructured_log) {
+        output += line + "\n";
+    }
+
+    lv_label_set_text(console_label, output.c_str());
+
+    // Auto-scroll to bottom
+    lv_obj_scroll_by_bounded(console_container, 0, -lv_obj_get_height(console_container), LV_ANIM_ON);
+}
+
+void print(int line, const std::string& msg) {
+    if (line < 0 || line >= STRUCTURED_LINES) return;
+    structured_log[line] = msg;
+    refresh_console_label();
 }
 
 void print(const std::string& msg) {
-    static std::string log;
-    log += msg + "\n";
-    lv_label_set_text(console_label, log.c_str());
-    // Auto-scroll to bottom
-	lv_obj_scroll_by_bounded(console_container, 0, -lv_obj_get_height(console_container), LV_ANIM_ON);}
+    unstructured_log.push_back(msg);
+    refresh_console_label();
+}
 
 lv_event_cb_t SelectAuton = selectAuton;
 lv_event_cb_t AutonUpEvent = autonUpEvent;
@@ -421,6 +459,7 @@ void autoSelectorInit() {
     lv_obj_add_style(colorInd, &pushback, LV_PART_MAIN);
     lv_obj_set_style_outline_width(colorInd, 0, LV_PART_MAIN);
     lv_obj_add_flag(colorInd, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(colorInd, refreshConsoleEvent, LV_EVENT_CLICKED, NULL);
 
     // colorOverlay setup
     lv_obj_set_size(colorOverlay, 51, 51);

@@ -151,8 +151,8 @@ const lv_img_dsc_t pfp2145 = {
   .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
   .header.always_zero = 0,
   .header.reserved = 0,
-  .header.w = 22,
-  .header.h = 25,
+  .header.w = 22, //22
+  .header.h = 26, //25
   .data_size = 616 * LV_IMG_PX_SIZE_ALPHA_BYTE,
   .data = pfp2145_map,
 };

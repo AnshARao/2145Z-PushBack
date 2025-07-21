@@ -3,6 +3,7 @@
 #include "drive.hpp"
 #include "main.h" // IWYU pragma: keep
 #include "pros/motors.h"
+#include "screen.hpp"
 #include "subsystems.hpp"
 
 ///
@@ -336,18 +337,113 @@ void measure_offsets() {
 
 void doNothing() {}
 
+void move_forward() {
+  set_position(0, 0, 0);
+  wait(250);
+  set_drive(24, 20);
+}
+
 void sawpLeft() {
-  set_position(-57, 18, 0);
-  set_drive(29, 127);
+  //start touching alliance park zone, facing perpendicular wall
+  set_position(-50, 18, 0);
+
+  //go to the matchloading station and load 3 blocks
+  set_drive(31, 127);
+  wait(WAIT);
   set_turn(270, TURN_SPEED);
-  set_drive(3, DRIVE_SPEED);
+  wait(WAIT);
+  set_drive(7, DRIVE_SPEED);
+  wait(WAIT);
   set_loader(true);
   load_until(3);  //maybe 6 if time permits
+
+  //go to the close long goal and load 3 blocks
+  set_drive(-12, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(90, TURN_SPEED);
+  wait(WAIT);
+  set_drive(14, DRIVE_SPEED);
+  wait(WAIT);
+  score_until(SCORE_TOP, 4);
+
+  //go to the middle center goal and score 3 blocks
+  set_drive(-17, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(135, TURN_SPEED);
+  wait(WAIT);
+  set_drive(46, DRIVE_SPEED);
+  wait(WAIT);
+  score_until(SCORE_MID, 3);
   
+  // go to the bottom center goal and score 3 blocks
+  set_drive(-13, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(180, TURN_SPEED);
+  wait(WAIT);
+  set_drive(48, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(45, TURN_SPEED);
+  wait(WAIT);
+  set_drive(12, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_BOT);
+  wait(3000);
+
+  // go to the far long goal and score 3 blocks
+}
+
+void sawpRight() {
+    //start touching alliance park zone, facing perpendicular wall
+  set_position(-50, -18, 180);
+
+  //go to the matchloading station and load 3 blocks
+  set_drive(31, 127);
+  wait(WAIT);
+  set_turn(270, TURN_SPEED);
+  wait(WAIT);
+  set_drive(7, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(true);
+  load_until(3);  //maybe 6 if time permits
+
+  //go to the close long goal and load 3 blocks
+  set_drive(-12, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(90, TURN_SPEED);
+  wait(WAIT);
+  set_drive(14, DRIVE_SPEED);
+  wait(WAIT);
+  score_until(SCORE_TOP, 4);
+
+  //go to the middle center goal and score 3 blocks
+  set_drive(-17, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(45, TURN_SPEED);
+  wait(WAIT);
+  set_drive(46, DRIVE_SPEED);
+  wait(WAIT);
+  score_until(SCORE_BOT, 3);
+  
+  // go to the bottom center goal and score 3 blocks
+  set_drive(-13, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(0, TURN_SPEED);
+  wait(WAIT);
+  set_drive(48, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(135, TURN_SPEED);
+  wait(WAIT);
+  set_drive(12, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_MID);
+  wait(3000);
+
+  // go to the far long goal and score 3 blocks
 }
 
 void skills() {
   allianceColor = RED;
+  colorSet(allianceColor, allianceInd);
   set_position(-62.5, -18, 0); // start
 
   set_drive(42, DRIVE_SPEED); // clear out zone

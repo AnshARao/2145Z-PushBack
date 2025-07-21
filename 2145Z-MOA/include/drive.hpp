@@ -2,6 +2,7 @@
 
 #include "EZ-Template/api.hpp"
 #include "EZ-Template/util.hpp"
+#include "pros/colors.h"
 
 const int KEY = 267267;
 
@@ -21,7 +22,10 @@ class Coordinate {
         ez::e_angle_behavior behavior = ez::cw;
 };
 
+extern Coordinate currentPoint;
 extern vector<Coordinate> autonPath;
+
+void flip();
 
 // Internal math
 double get_distance(Coordinate point1, Coordinate point2);

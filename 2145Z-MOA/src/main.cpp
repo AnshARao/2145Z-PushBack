@@ -3,6 +3,7 @@
 #include "EZ-Template/sdcard.hpp"
 #include "autons.hpp"
 #include "controls.hpp"
+#include "pros/colors.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "subsystems.hpp"
@@ -25,9 +26,9 @@ void initialize() {
 
     auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
-      {skills, "Skills", black},
       {sawpLeft, "Sawp Left", green},
-
+      {sawpRight, "Sawp Right", green},
+      {skills, "Skills", black},
     });
 
     chassis.initialize();

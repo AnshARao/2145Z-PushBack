@@ -66,6 +66,13 @@ void uiInit();
 // Auton Selector UI
 void autoSelectorInit();
 
+inline const int STRUCTURED_LINES = 7;
+
+inline static std::string structured_log[STRUCTURED_LINES];
+inline static std::vector<std::string> unstructured_log;
+
+void refresh_console_label();
 void print(const std::string& msg);
+void print(int line, const std::string& msg);
 
 void colorSet(Alliances color, lv_obj_t* object);
