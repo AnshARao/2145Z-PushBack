@@ -95,7 +95,7 @@ inline pros::Motor motor_roller_back    (PORT_ROLLER_BACK, pros::v5::MotorGears:
 
 // smartwire device constructors
 inline pros::Imu      imu               (PORT_IMU);
-//inline pros::Link     vexnet            (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);
+inline pros::Link     vexnet            (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);
 inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);
 inline pros::Rotation odom_vert         (PORT_ODOM_VERT);
 inline pros::Optical  optical_top       (PORT_OPTICAL_TOP);
