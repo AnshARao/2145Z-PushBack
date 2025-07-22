@@ -1,4 +1,5 @@
 #include "controls.hpp"
+#include <string>
 #include "EZ-Template/util.hpp"
 #include "drive.hpp"
 #include "main.h"
@@ -76,6 +77,9 @@ void set_rollers(int vltg) {
 }
 
 void set_rollers(Rollers situation) {
+    if (matchState == DISABLED) {
+        return;
+    }
     switch (situation) {
         case STOP:
             set_rollers(0);
@@ -92,7 +96,7 @@ void set_rollers(Rollers situation) {
             break;
         case HOPPER_TOP:
             set_rollers(12000);
-            stateHood = false;
+            stateHood = true;
             break;
         case OUTTAKE:
             set_rollers(-12000);
@@ -100,7 +104,7 @@ void set_rollers(Rollers situation) {
         case SCORE_TOP:
             stateBlocker_top = true;
             stateHopper = true;
-            stateHood = true;
+            stateHood = false;
             set_rollers(12000);
             break;
         case SCORE_MID:
@@ -134,7 +138,7 @@ void control_rollers() {
         set_rollers(STOP);
         stateBlocker_top = false;
         //stateBlocker_bot = true;
-        stateHood = false;
+        stateHood = true;
         stateHopper = false;
     }
 }
@@ -250,13 +254,13 @@ void colorSortLoop() {
     Alliances blockColor_mid = get_color_mid();
     Alliances blockColor_bot = get_color_bot();
     colorSet(blockColor_bot, colorInd);
+    print(4, "bottom color is wrong? " + std::to_string(wrongBlockDetected(blockColor_bot)));
     if (matchState != DISABLED) {
         Rollers temp_roller = curRoller;
         if (wrongBlockDetected(blockColor_bot)) {
             ctrlLock = true;
-            motor_roller_top.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-            set_rollers(STOP);
-            pros::delay(500);
+            // set_rollers(STOP);
+            // pros::delay(500);
             set_rollers(HOPPER_BOTTOM);
             int MAXSORTTIME = 1000;
             while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
@@ -312,6 +316,7 @@ void load_until(int blocks) {
                 }
             }
             loadedBlocks++;
+            print("blocks loaded: " + std::to_string(loadedBlocks));
         }
         loadTime += ez::util::DELAY_TIME;
         pros::delay(ez::util::DELAY_TIME);
@@ -348,6 +353,7 @@ void score_until(Rollers situation, int blocks) {
                         }
                     }
                     scoredBlocks++;
+                    print("scored blocks: " + std::to_string(scoredBlocks));
                 }
             }
             set_rollers(HOPPER_TOP);
@@ -384,10 +390,11 @@ void colorSort_t() {
     optical_bot.set_led_pwm(100);
 
     while (true) {
-        colorSortLoop();
+        if(doColorSort) colorSortLoop();
         piston_blocker_top.set_value(stateBlocker_top);
         piston_blocker_bot.set_value(stateBlocker_bot);
-        pros::delay(5);
+        print(3, "Color sort active: " + std::to_string(doColorSort));
+        pros::delay(3);
     }
 }
 

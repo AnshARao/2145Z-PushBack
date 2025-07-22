@@ -348,13 +348,13 @@ void sawpLeft() {
   set_position(-50, 18, 0);
 
   //go to the matchloading station and load 3 blocks
-  set_drive(31, 127);
-  wait(WAIT);
+  set_drive(30, DRIVE_SPEED);
+  wait(QUICK);
   set_turn(270, TURN_SPEED);
-  wait(WAIT);
-  set_drive(7, DRIVE_SPEED);
-  wait(WAIT);
+  wait(QUICK);
+  set_drive(10, DRIVE_SPEED);
   set_loader(true);
+  wait(WAIT);
   load_until(3);  //maybe 6 if time permits
 
   //go to the close long goal and load 3 blocks
@@ -363,28 +363,33 @@ void sawpLeft() {
   set_turn(90, TURN_SPEED);
   wait(WAIT);
   set_drive(14, DRIVE_SPEED);
+  set_loader(false);
   wait(WAIT);
-  score_until(SCORE_TOP, 4);
+  //score_until(SCORE_TOP, 4);
+  set_rollers(SCORE_TOP);
+  wait(2000);
 
   //go to the middle center goal and score 3 blocks
   set_drive(-17, DRIVE_SPEED);
   wait(WAIT);
   set_turn(135, TURN_SPEED);
   wait(WAIT);
-  set_drive(46, DRIVE_SPEED);
+  set_drive(48, DRIVE_SPEED);
   wait(WAIT);
-  score_until(SCORE_MID, 3);
+  //score_until(SCORE_MID, 3);
+  set_rollers(SCORE_MID);
+  wait(3000);
   
-  // go to the bottom center goal and score 3 blocks
-  set_drive(-13, DRIVE_SPEED);
+  // // go to the bottom center goal and score 3 blocks
+  set_drive(-14, DRIVE_SPEED);
   wait(WAIT);
   set_turn(180, TURN_SPEED);
   wait(WAIT);
-  set_drive(48, DRIVE_SPEED);
+  set_drive(50, DRIVE_SPEED);
   wait(WAIT);
   set_turn(45, TURN_SPEED);
   wait(WAIT);
-  set_drive(12, DRIVE_SPEED);
+  set_drive(14, DRIVE_SPEED);
   wait(WAIT);
   set_rollers(SCORE_BOT);
   wait(3000);

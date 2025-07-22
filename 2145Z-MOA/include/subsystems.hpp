@@ -95,7 +95,7 @@ inline pros::Motor motor_roller_back    (PORT_ROLLER_BACK, pros::v5::MotorGears:
 
 // smartwire device constructors
 inline pros::Imu      imu               (PORT_IMU);
-inline pros::Link     vexnet            (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);
+//inline pros::Link     vexnet            (PORT_VEXNET, "2145Z_link", pros::E_LINK_TX);
 inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);
 inline pros::Rotation odom_vert         (PORT_ODOM_VERT);
 inline pros::Optical  optical_top       (PORT_OPTICAL_TOP);
@@ -108,7 +108,7 @@ inline pros::adi::DigitalOut piston_blocker_top   (PORT_BLOCKER_TOP);
 inline pros::adi::DigitalOut piston_blocker_bot   (PORT_BLOCKER_BOT);
 inline pros::adi::DigitalOut piston_hopper    (PORT_HOPPER);  // This is the hood for the intake
 inline pros::adi::DigitalOut piston_loader    (PORT_LOADER);  // This is the loader for the intake
-inline pros::adi::DigitalOut piston_hood      (PORT_HOOD);
+inline pros::adi::DigitalOut piston_hood      (PORT_HOOD, true);
 inline pros::adi::DigitalOut piston_puncher_mid(PORT_PUNCHER_MID);
 inline pros::adi::DigitalOut piston_puncher_top(PORT_PUNCHER_TOP);
 // Chassis constructor

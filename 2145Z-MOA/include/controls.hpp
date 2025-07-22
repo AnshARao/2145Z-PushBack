@@ -22,7 +22,7 @@ inline bool stateLoader =  false;
 inline bool stateBlocker_top = false;
 inline bool stateBlocker_bot = false;
 inline bool stateHopper =  false;
-inline bool stateHood =    false;
+inline bool stateHood =    true;
 inline bool statePuncherMid = false;
 inline bool statepuncherTop = false;
 
