@@ -18,41 +18,40 @@
 #define PORT_LF -15
 #define PORT_LM -11
 #define PORT_LB 13
-#define PORT_RF -14
+#define PORT_RF 14
 #define PORT_RM 16
 #define PORT_RB -17
 
 // Defining subsystem motor ports
 #define PORT_ROLLER_FRONT -6
-#define PORT_ROLLER_TOP   -7
-#define PORT_ROLLER_BACK  4
+#define PORT_ROLLER_TOP   7
+#define PORT_ROLLER_BACK  2
 
 // Defining smartwire device ports
 #define PORT_IMU            20
-#define PORT_VEXNET         21
-#define PORT_ODOM_HORIZ     0
-#define PORT_ODOM_VERT      0
-#define PORT_OPTICAL_TOP    0
+#define PORT_ODOM_HORIZ     1
+#define PORT_ODOM_VERT      3
+#define PORT_OPTICAL_TOP    5
 #define PORT_OPTICAL_MID    5
 #define PORT_OPTICAL_BOT    19
 
 // Defining three wire ports
-#define PORT_PTO            '0'
+#define PORT_PTO            'G'
 #define PORT_BLOCKER_TOP    'F'
 #define PORT_BLOCKER_BOT    'A'
 #define PORT_HOPPER         'H'
 #define PORT_LOADER         'C'
 #define PORT_HOOD           'B'
-#define PORT_PUNCHER_MID    'F'
-#define PORT_PUNCHER_TOP    'G'
+#define PORT_PUNCHER_MID    'D'
+#define PORT_PUNCHER_TOP    'D'
 
 // Defining robot constants
 #define DRIVE_DIAMETER      2.75
 #define TRACK_WIDTH         12.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.125
-#define OFFSET_VERT         0
-#define OFFSET_HORI         0
+#define OFFSET_VERT         -6.25
+#define OFFSET_HORI         3
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
 #define SWING_SPEED         110
@@ -83,7 +82,7 @@ inline pros::Motor motor_RF     (PORT_RF, pros::v5::MotorGears::blue);
 inline pros::Motor motor_RM     (PORT_RM, pros::v5::MotorGears::blue);
 inline pros::Motor motor_RB     (PORT_RB, pros::v5::MotorGears::blue);
 
-    
+
 // Drive motorgroup constructors
 inline pros::MotorGroup motorgroup_L({PORT_LF, PORT_LM, PORT_LB,});
 inline pros::MotorGroup motorgroup_R({PORT_RF, PORT_RM, PORT_RB,});
@@ -108,19 +107,18 @@ inline pros::adi::DigitalOut piston_blocker_top   (PORT_BLOCKER_TOP);
 inline pros::adi::DigitalOut piston_blocker_bot   (PORT_BLOCKER_BOT);
 inline pros::adi::DigitalOut piston_hopper    (PORT_HOPPER);  // This is the hood for the intake
 inline pros::adi::DigitalOut piston_loader    (PORT_LOADER);  // This is the loader for the intake
-inline pros::adi::DigitalOut piston_hood      (PORT_HOOD, true);
+inline pros::adi::DigitalOut piston_hood      (PORT_HOOD);
 inline pros::adi::DigitalOut piston_puncher_mid(PORT_PUNCHER_MID);
 inline pros::adi::DigitalOut piston_puncher_top(PORT_PUNCHER_TOP);
 // Chassis constructor
 inline ez::Drive chassis(
     {PORT_LF, PORT_LM, PORT_LB},    // Left Chassis Ports
-    {-PORT_RF, PORT_RM, PORT_RB},  // Right Chassis Ports
+    {PORT_RF, PORT_RM, PORT_RB},  // Right Chassis Ports
 
-    PORT_IMU,                                                          // IMU Port
-    DRIVE_DIAMETER,                                              // Wheel Diameter
-    DRIVE_RPM);                                                           // Wheel RPM
-
-//inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
-//inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
+    PORT_IMU,   // IMU Port
+    DRIVE_DIAMETER, // Wheel Diameter
+    DRIVE_RPM); // Wheel RPM
+inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
+inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
 
 #pragma endregion

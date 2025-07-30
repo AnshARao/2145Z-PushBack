@@ -1,4 +1,8 @@
 #include "autons.hpp"
+#include <cstdlib>
+#include <string>
+#include "EZ-Template/drive/drive.hpp"
+#include "EZ-Template/util.hpp"
 #include "controls.hpp"
 #include "drive.hpp"
 #include "main.h" // IWYU pragma: keep
@@ -329,6 +333,7 @@ void measure_offsets() {
   if (chassis.odom_tracker_right != nullptr) chassis.odom_tracker_right->distance_to_center_set(r_offset);
   if (chassis.odom_tracker_back != nullptr) chassis.odom_tracker_back->distance_to_center_set(b_offset);
   if (chassis.odom_tracker_front != nullptr) chassis.odom_tracker_front->distance_to_center_set(f_offset);
+
 }
 
 // . . .
@@ -337,116 +342,261 @@ void measure_offsets() {
 
 void doNothing() {}
 
-void move_forward() {
-  set_position(0, 0, 0);
-  wait(250);
-  set_drive(24, 20);
+void test() {
+
 }
 
-void sawpLeft() {
+void left7Odom() {
+  // if (matchState == DISABLED) return;
+  //start touching alliance park zone, facing perpendicular wall
+  set_rollers(STOP);
+  set_position(-50, 18, 0);
+
+  // go to matchloading and load 3
+  move_point({-50, 46}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(true);
+  set_turn({-60, 46}, fwd, TURN_SPEED);
+  wait(WAIT);
+  move_point({-60, 46}, fwd, 127);
+  set_rollers(HOPPER_BOTTOM);
+  wait(WAIT);
+  doColorSort = false;
+  wait(150);
+
+  // go back and turn
+  move_point({-40, 46}, rev, DRIVE_SPEED);
+  set_rollers(OUTTAKE);
+  wait(150);
+  set_rollers(HOPPER_BOTTOM);
+  wait(WAIT);
+  set_loader(false);
+  //set_turn(90, TURN_SPEED, ccw, true);
+  // set_turn({-34, 47}, fwd, 60, ccw);
+  // wait(WAIT);
+  // // go to close long goal
+  // set_drive(6, DRIVE_SPEED);
+  move_point({-34, 47}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_TOP);
+  set_rollers(12000);
+  stateHood = false;
+  wait(WAIT);
+  wait(2500);
+
+  // back up and score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
+  move_point({-24, 23.5}, fwd, DRIVE_SPEED);
+  set_rollers(HOPPER_BOTTOM);
+  wait(CHAIN);
+  set_turn({-14.5, 13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  move_point({-14.5, 13.5}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_MID);
+  set_rollers(12000, -3000);
+  wait(WAIT);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void right7Odom() {
+  // if (matchState == DISABLED) return;
+  //start touching alliance park zone, facing perpendicular wall
+  set_rollers(STOP);
+  set_position(-50, -18, 180);
+
+  // go to matchloading and load 3
+  move_point({-50, -46.5}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(true);
+  set_turn({-60, -46.5}, fwd, TURN_SPEED);
+  wait(WAIT);
+  move_point({-60, -46.5}, fwd, 127);
+  set_rollers(HOPPER_BOTTOM);
+  wait(WAIT);
+  doColorSort = false;
+  wait(150);
+
+  // go back and turn
+  move_point({-40, -46}, rev, DRIVE_SPEED);
+  set_rollers(OUTTAKE);
+  wait(150);
+  set_rollers(HOPPER_BOTTOM);
+  wait(WAIT);
+  set_loader(false);
+  //set_turn(90, TURN_SPEED, ccw, true);
+  // set_turn({-34, 47}, fwd, 60, ccw);
+  // wait(WAIT);
+  // // go to close long goal
+  // set_drive(6, DRIVE_SPEED);
+  move_point({-34, -47}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_TOP);
+  set_rollers(12000);
+  stateHood = false;
+  wait(WAIT);
+  wait(2500);
+
+  // back up and score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
+  move_point({-24, -23.5}, fwd, DRIVE_SPEED);
+  set_rollers(HOPPER_BOTTOM);
+  wait(CHAIN);
+  set_turn({-14.5, -13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  move_point({-14.5, -13.5}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_MID);
+  stateBlocker_bot = false;
+  set_rollers(-12000, vltg_top, 12000);
+  wait(WAIT);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void left7PID() {
   //start touching alliance park zone, facing perpendicular wall
   set_position(-50, 18, 0);
 
   //go to the matchloading station and load 3 blocks
-  set_drive(30, DRIVE_SPEED);
+  set_drive(27, DRIVE_SPEED);
+  wait(QUICK);
+  set_turn(270, TURN_SPEED);
+  wait(QUICK);
+  set_drive(10, 127);
+  set_loader(true);
+  wait(WAIT);
+  //load_until(3);  //maybe 6 if time permits
+  set_rollers(INTAKE);
+  wait(415);
+  set_rollers(STOP);
+
+  //go to the close long goal and load 3 blocks
+  set_drive(-12, DRIVE_SPEED);
+  set_loader(false);
+  wait(WAIT);
+  set_rollers(INTAKE);
+  set_turn(87, TURN_SPEED);
+  wait(WAIT);
+  set_drive(14, DRIVE_SPEED);
+  wait(WAIT);
+  //score_until(SCORE_TOP, 4);
+  set_rollers(SCORE_TOP);
+  wait(3000);
+  set_rollers(INTAKE);
+
+  // //go to the middle center goal and score 3 blocks
+  set_drive(-14, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn(135, TURN_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_MID);
+  set_drive(28, DRIVE_SPEED, true);
+  //wait_until(24);
+  wait(QUICK);
+  set_rollers(SCORE_MID);
+  set_drive(20, DRIVE_SPEED, true);
+  wait(WAIT);
+  wait(3000);
+}
+
+void right7PID() {
+  //start touching alliance park zone, facing perpendicular wall
+  set_position(-50, -18, 180);
+
+  //go to the matchloading station and load 3 blocks
+  set_drive(27, DRIVE_SPEED);
   wait(QUICK);
   set_turn(270, TURN_SPEED);
   wait(QUICK);
   set_drive(10, DRIVE_SPEED);
   set_loader(true);
   wait(WAIT);
-  load_until(3);  //maybe 6 if time permits
+  //load_until(3);  //maybe 6 if time permits
+  set_rollers(INTAKE);
+  wait(2000);
 
   //go to the close long goal and load 3 blocks
   set_drive(-12, DRIVE_SPEED);
   wait(WAIT);
-  set_turn(90, TURN_SPEED);
+  set_turn(93, TURN_SPEED);
   wait(WAIT);
   set_drive(14, DRIVE_SPEED);
   set_loader(false);
   wait(WAIT);
   //score_until(SCORE_TOP, 4);
   set_rollers(SCORE_TOP);
-  wait(2000);
-
-  //go to the middle center goal and score 3 blocks
-  set_drive(-17, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(135, TURN_SPEED);
-  wait(WAIT);
-  set_drive(48, DRIVE_SPEED);
-  wait(WAIT);
-  //score_until(SCORE_MID, 3);
-  set_rollers(SCORE_MID);
   wait(3000);
-  
-  // // go to the bottom center goal and score 3 blocks
-  set_drive(-14, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(180, TURN_SPEED);
-  wait(WAIT);
-  set_drive(50, DRIVE_SPEED);
+  set_rollers(INTAKE);
+
+  // //go to the middle center goal and score 3 blocks
+  set_drive(-13, DRIVE_SPEED);
   wait(WAIT);
   set_turn(45, TURN_SPEED);
   wait(WAIT);
-  set_drive(14, DRIVE_SPEED);
+  set_drive(40, DRIVE_SPEED, true);
+  //wait_until(24);
+  wait(QUICK);
+  set_rollers(SCORE_BOT);
+  set_drive(6, DRIVE_SPEED);
+  set_rollers(SCORE_BOT);
   wait(WAIT);
   set_rollers(SCORE_BOT);
   wait(3000);
-
-  // go to the far long goal and score 3 blocks
 }
 
-void sawpRight() {
-    //start touching alliance park zone, facing perpendicular wall
-  set_position(-50, -18, 180);
+void left8Odom() {
+  set_position(-45, 14, 90);
 
-  //go to the matchloading station and load 3 blocks
-  set_drive(31, 127);
+  set_turn_relative(15, TURN_SPEED);
   wait(WAIT);
-  set_turn(270, TURN_SPEED);
-  wait(WAIT);
-  set_drive(7, DRIVE_SPEED);
-  wait(WAIT);
-  set_loader(true);
-  load_until(3);  //maybe 6 if time permits
+  move_point({-22, 22}, ez::drive_directions::fwd, DRIVE_SPEED, cw, false);
+  wait(QUICK);
+}
 
-  //go to the close long goal and load 3 blocks
-  set_drive(-12, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(90, TURN_SPEED);
-  wait(WAIT);
-  set_drive(14, DRIVE_SPEED);
-  wait(WAIT);
-  score_until(SCORE_TOP, 4);
+void right8Odom() {
 
-  //go to the middle center goal and score 3 blocks
-  set_drive(-17, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(45, TURN_SPEED);
-  wait(WAIT);
-  set_drive(46, DRIVE_SPEED);
-  wait(WAIT);
-  score_until(SCORE_BOT, 3);
-  
-  // go to the bottom center goal and score 3 blocks
-  set_drive(-13, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(0, TURN_SPEED);
-  wait(WAIT);
-  set_drive(48, DRIVE_SPEED);
-  wait(WAIT);
-  set_turn(135, TURN_SPEED);
-  wait(WAIT);
-  set_drive(12, DRIVE_SPEED);
-  wait(WAIT);
-  set_rollers(SCORE_MID);
-  wait(3000);
-
-  // go to the far long goal and score 3 blocks
 }
 
 void skills() {
+  set_position(-50, -18, 180);
+  doColorSort = true;
+
+  // go to matchloading and load 3
+  move_point({-50, -46.5}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(true);
+  set_turn({-60, -46.5}, fwd, TURN_SPEED);
+  wait(WAIT);
+  move_point({-57.5, -46.5}, fwd, DRIVE_SPEED);
+  set_rollers(INTAKE);
+  wait(WAIT);
+  wait(750);
+
+  // go back and turn
+  move_point({-40, -46}, rev, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(false);
+  
+  set_turn({-25, -24}, fwd, TURN_SPEED);
+  wait(WAIT);
+  
+  set_drive(6, DRIVE_SPEED);
+  wait(CHAIN);
+  move_point({-25, -24}, fwd, 45);
+  wait(CHAIN);
+
+
+  move_point({24, -24}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  
+  // set_turn({14, -14}, fwd, TURN_SPEED);
+  // wait(WAIT);
+  // move_point({14, -14}, fwd, DRIVE_SPEED);
+  // set_rollers(SCORE_MID);
+  // wait(WAIT);
+}
+
+void skills1() {
   allianceColor = RED;
   colorSet(allianceColor, allianceInd);
   set_position(-62.5, -18, 0); // start

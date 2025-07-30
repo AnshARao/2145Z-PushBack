@@ -1,4 +1,7 @@
 #include "drive.hpp"
+#include <cmath>
+#include <cstdlib>
+#include "EZ-Template/util.hpp"
 #include "controls.hpp"
 #include "main.h"  // IWYU pragma: keep
 #include "okapi/api/units/QAngle.hpp"
@@ -270,6 +273,26 @@ void wait(int millis) {
 // Move to point wrappers
 //
 
+void move_point(Coordinate newpoint, drive_directions direction, int speed, ez::e_angle_behavior turn_behavior, bool use_slew ) {
+	bool slew_state = false;
+	switch(matchState) {
+		case MatchStates::AUTO_ODOM:
+			chassis.pid_odom_set({{newpoint.x * okapi::inch, newpoint.y * okapi::inch}, direction, speed});
+			currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, direction);
+			currentPoint.x = newpoint.x;
+			currentPoint.y = newpoint.y;
+			currentPoint.left = speed * (direction == fwd ? 1 : -1);
+			currentPoint.right = speed * (direction == fwd ? 1 : -1);
+			autonPath.push_back(currentPoint);
+			break;
+		default:
+			set_turn(get_theta(currentPoint, newpoint, direction), speed, turn_behavior, use_slew);
+			wait(Wait::CHAIN);
+			set_drive((get_distance(currentPoint, newpoint) * (direction == rev ? -1 : 1)), speed);
+			break;
+	}
+}
+
 void move_point(Coordinate newpoint, drive_directions direction, int speed) {
 	bool slew_state = false;
 	switch(matchState) {
@@ -293,6 +316,14 @@ void move_point(Coordinate newpoint, drive_directions direction, int speed) {
 //
 // Drive set wrappers
 //
+void set_drive(int speed) {
+	drive_directions direction = speed < 0 ? rev : fwd;
+	chassis.drive_set(speed, speed);
+	currentPoint.left = speed * (direction == fwd ? 1 : -1);
+	currentPoint.right = speed * (direction == fwd ? 1 : -1);
+	currentPoint.t = currentPoint.t;
+	autonPath.push_back(currentPoint);
+}
 
 void set_drive(double distance, int speed, bool slew) {
 	drive_directions direction = distance < 0 ? rev : fwd;
@@ -317,7 +348,7 @@ void set_drive(double distance, int speed, bool slew) {
 }
 
 void set_drive(double distance, int speed) {
-	bool slew = abs(distance) > 48 ? true : false;
+	bool slew = abs(distance) >= 24 ? true : false;
 	set_drive(distance, speed, slew);
 }
 
@@ -325,12 +356,11 @@ void set_drive(double distance, int speed) {
 // Turn set wrappers
 //
 
-void set_turn(double theta, int speed, e_angle_behavior behavior) {
+void set_turn(double theta, int speed, e_angle_behavior behavior, bool use_slew) {
 	switch(matchState) {
 		case MatchStates::AUTO_PID:
 		case MatchStates::AUTO_ODOM:
-			//allianceColor == RED ? theta = theta : theta = theta - 180; // auto flip based on color
-			chassis.pid_turn_set(theta * okapi::degree, speed, behavior);
+			chassis.pid_turn_set(theta * okapi::degree, speed, behavior, use_slew);
 			break;
 		default:
 			break;
@@ -347,7 +377,7 @@ void set_turn(double theta, int speed, e_angle_behavior behavior) {
 	autonPath.push_back(currentPoint);
 }
 
-void set_turn(double theta, int speed) {
+void set_turn(double theta, int speed, bool use_slew) {
 	e_angle_behavior behavior = (util::turn_shortest(theta, currentPoint.t) < currentPoint.t) ? ccw : cw;
 	switch(matchState) {
 		case MatchStates::AUTO_PID:
@@ -357,7 +387,21 @@ void set_turn(double theta, int speed) {
 		default:
 			break;
 	}
-	set_turn(theta, speed, behavior);
+	set_turn(theta, speed, behavior, use_slew);
+}
+
+void set_turn(double theta, int speed) {
+	e_angle_behavior behavior = (util::turn_shortest(theta, currentPoint.t) < currentPoint.t) ? ccw : cw;
+	bool use_slew = fabs(theta - currentPoint.t) > 90 ? true : false;
+	switch(matchState) {
+		case MatchStates::AUTO_PID:
+		case MatchStates::AUTO_ODOM:
+			behavior = (util::turn_shortest(theta, chassis.odom_theta_get()) < chassis.odom_theta_get()) ? ccw : cw;
+			break;
+		default:
+			break;
+	}
+	set_turn(theta, speed, behavior, use_slew);
 }
 
 void set_turn(Coordinate point, drive_directions direction, int speed, e_angle_behavior behavior) {

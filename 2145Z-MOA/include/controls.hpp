@@ -6,7 +6,7 @@ inline int sortTime = 0;
 enum MatchStates {DISABLED = 0, AUTO_PID = 1, AUTO_ODOM = 2, DRIVER = 3};
 inline MatchStates matchState = DISABLED;
 enum Alliances {BLUE = 0, NONE = 1, RED = 2};
-inline Alliances allianceColor = Alliances::NONE;
+inline Alliances allianceColor = Alliances::RED; // for now
 
 inline bool ctrlLock = false;
 
@@ -20,9 +20,9 @@ inline Rollers curRoller = STOP;
 inline bool statePto =     false;
 inline bool stateLoader =  false;
 inline bool stateBlocker_top = false;
-inline bool stateBlocker_bot = false;
+inline bool stateBlocker_bot = true;
 inline bool stateHopper =  false;
-inline bool stateHood =    true;
+inline bool stateHood =    false;
 inline bool statePuncherMid = false;
 inline bool statepuncherTop = false;
 

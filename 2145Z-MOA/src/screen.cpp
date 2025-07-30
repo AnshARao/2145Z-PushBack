@@ -10,7 +10,7 @@
 #include "liblvgl/core/lv_obj_style.h"
 #include "liblvgl/font/lv_font.h"
 #include "liblvgl/font/lv_symbol_def.h"
-#include "liblvgl/hal/lv_hal_disp.h"
+#include "liblvgl/hal/lv_hal_disp.h"    // IWYU pragma: keep
 #include "liblvgl/misc/lv_anim.h"
 #include "liblvgl/misc/lv_area.h"
 #include "liblvgl/misc/lv_style.h"

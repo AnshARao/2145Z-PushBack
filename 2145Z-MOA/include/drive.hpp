@@ -2,6 +2,7 @@
 
 #include "EZ-Template/api.hpp"
 #include "EZ-Template/util.hpp"
+#include "drive.hpp"
 #include "pros/colors.h"
 
 const int KEY = 267267;
@@ -51,14 +52,17 @@ void wait(int millis);
 void wait(int millis, bool ignore);
 
 // Move to point wrappers
+void move_point(Coordinate newpoint, ez::drive_directions direction, int speed, e_angle_behavior turn_behavior, bool use_slew);
 void move_point(Coordinate newpoint, ez::drive_directions direction, int speed);
 
 // Drive set wrappers
 void set_drive(double distance, int speed, bool slew);
 void set_drive(double distance, int speed);
+void set_drive(int speed1);
 
 // Turn set wrappers
-void set_turn(double theta, int speed, e_angle_behavior behavior);
+void set_turn(double theta, int speed, e_angle_behavior behavior, bool use_slew);
+void set_turn(double theta, int speed, bool use_slew);
 void set_turn(double theta, int speed);
 void set_turn(Coordinate point, drive_directions direction, int speed, e_angle_behavior behavior);
 void set_turn(Coordinate point, drive_directions direction, int speed);

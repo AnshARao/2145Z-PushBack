@@ -1,13 +1,15 @@
 #include "controls.hpp"
 #include <string>
+#include <vector>
 #include "EZ-Template/util.hpp"
 #include "drive.hpp"
-#include "main.h"
-#include "pros/abstract_motor.hpp"
+#include "main.h"   // IWYU pragma: keep
+#include "pros/abstract_motor.hpp"  // IWYU pragma: keep
 #include "pros/adi.hpp"
 #include "pros/device.hpp"
 #include "pros/misc.h"
 #include "pros/motors.h"
+#include "pros/motors.hpp"
 #include "pros/optical.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"
@@ -15,9 +17,9 @@
 
 void default_constants() {
   // P, I, D, and Start I
-  chassis.pid_drive_constants_set(20.0, 0.0, 100.0);         // Fwd/rev constants, used for odom and non odom motions
-  chassis.pid_heading_constants_set(11.0, 0.0, 20.0);        // Holds the robot straight while going forward without odom
-  chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);     // Turn in place constants
+  chassis.pid_drive_constants_set(30.0, 0.0, 50.0);         // Fwd/rev constants, used for odom and non odom motions
+  chassis.pid_heading_constants_set(30.0, 0.0, 55.0);        // Holds the robot straight while going forward without odom
+  chassis.pid_turn_constants_set(6.0, 0.05, 45.0, 15.0);     // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
   chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
@@ -46,6 +48,9 @@ void default_constants() {
   chassis.odom_boomerang_dlead_set(0.625);     // This handles how aggressive the end of boomerang motions are
 
   chassis.pid_angle_behavior_set(ez::shortest);  // Changes the default behavior for turning, this defaults it to the shortest path there
+
+    chassis.pid_drive_chain_constant_set(1_in);
+    chassis.pid_turn_chain_constant_set(1_deg);
 }
 
 #pragma region rollers
@@ -87,7 +92,8 @@ void set_rollers(Rollers situation) {
         case INTAKE:
             set_rollers(12000);
             stateHopper = false;
-            doColorSort = true;
+            stateHood = true;
+            //doColorSort = true;
             break;
         case HOPPER_BOTTOM:
             set_rollers(12000, 12000, -12000);
@@ -97,25 +103,34 @@ void set_rollers(Rollers situation) {
         case HOPPER_TOP:
             set_rollers(12000);
             stateHood = true;
+            stateBlocker_top = true;
             break;
         case OUTTAKE:
             set_rollers(-12000);
             break;
         case SCORE_TOP:
-            stateBlocker_top = true;
+            stateBlocker_top = false;
             stateHopper = true;
             stateHood = false;
             set_rollers(12000);
             break;
         case SCORE_MID:
-            set_rollers(12000, -12000);
-            stateBlocker_top = true;
+            switch (matchState) {
+                case MatchStates::AUTO_PID:
+                case MatchStates::AUTO_ODOM:
+                    set_rollers(12000, -6000);
+                    break;
+                default:
+                    set_rollers(12000, -12000);
+                    break;
+            }
+            stateBlocker_top = false;
             stateHopper = true;
             break;
         case SCORE_BOT:
-            stateHopper = true;
-            stateBlocker_top = true;
             set_rollers(-12000);
+            stateHopper = true;
+            stateBlocker_top = false;
         default:
             set_rollers(0);
             break;
@@ -136,9 +151,6 @@ void control_rollers() {
         set_rollers(SCORE_TOP);
     }   else {
         set_rollers(STOP);
-        stateBlocker_top = false;
-        //stateBlocker_bot = true;
-        stateHood = true;
         stateHopper = false;
     }
 }
@@ -158,6 +170,29 @@ void control_rollers_old() {
     }
 }
 
+bool isJammed = false;
+std::vector<pros::Motor> rollerMotors = {motor_roller_front, motor_roller_top, motor_roller_back};
+
+void checkIfJammed() {
+    for (int i = 0; i < rollerMotors.size(); i++) {
+        if (rollerMotors[i].get_efficiency() < 10) {
+            isJammed = true;
+        }
+    }
+
+    if (isJammed) {
+        int temp_front = vltg_front;
+        int temp_top = vltg_top;
+        int temp_back = vltg_back;
+        ctrlLock = true;
+        set_rollers(-vltg_front, -vltg_top, -vltg_back);
+        pros::delay(500);
+        set_rollers(temp_front, temp_top, temp_back);
+        isJammed = false;
+        ctrlLock = false;
+    }
+}
+
 void roller_t() {
 
     motor_roller_front.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -165,12 +200,14 @@ void roller_t() {
     motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
     while (true) {
-        control_rollers/*_old*/();
+        control_rollers();
         motor_roller_front.move_voltage(vltg_front);
         motor_roller_top.move_voltage(vltg_top);
         motor_roller_back.move_voltage(vltg_back);
         piston_hood.set_value(stateHood);
         piston_hopper.set_value(stateHopper);
+        piston_blocker_top.set_value(stateBlocker_top);
+        piston_blocker_bot.set_value(stateBlocker_bot);
         pros::delay(ez::util::DELAY_TIME);
     }
 }
@@ -264,12 +301,12 @@ void colorSortLoop() {
             set_rollers(HOPPER_BOTTOM);
             int MAXSORTTIME = 1000;
             while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
-                pros::delay(ez::util::DELAY_TIME);
-                sortTime += ez::util::DELAY_TIME;
+                pros::delay(3);
+                sortTime += 3;
             }
             motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
             set_rollers(temp_roller);
-            //stateBlocker_bot = true;
+            stateBlocker_bot = true;
             ctrlLock = false;
             sortTime = 0; 
         }
@@ -279,20 +316,19 @@ void colorSortLoop() {
             ctrlLock = true;
             set_rollers(HOPPER_TOP);
             while (!wrongBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
-                pros::delay(ez::util::DELAY_TIME);
-                sortTime += ez::util::DELAY_TIME;
+                pros::delay(3);
+                sortTime += 3;
             }
             set_rollers(temp_roller);
             ctrlLock = false;
         }
     }
-    //stateBlocker_bot = false;
 }
 
 // TODO: might changed to prox based depending on consistency of color sort and skills
 // TODO: might change delayMillies to pros::delay if the screen work or not
 void load_until(int blocks) {
-    const int MAXLOADTIME = blocks * 500;
+    const int MAXLOADTIME = blocks * 750;
     if (matchState == DISABLED) {
         wait(MAXLOADTIME);
         return;
@@ -301,16 +337,16 @@ void load_until(int blocks) {
     int loadedBlocks = 0;
     set_rollers(INTAKE);
     while (!rightBlockDetected(get_color_bot()) && loadTime < 250) {
-        pros::delay(ez::util::DELAY_TIME);
-        loadTime += ez::util::DELAY_TIME;
+        pros::delay(3);
+        loadTime += 3;
     }
     loadTime = 0;
     while (loadedBlocks < blocks && loadTime < MAXLOADTIME) {
         if (get_color_bot() == allianceColor) {
             int timer = 0;
             while (get_color_bot() == allianceColor) {
-                pros::delay(ez::util::DELAY_TIME);
-                timer += ez::util::DELAY_TIME;
+                pros::delay(3);
+                timer += 3;
                 if (timer > 3000) {
                     return;
                 }
@@ -318,8 +354,8 @@ void load_until(int blocks) {
             loadedBlocks++;
             print("blocks loaded: " + std::to_string(loadedBlocks));
         }
-        loadTime += ez::util::DELAY_TIME;
-        pros::delay(ez::util::DELAY_TIME);
+        loadTime += 3;
+        pros::delay(3);
     }
     set_rollers(STOP);
 }
@@ -338,16 +374,16 @@ void score_until(Rollers situation, int blocks) {
         case SCORE_MID:
             set_rollers(SCORE_MID);
             while (!rightBlockDetected(get_color_mid()) && scoreTime < 250) {
-                wait(ez::util::DELAY_TIME);
-                scoreTime += ez::util::DELAY_TIME;
+                wait(3);
+                scoreTime += 3;
             }
             scoreTime = 0;
             while (scoredBlocks < blocks && scoreTime < MAXSCORETIME) {
                 if (get_color_mid() == allianceColor) {
                     int timer = 0;
                     while (get_color_mid() == allianceColor) {
-                        pros::delay(ez::util::DELAY_TIME);
-                        timer += ez::util::DELAY_TIME;
+                        pros::delay(3);
+                        timer += 3;
                         if (timer > 3000) {
                             return;
                         }
@@ -361,14 +397,14 @@ void score_until(Rollers situation, int blocks) {
         case SCORE_TOP:
             set_rollers(SCORE_TOP);
             while (!rightBlockDetected(get_color_top()) && scoreTime < 250) {
-                pros::delay(ez::util::DELAY_TIME);
-                scoreTime += ez::util::DELAY_TIME;
+                pros::delay(3);
+                scoreTime += 3;
             }
             scoreTime = 0;
             while (scoredBlocks < blocks && scoreTime < MAXSCORETIME) {
                 if (get_color_top() == allianceColor) {
                     while (get_color_top() == allianceColor) {
-                        pros::delay(ez::util::DELAY_TIME);
+                        pros::delay(3);
                     }
                     scoredBlocks++;
                 }
@@ -382,18 +418,16 @@ void score_until(Rollers situation, int blocks) {
 
 void colorSort_t() {
 
-    optical_top.set_integration_time(5);
-    optical_mid.set_integration_time(5);
-    optical_bot.set_integration_time(5);
+    optical_top.set_integration_time(3);
+    optical_mid.set_integration_time(3);
+    optical_bot.set_integration_time(3);
     optical_top.set_led_pwm(100);
     optical_mid.set_led_pwm(100);
     optical_bot.set_led_pwm(100);
 
     while (true) {
         if(doColorSort) colorSortLoop();
-        piston_blocker_top.set_value(stateBlocker_top);
-        piston_blocker_bot.set_value(stateBlocker_bot);
-        print(3, "Color sort active: " + std::to_string(doColorSort));
+        //print(3, "Color sort active: " + std::to_string(doColorSort));
         pros::delay(3);
     }
 }
@@ -460,12 +494,15 @@ void control_punchers() {
 void misc_t() {
     while (true) {
         control_loader();
-        control_punchers();
+        //control_punchers();
         control_pto();
         piston_loader.set_value(stateLoader);
         piston_puncher_mid.set_value(statePuncherMid);
         piston_puncher_top.set_value(statepuncherTop);
         piston_pto.set_value(statePto);
+        print(1, "x " + std::to_string(chassis.odom_pose_get().x));
+        print(2, "y " + std::to_string(chassis.odom_pose_get().y));
+        print(3, "theta " + std::to_string(chassis.odom_pose_get().theta));
         pros::delay(ez::util::DELAY_TIME);
     }
 }

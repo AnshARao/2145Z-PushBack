@@ -1,13 +1,12 @@
 #include "main.h"
-#include "EZ-Template/auton.hpp"
+#include "EZ-Template/auton.hpp"  // IWYU pragma: keep
 #include "EZ-Template/sdcard.hpp"
 #include "autons.hpp"
 #include "controls.hpp"
-#include "pros/colors.hpp"
+#include "pros/colors.hpp"  // IWYU pragma: keep
 #include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "subsystems.hpp"
-
 
 void initialize() {
   allianceColor = Alliances::NONE;
@@ -15,9 +14,9 @@ void initialize() {
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
   // Configure your chassis controls
-  chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
-  chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
+  chassis.opcontrol_curve_buttons_toggle(true);   
+  chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0);
 
   default_constants();
 
@@ -26,9 +25,13 @@ void initialize() {
 
     auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
-      {sawpLeft, "Sawp Left", green},
-      {sawpRight, "Sawp Right", green},
-      {skills, "Skills", black},
+        {skills, "Skills", black},
+      {left7Odom, "Left 7 Odom", green},
+      {right7Odom, "Right 7 Odom", green},
+      {left7PID, "Left 7 PID", blue},
+      {right7PID, "Right 7 PID", blue},
+      {left8Odom, "Rush Left", red},
+      {right8Odom, "Rush Right", red},
     });
 
     chassis.initialize();
@@ -97,7 +100,7 @@ void autonomous() {
   You can do cool curved motions, but you have to give your robot the best chance
   to be consistent
   */
-  matchState = AUTO_PID;
+  matchState = AUTO_ODOM;
   auton_sel.selector_callback();
 }
 
@@ -210,19 +213,10 @@ void opcontrol() {
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
   while (true) {
-    // Gives you some extras to make EZ-Template ezier
-    ez_template_extras();
+    //ez_template_extras();
 
-    if (!chassis.pid_tuner_enabled()) chassis.opcontrol_tank();
-    // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
-    // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
-    // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
-    // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
-
-    // . . .
-    // Put more user control code here!
-    // . . .
+    chassis.opcontrol_tank();
     
-    pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
+    pros::delay(ez::util::DELAY_TIME);
   }
 }
