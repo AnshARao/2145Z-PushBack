@@ -240,6 +240,7 @@ static void selectAuton(lv_event_t* e) {
 	}
 	lv_obj_add_state(target, LV_STATE_CHECKED);
 	auton_sel.selector_callback = (*getAuton).callback;
+    auton_sel.selector_name = (*getAuton).name;
 	// Set currentField based on selected auton
 	if ((*getAuton).callback.target<void(*)()>() && *(*getAuton).callback.target<void(*)()>() == skills) {
 		currentField = Fields::SKILLS;

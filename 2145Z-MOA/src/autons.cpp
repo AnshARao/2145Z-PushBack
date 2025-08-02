@@ -1,4 +1,5 @@
 #include "autons.hpp"
+#include <cctype>
 #include <cstdlib>
 #include <string>
 #include "EZ-Template/drive/drive.hpp"
@@ -347,8 +348,7 @@ void test() {
 }
 
 void left7Odom() {
-  // if (matchState == DISABLED) return;
-  //start touching alliance park zone, facing perpendicular wall
+  //start touching alliance park zone
   set_rollers(STOP);
   set_position(-50, 18, 0);
 
@@ -358,26 +358,22 @@ void left7Odom() {
   set_loader(true);
   set_turn({-60, 46}, fwd, TURN_SPEED);
   wait(WAIT);
-  move_point({-60, 46}, fwd, 127);
+  move_point({-58.5, 46}, fwd, 127);
   set_rollers(HOPPER_BOTTOM);
   wait(WAIT);
   doColorSort = false;
-  wait(150);
+  wait(200);
 
-  // go back and turn
-  move_point({-40, 46}, rev, DRIVE_SPEED);
-  set_rollers(OUTTAKE);
-  wait(150);
-  set_rollers(HOPPER_BOTTOM);
+  // go back and score long goal
+  // set_drive(-9, DRIVE_SPEED);
+  // wait(WAIT);
+  set_drive(-9, DRIVE_SPEED);
   wait(WAIT);
   set_loader(false);
-  //set_turn(90, TURN_SPEED, ccw, true);
-  // set_turn({-34, 47}, fwd, 60, ccw);
-  // wait(WAIT);
-  // // go to close long goal
-  // set_drive(6, DRIVE_SPEED);
+  set_rollers(HOPPER_BOTTOM);
+  wait(WAIT);
+  set_turn({-34, 47}, fwd, TURN_SPEED);
   move_point({-34, 47}, fwd, DRIVE_SPEED);
-  //set_rollers(SCORE_TOP);
   set_rollers(12000);
   stateHood = false;
   wait(WAIT);
@@ -391,6 +387,7 @@ void left7Odom() {
   wait(CHAIN);
   set_turn({-14.5, 13.5}, fwd, TURN_SPEED);
   wait(CHAIN);  
+  wait(500);
   move_point({-14.5, 13.5}, fwd, DRIVE_SPEED);
   //set_rollers(SCORE_MID);
   set_rollers(12000, -3000);
@@ -400,37 +397,75 @@ void left7Odom() {
 }
 
 void right7Odom() {
-  // if (matchState == DISABLED) return;
-  //start touching alliance park zone, facing perpendicular wall
+  //start touching alliance park zone, facing perpendicular to wall
   set_rollers(STOP);
   set_position(-50, -18, 180);
 
+ set_drive(26.25, DRIVE_SPEED, true);
+  set_loader(true);
+  set_rollers(6000);
+  wait(QUICK);
+  set_turn({-58, -44.25}, fwd, TURN_SPEED);
+  wait(QUICK);
+  set_drive(9, 127);
+  wait(WAIT);
+  wait(3000);
+
+  set_drive(-9, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn({-34, -47}, fwd, TURN_SPEED);
+  set_loader(false);
+  wait(WAIT);
+  set_drive(16, DRIVE_SPEED);
+  set_rollers(SCORE_TOP);  
+  wait(WAIT);
+  wait(5000);
+
+  //score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
+  move_point({-24, -23.5}, fwd, DRIVE_SPEED);
+  set_rollers(INTAKE);
+  wait(CHAIN);
+  set_turn({-14.5, -13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  wait(500);
+  move_point({-14.5, -13.5}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_MID);
+  stateBlocker_bot = false;
+  set_rollers(-8000, vltg_top, 12000);
+  wait(WAIT);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void elimsLeft() {
+   //start touching alliance park zone
+  set_rollers(STOP);
+  set_position(-50, 18, 0);
+
   // go to matchloading and load 3
-  move_point({-50, -46.5}, fwd, DRIVE_SPEED);
+  move_point({-50, 46}, fwd, DRIVE_SPEED);
   wait(WAIT);
   set_loader(true);
-  set_turn({-60, -46.5}, fwd, TURN_SPEED);
+  set_turn({-60, 46}, fwd, TURN_SPEED);
   wait(WAIT);
-  move_point({-60, -46.5}, fwd, 127);
-  set_rollers(HOPPER_BOTTOM);
+  move_point({-58.5, 46}, fwd, 127);
+  set_rollers(INTAKE);
   wait(WAIT);
-  doColorSort = false;
-  wait(150);
+  doColorSort = true;
+  wait(1000);
 
-  // go back and turn
-  move_point({-40, -46}, rev, DRIVE_SPEED);
-  set_rollers(OUTTAKE);
-  wait(150);
-  set_rollers(HOPPER_BOTTOM);
+  // go back and score long goal
+  // set_drive(-9, DRIVE_SPEED);
+  // wait(WAIT);
+  set_drive(-9, DRIVE_SPEED);
   wait(WAIT);
   set_loader(false);
-  //set_turn(90, TURN_SPEED, ccw, true);
-  // set_turn({-34, 47}, fwd, 60, ccw);
-  // wait(WAIT);
-  // // go to close long goal
-  // set_drive(6, DRIVE_SPEED);
-  move_point({-34, -47}, fwd, DRIVE_SPEED);
-  //set_rollers(SCORE_TOP);
+  set_rollers(INTAKE);
+  wait(WAIT);
+  set_turn({-34, 47}, fwd, TURN_SPEED);
+  move_point({-34, 47}, fwd, DRIVE_SPEED);
   set_rollers(12000);
   stateHood = false;
   wait(WAIT);
@@ -439,18 +474,138 @@ void right7Odom() {
   // back up and score middle goal
   set_drive(-6, DRIVE_SPEED);
   wait(WAIT);
+  move_point({-24, 23.5}, fwd, DRIVE_SPEED);
+  set_rollers(INTAKE);
+  wait(CHAIN);
+  set_turn({-14.5, 13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  wait(500);
+  move_point({-14.5, 13.5}, fwd, DRIVE_SPEED);
+  //set_rollers(SCORE_MID);
+  set_rollers(12000, -3000);
+  wait(WAIT);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void elimsRight() {
+  //start touching alliance park zone, facing perpendicular to wall
+  set_rollers(STOP);
+  set_position(-50, -18, 180);
+
+  set_drive(26.25, DRIVE_SPEED, true);
+  set_loader(true);
+  set_rollers(6000);
+  wait(QUICK);
+  set_turn({-58, -44.25}, fwd, TURN_SPEED);
+  wait(QUICK);
+  set_drive(9, 127);
+  wait(WAIT);
+  wait(3000);
+
+  set_drive(-9, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn({-34, -47}, fwd, TURN_SPEED);
+  set_loader(false);
+  wait(WAIT);
+  set_drive(16, DRIVE_SPEED);
+  set_rollers(SCORE_TOP);  
+  wait(WAIT);
+  wait(5000);
+
+  //score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
   move_point({-24, -23.5}, fwd, DRIVE_SPEED);
   set_rollers(HOPPER_BOTTOM);
   wait(CHAIN);
   set_turn({-14.5, -13.5}, fwd, TURN_SPEED);
   wait(CHAIN);  
-  move_point({-14.5, -13.5}, fwd, DRIVE_SPEED);
+  wait(500);
+  move_point({-14.5, -14}, fwd, DRIVE_SPEED);
   //set_rollers(SCORE_MID);
-  stateBlocker_bot = false;
-  set_rollers(-12000, vltg_top, 12000);
+  set_rollers(SCORE_BOT);
   wait(WAIT);
   wait(5000);
   set_rollers(STOP);
+}
+
+void left4Odom() {
+  //start touching alliance park zone
+  set_rollers(STOP);
+  set_position(-50, 18, 0);
+
+  // go to matchloading and load 3
+  move_point({-50, 47}, fwd, 80);
+  wait(WAIT);
+  set_turn({-34, 47.5}, fwd, TURN_SPEED);
+  wait(WAIT);
+  stateBlocker_bot = false;
+  move_point({-33.5, 47.5}, fwd, DRIVE_SPEED);
+  stateHood = false;
+  wait(WAIT);
+  set_rollers(12000);
+  wait(1000);
+
+  // back up and score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(HOPPER_TOP);
+  move_point({-24, 23.5}, fwd, 80);
+  wait(CHAIN);
+  set_turn({-14.5, 13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  move_point({-14.25, 13.75}, fwd, 80);
+  set_rollers(SCORE_MID);
+  stateBlocker_bot = true;
+  //set_rollers(12000, -12000);
+  wait(WAIT);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void right4Odom() {
+    //start touching alliance park zone, facing perpendicular to wall
+  set_rollers(STOP);
+  set_position(-50, -18, 180);
+
+  // get 3 blocks
+  move_point({-50, -46.5}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn({-34, -46}, fwd, TURN_SPEED);
+  wait(QUICK);
+  move_point({-33.5, -46, 90}, fwd, 80);
+  stateBlocker_bot = false;
+  stateHood = false;
+  wait(QUICK);
+  set_rollers(12000);
+  wait(1500);
+
+  //score middle goal
+  set_drive(-6, DRIVE_SPEED);
+  wait(WAIT);
+  stateBlocker_bot = true;
+  move_point({-24, -23.5}, fwd, 80);
+  set_rollers(HOPPER_BOTTOM);
+  wait(CHAIN);
+  set_turn({-14.25, -13.5}, fwd, TURN_SPEED);
+  wait(CHAIN);  
+  move_point({-14.25, -13.5}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  wait(250);
+  stateBlocker_bot = false;
+  set_rollers(-12000, 12000, 12000);
+  set_rollers(-12000, 12000, 12000);
+  set_rollers(-12000, 12000, 12000);
+  set_rollers(-12000, 12000, 12000);
+  set_rollers(-12000, 12000, 12000);
+  wait(5000);
+  set_rollers(STOP);
+}
+
+void move_forward() {
+  set_drive(6, DRIVE_SPEED);
+  wait(WAIT);
 }
 
 void left7PID() {
@@ -557,169 +712,129 @@ void right8Odom() {
 
 }
 
-void skills() {
+void skills1() {
   set_position(-50, -18, 180);
-  doColorSort = true;
+  doColorSort = false;
 
   // go to matchloading and load 3
-  move_point({-50, -46.5}, fwd, DRIVE_SPEED);
-  wait(WAIT);
+  move_point({-50, -47}, fwd, DRIVE_SPEED);
   set_loader(true);
-  set_turn({-60, -46.5}, fwd, TURN_SPEED);
+  wait(QUICK);
+  set_turn({-59, -47}, fwd, TURN_SPEED);
+  wait(QUICK);
+  move_point({-59, -47, 272}, fwd, 127);
+  set_rollers(HOPPER_TOP);
   wait(WAIT);
-  move_point({-57.5, -46.5}, fwd, DRIVE_SPEED);
-  set_rollers(INTAKE);
-  wait(WAIT);
-  wait(750);
+  wait(1250);
 
   // go back and turn
-  move_point({-40, -46}, rev, DRIVE_SPEED);
+  move_point({-46, -47, 270}, rev, DRIVE_SPEED);
   wait(WAIT);
   set_loader(false);
-  
-  set_turn({-25, -24}, fwd, TURN_SPEED);
+
+  set_turn(91.5 , TURN_SPEED);
   wait(WAIT);
-  
-  set_drive(6, DRIVE_SPEED);
+
+  move_point({-34, -47, 90}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_TOP);
+  wait(6000);
+  set_drive(-16, DRIVE_SPEED);
+  wait(WAIT);
+  move_point({-24, -34}, fwd, DRIVE_SPEED);
+  set_rollers(HOPPER_TOP);
+  set_loader(true);
   wait(CHAIN);
-  move_point({-25, -24}, fwd, 45);
-  wait(CHAIN);
+  //move_point({48, -34}, fwd, DRIVE_SPEED);
+  // set_turn({50, -34}, fwd, TURN_SPEED);
+  // wait(CHAIN);
+  move_point({40, -34, 180}, fwd, DRIVE_SPEED);
+  wait(QUICK);
+
+  move_point({40, -49}, fwd, DRIVE_SPEED);
+  wait(QUICK);
+  move_point({57, -49}, fwd, 127);
+  wait(QUICK);
+  wait(1250);
+
+    // go back and turn
+  move_point({46, -49, 90}, rev, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(false);
+
+  set_turn(91.5 , TURN_SPEED);
+  wait(WAIT);
+
+  move_point({34, -49, 270}, fwd, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_TOP);
 
 
-  move_point({24, -24}, fwd, DRIVE_SPEED);
-  wait(WAIT);
-  
-  // set_turn({14, -14}, fwd, TURN_SPEED);
-  // wait(WAIT);
-  // move_point({14, -14}, fwd, DRIVE_SPEED);
-  // set_rollers(SCORE_MID);
-  // wait(WAIT);
+
+  set_loader(false);
+
 }
 
-void skills1() {
-  allianceColor = RED;
-  colorSet(allianceColor, allianceInd);
-  set_position(-62.5, -18, 0); // start
+void skills() {
+  set_position(-50, -18, 180);
+  doColorSort = false;
 
-  set_drive(42, DRIVE_SPEED); // clear out zone
-  wait(CHAIN);
-
-  set_turn(90, TURN_SPEED); // turn to 4 stack
-  wait(CHAIN);
-
-  set_drive(36, DRIVE_SPEED); // drive to 4 stack
-  wait(CHAIN);
-
-  set_turn(135, TURN_SPEED); // turn to center goal
-  wait(CHAIN);
-
-  set_drive(16, DRIVE_SPEED); // drive to center goal
-  wait(CHAIN);
-
-  wait(500); // *TEMP* score center goal
-
-  move_point({-48, 48, 135}, ez::rev, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(270, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(10, DRIVE_SPEED);
-  wait(CHAIN);
-
+  set_drive(26.25, DRIVE_SPEED, true);
   set_loader(true);
+  set_rollers(HOPPER_TOP);
+  wait(QUICK);
+  set_turn({-58, -44.25}, fwd, TURN_SPEED);
+  wait(QUICK);
+  set_drive(9, 127);
   wait(WAIT);
-  wait(1000);
+  wait(1250);
 
-  set_drive(-10, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(90, TURN_SPEED, ez::ccw);
-  wait(CHAIN);
-
-  set_drive(14, DRIVE_SPEED);
-  wait(CHAIN);
-
-  wait(1000); // *TEMP*
-  move_point({-44, 48}, rev, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(180, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(98, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(270, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(14, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_loader(true);
+  set_drive(-9, DRIVE_SPEED);
   wait(WAIT);
-  wait(1000);
+  set_turn({-34, -47}, fwd, TURN_SPEED);
+  set_loader(false);
+  wait(WAIT);
+  set_drive(16, DRIVE_SPEED);
+  set_rollers(SCORE_TOP);  
+  wait(WAIT);
+  wait(5000);
 
-  set_drive(-14, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(90, TURN_SPEED, ez::cw);
-  wait(CHAIN);
-
-  set_drive(10, DRIVE_SPEED);
-  wait(CHAIN);
-
-  wait(1000); // *TEMP*
   set_drive(-12, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(0, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(14, DRIVE_SPEED);
-  wait(CHAIN);
-
+  wait(WAIT);
+  set_rollers(HOPPER_TOP);
+  move_point({-24, -32}, fwd, TURN_SPEED);
+  wait(WAIT);
   set_turn(90, TURN_SPEED);
-  wait(CHAIN);
+  set_drive(72, 80);
+  wait_until(45);
+  chassis.pid_speed_max_set(40);
+  wait(WAIT);
+  set_turn(180, 60);
+  wait(WAIT);
+  set_loader(true);
+  move_point({50, -46.5}, fwd, DRIVE_SPEED);
+  wait(QUICK);
+  set_turn({58, -46.5}, fwd, TURN_SPEED);
+  wait(QUICK);
+  set_drive(9, 127);
+  wait(WAIT);
+  wait(1250);
 
-  set_drive(70, DRIVE_SPEED);
-  wait(CHAIN);
 
-  move_point({48, -51}, fwd, DRIVE_SPEED);
-  wait(CHAIN);
+  set_drive(-9, DRIVE_SPEED);
+  wait(WAIT);
+  set_loader(false);
+  set_turn({34, -47}, fwd, TURN_SPEED);
+  set_loader(false);
+  wait(WAIT);
+  set_drive(16, DRIVE_SPEED);
+  wait(WAIT);
+  set_rollers(SCORE_TOP);
+  wait(5000);
 
-  set_turn(90, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(8, DRIVE_SPEED);
-  wait(CHAIN);
-
-  wait(1000);
-  set_drive(-8, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_swing(ez::RIGHT_SWING, 0, SWING_SPEED, 60, ccw);
-  wait(CHAIN);
-
-  set_drive(30, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(270, TURN_SPEED);
-  wait(CHAIN);
-
-  move_point({24, 24}, fwd, DRIVE_SPEED);
-  wait(CHAIN);
-
-  set_turn(225, TURN_SPEED);
-  wait(CHAIN);
-
-  set_drive(14, DRIVE_SPEED);
-  wait(CHAIN);
-
-  wait(1000);
-  set_drive(-4, DRIVE_SPEED);
-  wait(CHAIN);
-
-  move_point({62, 0}, fwd, DRIVE_SPEED);
-  wait(CHAIN);
+  set_drive(-18, DRIVE_SPEED);
+  wait(WAIT);
+  set_turn({64, 0}, fwd, TURN_SPEED);
+  wait(WAIT);
+  set_drive(127);
 }

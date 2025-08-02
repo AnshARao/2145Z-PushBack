@@ -1,9 +1,11 @@
 #include "main.h"
+#include <string>
 #include "EZ-Template/auton.hpp"  // IWYU pragma: keep
 #include "EZ-Template/sdcard.hpp"
 #include "autons.hpp"
 #include "controls.hpp"
 #include "pros/colors.hpp"  // IWYU pragma: keep
+#include "pros/misc.hpp"
 #include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "subsystems.hpp"
@@ -15,7 +17,7 @@ void initialize() {
 
   // Configure your chassis controls
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
-  chassis.opcontrol_curve_buttons_toggle(true);   
+  chassis.opcontrol_curve_buttons_toggle(false);   
   chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0);
 
   default_constants();
@@ -25,13 +27,17 @@ void initialize() {
 
     auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
-        {skills, "Skills", black},
+      {move_forward, "forward", black},
+      {skills, "Skills", black},
+      // {elimsLeft, "Elims Left", red},
+      // {elimsRight, "Elims Right", red},
       {left7Odom, "Left 7 Odom", green},
       {right7Odom, "Right 7 Odom", green},
+      {left4Odom, "Left 4 Odom", orange},
+      {right4Odom, "Right 4 Odom", orange},
       {left7PID, "Left 7 PID", blue},
       {right7PID, "Right 7 PID", blue},
-      {left8Odom, "Rush Left", red},
-      {right8Odom, "Rush Right", red},
+
     });
 
     chassis.initialize();
@@ -101,6 +107,7 @@ void autonomous() {
   to be consistent
   */
   matchState = AUTO_ODOM;
+  controlla.print(1, 0, auton_sel.selector_name.c_str());
   auton_sel.selector_callback();
 }
 
@@ -211,11 +218,24 @@ void opcontrol() {
   matchState = DRIVER;
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+  // const int totalTIme = 105;
+  // int curTime = pros::millis();
+  currentHopper = TOP;
 
   while (true) {
     //ez_template_extras();
 
     chassis.opcontrol_tank();
+    if (pros::competition::is_connected()) {
+      
+    }
+    print(4, "prox: " + std::to_string(optical_bot.get_proximity()));
+
+            if (controlla.get_digital_new_press(BUTTON_HOPPER)) {
+            currentHopper = currentHopper == TOP ? BOTTOM : TOP;
+            controlla.rumble(".");
+            controlla.print(1, 0, "Hopper State: %s", currentHopper == TOP ? "TOP" : "BOTTOM");
+        }
     
     pros::delay(ez::util::DELAY_TIME);
   }

@@ -26,8 +26,6 @@ class Coordinate {
 extern Coordinate currentPoint;
 extern vector<Coordinate> autonPath;
 
-void flip();
-
 // Internal math
 double get_distance(Coordinate point1, Coordinate point2);
 double get_theta(Coordinate point1, Coordinate point2, ez::drive_directions direction);

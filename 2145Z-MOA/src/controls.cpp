@@ -1,4 +1,5 @@
 #include "controls.hpp"
+#include <functional>
 #include <string>
 #include <vector>
 #include "EZ-Template/util.hpp"
@@ -91,14 +92,16 @@ void set_rollers(Rollers situation) {
             break;
         case INTAKE:
             set_rollers(12000);
+            doColorSort = true;
             stateHopper = false;
             stateHood = true;
-            //doColorSort = true;
+            if (currentHopper == TOP) {
+                stateBlocker_top = true;
+            }
             break;
         case HOPPER_BOTTOM:
             set_rollers(12000, 12000, -12000);
             stateBlocker_bot = false;
-            doColorSort = false;
             break;
         case HOPPER_TOP:
             set_rollers(12000);
@@ -109,8 +112,17 @@ void set_rollers(Rollers situation) {
             set_rollers(-12000);
             break;
         case SCORE_TOP:
-            stateBlocker_top = false;
-            stateHopper = true;
+            switch (currentHopper) {
+                case TOP:
+                    stateBlocker_top = false;
+                    stateHopper = true;
+                    break;
+                case BOTTOM:
+                    stateBlocker_bot = false;
+                    break;
+                default:
+                    break;
+            }
             stateHood = false;
             set_rollers(12000);
             break;
@@ -124,13 +136,31 @@ void set_rollers(Rollers situation) {
                     set_rollers(12000, -12000);
                     break;
             }
-            stateBlocker_top = false;
-            stateHopper = true;
+            switch (currentHopper) {
+                case TOP:
+                    stateBlocker_top = false;
+                    stateHopper = true;
+                    break;
+                case BOTTOM:
+                    stateBlocker_bot =false;
+                    break;
+                default:
+                    break;
+            }
             break;
         case SCORE_BOT:
             set_rollers(-12000);
-            stateHopper = true;
-            stateBlocker_top = false;
+            switch (currentHopper) {
+                case TOP:
+                    stateBlocker_top = false;
+                    stateHopper = true;
+                    break;
+                case BOTTOM:
+                    stateBlocker_bot =false;
+                    break;
+                default:
+                    break;
+            }
         default:
             set_rollers(0);
             break;
@@ -140,7 +170,7 @@ void set_rollers(Rollers situation) {
 
 void control_rollers() {
     if (matchState != DRIVER) return;
-    if (ctrlLock) return;
+    if (ctrlLock && !override) return;
     if (controlla.get_digital(BUTTON_INTAKE)) {
         set_rollers(INTAKE);
     }   else if (controlla.get_digital(BUTTON_OUTTAKE)) {
@@ -151,7 +181,6 @@ void control_rollers() {
         set_rollers(SCORE_TOP);
     }   else {
         set_rollers(STOP);
-        stateHopper = false;
     }
 }
 
@@ -200,6 +229,7 @@ void roller_t() {
     motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
     while (true) {
+
         control_rollers();
         motor_roller_front.move_voltage(vltg_front);
         motor_roller_top.move_voltage(vltg_top);
@@ -217,7 +247,7 @@ void roller_t() {
 #pragma region colorSort
 
 Alliances get_color_top() {
-    if (optical_top.get_proximity() > 75) {
+    if (optical_top.get_proximity() > 40) {
         if (optical_top.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -235,7 +265,7 @@ Alliances get_color_top() {
 }
 
 Alliances get_color_mid() {
-    if (optical_mid.get_proximity() > 75) {
+    if (optical_mid.get_proximity() > 40) {
                 if (optical_mid.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -254,7 +284,7 @@ Alliances get_color_mid() {
 }
 
 Alliances get_color_bot() {
-    if (optical_bot.get_proximity() > 75) {
+    if (optical_bot.get_proximity() > 40) {
                 if (optical_bot.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -291,14 +321,20 @@ void colorSortLoop() {
     Alliances blockColor_mid = get_color_mid();
     Alliances blockColor_bot = get_color_bot();
     colorSet(blockColor_bot, colorInd);
-    print(4, "bottom color is wrong? " + std::to_string(wrongBlockDetected(blockColor_bot)));
     if (matchState != DISABLED) {
         Rollers temp_roller = curRoller;
         if (wrongBlockDetected(blockColor_bot)) {
             ctrlLock = true;
-            // set_rollers(STOP);
-            // pros::delay(500);
-            set_rollers(HOPPER_BOTTOM);
+            switch (currentHopper) {
+                case TOP:
+                    set_rollers(HOPPER_BOTTOM);
+                    break;
+                case BOTTOM: 
+                    set_rollers(HOPPER_TOP);
+                    break;
+                default:
+                    break;
+            }
             int MAXSORTTIME = 1000;
             while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
                 pros::delay(3);
@@ -314,7 +350,16 @@ void colorSortLoop() {
             //print("right color detected");
             int MAXSORTTIME = 2000;
             ctrlLock = true;
-            set_rollers(HOPPER_TOP);
+            switch (currentHopper) {
+                case TOP:
+                    set_rollers(HOPPER_TOP);
+                    break;
+                case BOTTOM: 
+                    set_rollers(HOPPER_BOTTOM);
+                    break;
+                default:
+                    break;
+            }
             while (!wrongBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
                 pros::delay(3);
                 sortTime += 3;
@@ -478,14 +523,10 @@ void set_puncher_top(bool state) {
 
 void control_punchers() {
     if (matchState != DRIVER) return;
-    if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1) && controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) {
-        statePuncherMid = true;
-        pros::delay(250);
-        statePuncherMid = false;
-    } else if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L2) && controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R2)) {
-        statepuncherTop = true;
-        pros::delay(250);
-        statepuncherTop = false;
+    if (controlla.get_digital_new_press(BUTTON_PUNCHER_MID)) {
+        set_puncher_mid(!statePuncherMid);
+    } else if (controlla.get_digital_new_press(BUTTON_PUNCHER_TOP)) {
+        set_puncher_top(!statepuncherTop);   
     }
 }
 
@@ -494,8 +535,11 @@ void control_punchers() {
 void misc_t() {
     while (true) {
         control_loader();
-        //control_punchers();
+        control_punchers();
         control_pto();
+        if (controlla.get_digital_new_press(BUTTON_OVERRIDE)) {
+            override = !override;
+        }
         piston_loader.set_value(stateLoader);
         piston_puncher_mid.set_value(statePuncherMid);
         piston_puncher_top.set_value(statepuncherTop);

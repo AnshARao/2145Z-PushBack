@@ -51,7 +51,7 @@
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.125
 #define OFFSET_VERT         -6.25
-#define OFFSET_HORI         3
+#define OFFSET_HORI         3.25
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
 #define SWING_SPEED         110
@@ -63,8 +63,11 @@
 #define BUTTON_SCORE_TOP    pros::E_CONTROLLER_DIGITAL_L1
 #define BUTTON_SCORE_MID    pros::E_CONTROLLER_DIGITAL_L2
 #define BUTTON_LOADER       pros::E_CONTROLLER_DIGITAL_B
-#define BUTTON_PTO          pros::E_CONTROLLER_DIGITAL_DOWN
-#define BUTTON_OVERRIDE     pros::E_CONTROLLER_DIGITAL_
+#define BUTTON_PTO          pros::E_CONTROLLER_DIGITAL_RIGHT
+#define BUTTON_OVERRIDE     pros::E_CONTROLLER_DIGITAL_LEFT
+#define BUTTON_HOPPER       pros::E_CONTROLLER_DIGITAL_Y
+#define BUTTON_PUNCHER_TOP pros::E_CONTROLLER_DIGITAL_DOWN
+#define BUTTON_PUNCHER_MID pros::E_CONTROLLER_DIGITAL_A
 
 #pragma endregion
 

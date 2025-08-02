@@ -17,21 +17,6 @@
 Coordinate currentPoint = {0, 0, 0};
 vector<Coordinate> autonPath = {};
 
-void flip() {
-	currentPoint.x = -currentPoint.x;
-	currentPoint.y = -currentPoint.y;
-	currentPoint.t = 360 -currentPoint.t;
-	if (currentPoint.t == 0) {
-		currentPoint.t = 180;
-		return;
-	}
-	if (currentPoint.t == 180) {
-		currentPoint.t = 0;
-		return;
-	}
-	return;
-}
-
 //
 // Internal math
 //
