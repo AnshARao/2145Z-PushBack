@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EZ-Template/api.hpp"
+#include "EZ-Template/util.hpp"
 #include "drive.hpp"
 #include "pros/colors.h"
 
@@ -47,7 +48,7 @@ void wait_until(double target);
 void wait_until(Coordinate coordinate);
 
 // Move to point wrappers
-void move_point(Coordinate newpoint, ez::drive_directions direction, int speed, bool slew = false);
+void move_point(Coordinate newpoint, int speed, ez::drive_directions direction = fwd, bool slew = false);
 
 // Drive set wrappers
 void set_drive(double distance, int speed, bool slew = false, bool correction = false);

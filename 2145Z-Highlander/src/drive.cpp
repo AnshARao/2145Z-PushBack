@@ -57,7 +57,7 @@ Coordinate get_point(Coordinate startPoint, double distance) {
 
 Coordinate get_point(Coordinate startPoint, double v_left, double v_right, double time) {
 	// Get the coordinate within the reference frame of the robot of the end point
-	double radius = (v_right + v_left) / (v_right - v_left) * (TRACK_WIDTH / 2);
+	double radius = (v_right + v_left) / (v_right - v_left) * ((double)TRACK_WIDTH / 2);
 	double theta = ((v_right - v_left) / TRACK_WIDTH * time) + (startPoint.t * M_PI / 180);
 
 	double relative_x = -((-radius * cos(theta) + radius) - (-radius * cos(startPoint.t * M_PI / 180) + radius));
@@ -224,7 +224,7 @@ void wait_until(Coordinate coordinate) {
 // Move to point wrappers
 //
 
-void moveToPoint(Coordinate newpoint, drive_directions direction, int speed, bool slew) {
+void move_point(Coordinate newpoint, drive_directions direction, int speed, bool slew) {
 	switch(matchState) {
 		case AUTO_ODOM:
 			chassis.pid_odom_set({{newpoint.x * okapi::inch, newpoint.y * okapi::inch}, direction, speed}, slew);
@@ -383,7 +383,7 @@ void set_swing(e_swing side, double theta, double main, double opp, e_angle_beha
 	double new_t = theta - currentPoint.t;
 	fmod(new_t, 360);
 	if(new_t < 0) new_t += 360;
-	double radius = (v_right + v_left) / (v_right - v_left) * (TRACK_WIDTH / 2);
+	double radius = (v_right + v_left) / (v_right - v_left) * ((double)TRACK_WIDTH / 2);
 	double arcLength = radius * new_t * M_PI / 180;
 
 	currentPoint = get_point(currentPoint, v_left, v_right, get_time_point(arcLength, v_all));
