@@ -18,16 +18,3 @@ void odom_boomerang_injected_pure_pursuit_example();
 void measure_offsets();
 
 void doNothing();
-void move_forward();
-void test();
-void left7Odom();
-void right7Odom();
-void elimsLeft();
-void elimsRight();
-void left4Odom();
-void right4Odom();
-void left7PID();
-void right7PID();
-void left8Odom();
-void right8Odom();
-void skills();

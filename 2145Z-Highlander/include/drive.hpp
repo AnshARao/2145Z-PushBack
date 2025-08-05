@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EZ-Template/api.hpp"
-#include "EZ-Template/util.hpp"
 #include "drive.hpp"
 #include "pros/colors.h"
 

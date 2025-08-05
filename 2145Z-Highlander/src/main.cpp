@@ -11,9 +11,8 @@
 #include "subsystems.hpp"
 
 void initialize() {
-  allianceColor = Alliances::NONE;
-
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
+  allianceColor = NONE;
 
   // Configure your chassis controls
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
@@ -27,17 +26,6 @@ void initialize() {
 
     auton_sel.selector_populate({
       {doNothing, "Auton Selector", pink},
-      {move_forward, "forward", black},
-      {skills, "Skills", black},
-      // {elimsLeft, "Elims Left", red},
-      // {elimsRight, "Elims Right", red},
-      {left7Odom, "Left 7 Odom", green},
-      {right7Odom, "Right 7 Odom", green},
-      {left4Odom, "Left 4 Odom", orange},
-      {right4Odom, "Right 4 Odom", orange},
-      {left7PID, "Left 7 PID", blue},
-      {right7PID, "Right 7 PID", blue},
-
     });
 
     chassis.initialize();
@@ -45,13 +33,9 @@ void initialize() {
     
     pros::Task PathViewerTask(pathViewerTask);
     pros::Task AngleCheckTask(angleCheckTask);
-    
-    pros::Task RollerTask(roller_t);
-    pros::Task MiscTask(misc_t);
-    //pros::Task ColorSortTask(colorSort_t);
   
-  print("Robot Initalized");
-  master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+    print("Robot Initalized");
+    master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
 /**
@@ -218,24 +202,10 @@ void opcontrol() {
   matchState = DRIVER;
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
-  // const int totalTIme = 105;
-  // int curTime = pros::millis();
-  currentHopper = TOP;
 
   while (true) {
     //ez_template_extras();
-
     chassis.opcontrol_tank();
-    if (pros::competition::is_connected()) {
-      
-    }
-    print(4, "prox: " + std::to_string(optical_bot.get_proximity()));
-
-            if (controlla.get_digital_new_press(BUTTON_HOPPER)) {
-            currentHopper = currentHopper == TOP ? BOTTOM : TOP;
-            controlla.rumble(".");
-            controlla.print(1, 0, "Hopper State: %s", currentHopper == TOP ? "TOP" : "BOTTOM");
-        }
     
     pros::delay(ez::util::DELAY_TIME);
   }
