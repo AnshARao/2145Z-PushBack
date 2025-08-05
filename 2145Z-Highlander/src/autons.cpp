@@ -1,15 +1,12 @@
-#include "autons.hpp"
-#include <cctype>
-#include <cstdlib>
-#include <string>
-#include "EZ-Template/drive/drive.hpp"
-#include "EZ-Template/util.hpp"
-#include "controls.hpp"
 #include "drive.hpp"
-#include "main.h" // IWYU pragma: keep
+#include "main.h"
 #include "pros/motors.h"
-#include "screen.hpp"
-#include "subsystems.hpp"
+
+/////
+// For installation, upgrading, documentations, and tutorials, check out our website!
+// https://ez-robotics.github.io/EZ-Template/
+/////
+
 
 ///
 // Drive Example
@@ -334,15 +331,20 @@ void measure_offsets() {
   if (chassis.odom_tracker_right != nullptr) chassis.odom_tracker_right->distance_to_center_set(r_offset);
   if (chassis.odom_tracker_back != nullptr) chassis.odom_tracker_back->distance_to_center_set(b_offset);
   if (chassis.odom_tracker_front != nullptr) chassis.odom_tracker_front->distance_to_center_set(f_offset);
-
 }
 
 // . . .
 // Make your own autonomous functions here!
 // . . .
 
-void doNothing() {}
+void doNothing() {
+
+}
 
 void test() {
+  
+}
+
+void skills() {
   
 }

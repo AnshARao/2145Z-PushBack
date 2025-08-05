@@ -38,7 +38,7 @@ class AutonSel {
     public:
         vector<AutonObj> autons = {};
         function<void()> selector_callback = doNothing; // make this doNothing
-        string selector_name = "";
+        string selector_name = "no name";
         void selector_populate(vector<AutonObj> auton_list);
 };
 

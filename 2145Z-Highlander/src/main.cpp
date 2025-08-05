@@ -1,41 +1,29 @@
 #include "main.h"
-#include <string>
-#include "EZ-Template/auton.hpp"  // IWYU pragma: keep
-#include "EZ-Template/sdcard.hpp"
-#include "autons.hpp"
-#include "controls.hpp"
-#include "pros/colors.hpp"  // IWYU pragma: keep
-#include "pros/misc.hpp"
-#include "pros/rtos.hpp"
 #include "screen.hpp"
-#include "subsystems.hpp"
+
+/////
+// For installation, upgrading, documentations, and tutorials, check out our website!
+// https://ez-robotics.github.io/EZ-Template/
+/////
+
 
 void initialize() {
+  // Print our branding over your terminal :D
+  ez::ez_template_print();
+
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
-  allianceColor = NONE;
 
   // Configure your chassis controls
+  chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
-  chassis.opcontrol_curve_buttons_toggle(false);   
-  chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0);
+  chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
   default_constants();
 
   // Initialize chassis and auton selector
-    default_constants();
-
-    auton_sel.selector_populate({
-      {doNothing, "Auton Selector", pink},
-    });
-
-    chassis.initialize();
-    uiInit();
-    
-    pros::Task PathViewerTask(pathViewerTask);
-    pros::Task AngleCheckTask(angleCheckTask);
-  
-    print("Robot Initalized");
-    master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+  chassis.initialize();
+  uiInit();
+  master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
 /**
@@ -44,7 +32,7 @@ void initialize() {
  * the robot is enabled, this task will exit.
  */
 void disabled() {
-  matchState = DISABLED;
+  // . . .
 }
 
 /**
@@ -90,9 +78,8 @@ void autonomous() {
   You can do cool curved motions, but you have to give your robot the best chance
   to be consistent
   */
-  matchState = AUTO_ODOM;
-  controlla.print(1, 0, auton_sel.selector_name.c_str());
-  auton_sel.selector_callback();
+
+  ez::as::auton_selector.selected_auton_call();  // Calls selected auton from autonomous selector
 }
 
 /**
@@ -199,14 +186,23 @@ void ez_template_extras() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-  matchState = DRIVER;
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
 
   while (true) {
-    //ez_template_extras();
-    chassis.opcontrol_tank();
-    
-    pros::delay(ez::util::DELAY_TIME);
+    // Gives you some extras to make EZ-Template ezier
+    ez_template_extras();
+
+    chassis.opcontrol_tank();  // Tank control
+    // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
+    // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
+    // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
+    // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
+
+    // . . .
+    // Put more user control code here!
+    // . . .
+
+    pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
 }

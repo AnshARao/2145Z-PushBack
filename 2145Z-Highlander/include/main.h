@@ -34,22 +34,21 @@
  */
 #define PROS_USE_LITERALS
 
-#include "api.h"    // IWYU pragma: keep
+#include "api.h"
 
 /**
  * You should add more #includes here
  */
-//#include "okapi/api.hpp"
-//#include "pros/api_legacy.h"
-#include "EZ-Template/api.hpp"  // IWYU pragma: keep
+// #include "okapi/api.hpp"
+// #include "pros/api_legacy.h"
+#include "EZ-Template/api.hpp"
 
 // More includes here...
-#include "autons.hpp"   // IWYU pragma: keep
-#include "subsystems.hpp"   // IWYU pragma: keep
-#include "drive.hpp"    // IWYU pragma: keep
-#include "screen.hpp"   // IWYU pragma: keep
 #include "autons.hpp"
-#include "controls.hpp" // IWYU pragma: keep
+#include "subsystems.hpp"
+#include "controls.hpp"
+#include "drive.hpp"
+#include "screen.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do
