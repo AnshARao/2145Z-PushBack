@@ -20,6 +20,10 @@
 #include "subsystems.hpp"
 #include "screen.hpp"
 
+#include "pros/misc.hpp"
+#include <fstream>
+#include <sstream>
+
 /**
  * @file screen.cpp
  * @brief This file contains the screen function for the brain
@@ -75,42 +79,95 @@ static const char* allianceColorNames[] = {"Blue", "None", "Red"};
 
 AutonSel auton_sel;
 
+// SD card file path for selected auton
+constexpr const char* SD_SELECTED_AUTON_FILE = "/usd/selected_auton.txt";
+
+// Helper: Find AutonObj by name
+AutonObj* find_auton_by_name(const std::string& name) {
+    for (auto& auton : auton_sel.autons) {
+        if (auton.name == name) return &auton;
+    }
+    return nullptr;
+}
+
+// Load selected auton from SD card (if present)
+void load_selected_auton_from_sd() {
+    if (!pros::usd::is_installed()) {
+        auton_sel.selector_callback = doNothing;
+        auton_sel.selector_name = "no name";
+        print(1, "SD card not found. Defaulting to doNothing.");
+        return;
+    }
+    FILE* file = fopen(SD_SELECTED_AUTON_FILE, "r");
+    if (!file) {
+        auton_sel.selector_callback = doNothing;
+        auton_sel.selector_name = "no name";
+        print(1, "No auton file. Defaulting to doNothing.");
+        return;
+    }
+    char buffer[128] = {0};
+    fgets(buffer, sizeof(buffer), file);
+    fclose(file);
+    std::string auton_name(buffer);
+    // Remove trailing newline
+    auton_name.erase(auton_name.find_last_not_of("\r\n") + 1);
+    AutonObj* found = find_auton_by_name(auton_name);
+    if (found) {
+        auton_sel.selector_callback = found->callback;
+        auton_sel.selector_name = found->name;
+        print(1, "Loaded auton: " + found->name);
+    } else {
+        auton_sel.selector_callback = doNothing;
+        auton_sel.selector_name = "no name";
+        print(1, "Auton not found. Defaulting to doNothing.");
+    }
+}
+
+// Save selected auton to SD card
+void save_selected_auton_to_sd(const std::string& name) {
+    if (!pros::usd::is_installed()) return;
+    FILE* file = fopen(SD_SELECTED_AUTON_FILE, "w");
+    if (!file) return;
+    fprintf(file, "%s\n", name.c_str());
+    fclose(file);
+}
+
 void AutonSel::selector_populate(vector<AutonObj> auton_list) { autons.insert(autons.end(), auton_list.begin(), auton_list.end()); }
 
 void angleCheckTask() {
-	while(true) {
-		if(aligning) {
-			auto target = autonPath.size() > 0 ? autonPath[0].t : 0;
-			auto current = fmod(chassis.odom_theta_get(), 360);
-			lv_label_set_text(angleText,
-							  (util::to_string_with_precision(current, 2) + " °" + "\ntarget: " + util::to_string_with_precision(target, 2)).c_str());
-			if(target + 0.15 >= current && target - 0.15 <= current)
-				lv_obj_set_style_bg_color(angleViewer, green, LV_PART_MAIN);
-			else
-				lv_obj_set_style_bg_color(angleViewer, red, LV_PART_MAIN);
-		}
-		pros::delay(10);
-	}
+    while(true) {
+        if(aligning) {
+            auto target = autonPath.size() > 0 ? autonPath[0].t : 0;
+            auto current = fmod(chassis.odom_theta_get(), 360);
+            lv_label_set_text(angleText,
+                              (util::to_string_with_precision(current, 2) + " °" + "\ntarget: " + util::to_string_with_precision(target, 2)).c_str());
+            if(target + 0.15 >= current && target - 0.15 <= current)
+                lv_obj_set_style_bg_color(angleViewer, green, LV_PART_MAIN);
+            else
+                lv_obj_set_style_bg_color(angleViewer, red, LV_PART_MAIN);
+        }
+        pros::delay(10);
+    }
 }
 
 int pathIter = 0;
 vector<Coordinate> pathDisplay;
 
 void resetViewer(bool full) {
-	if(full) {
-		auto preference = matchState;
-		matchState = MatchStates::DISABLED;
-		autonPath = {};
-		auton_sel.selector_callback();
-		pathDisplay = injectPath(autonPath, 1);
-		matchState = preference;
-		lv_img_set_src(autonField, &(currentField == Fields::MATCH ? matchField : skillsField));
-	}
-	pathIter = 0;
+    if(full) {
+        auto preference = matchState;
+        matchState = MatchStates::DISABLED;
+        autonPath = {};
+        auton_sel.selector_callback();
+        pathDisplay = injectPath(autonPath, 1);
+        matchState = preference;
+        lv_img_set_src(autonField, &(currentField == Fields::MATCH ? matchField : skillsField));
+    }
+    pathIter = 0;
 }
 
 void pathViewerTask() {
-	while(true) {
+    while(true) {
         if (allianceColor == BLUE) {
             pathDisplay[pathIter].x = -pathDisplay[pathIter].x;
             pathDisplay[pathIter].y = -pathDisplay[pathIter].y;
@@ -121,40 +178,40 @@ void pathViewerTask() {
                 pathDisplay[pathIter].t = 0;
             }
         }
-		if(pathIter < pathDisplay.size() && pathDisplay.size() > 1 && playing) {
-			lv_obj_clear_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
-			lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 97, 95 - (1.5 * pathDisplay[pathIter].y));
-			if(pathIter < pathDisplay.size() - 1) {
-				lv_img_set_angle(autonRobot, 10 * (pathDisplay[pathIter].t));
-				if(pathDisplay[pathIter].left == KEY)
-					pros::delay(pathDisplay[pathIter].right);
-				else {
-					double velocity = get_velocity(pathDisplay[pathIter].left) + get_velocity(pathDisplay[pathIter].right) / 2;
-					if(velocity == 0) velocity = get_velocity(pathDisplay[pathIter].left);
-					pros::delay(1000 * abs(get_time_point(1, velocity)));
-				}
-			}
-			if(pathIter == 1) pros::delay(500);
-			pathIter++;
-		} else if(pathIter >= pathDisplay.size()) {
-			pros::delay(1000);
-			resetViewer(false);
-		}
-		pros::delay(10);
-	}
+        if(pathIter < pathDisplay.size() && pathDisplay.size() > 1 && playing) {
+            lv_obj_clear_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 97, 95 - (1.5 * pathDisplay[pathIter].y));
+            if(pathIter < pathDisplay.size() - 1) {
+                lv_img_set_angle(autonRobot, 10 * (pathDisplay[pathIter].t));
+                if(pathDisplay[pathIter].left == KEY)
+                    pros::delay(pathDisplay[pathIter].right);
+                else {
+                    double velocity = get_velocity(pathDisplay[pathIter].left) + get_velocity(pathDisplay[pathIter].right) / 2;
+                    if(velocity == 0) velocity = get_velocity(pathDisplay[pathIter].left);
+                    pros::delay(1000 * abs(get_time_point(1, velocity)));
+                }
+            }
+            if(pathIter == 1) pros::delay(500);
+            pathIter++;
+        } else if(pathIter >= pathDisplay.size()) {
+            pros::delay(1000);
+            resetViewer(false);
+        }
+        pros::delay(10);
+    }
 }
 
 // // // // // // UI // // // // // //
 
 void colorSet(Alliances color, lv_obj_t* object) {
-	// Set on screen elements to the corresponding color
-	lv_color32_t color_use = theme_accent;
-	if(color == Alliances::RED) {
-		color_use = red;
-	}	else if(color == Alliances::BLUE) {
-		color_use = blue;
-	}
-	lv_obj_set_style_bg_color(object, color_use, LV_PART_MAIN);
+    // Set on screen elements to the corresponding color
+    lv_color32_t color_use = theme_accent;
+    if(color == Alliances::RED) {
+        color_use = red;
+    }	else if(color == Alliances::BLUE) {
+        color_use = blue;
+    }
+    lv_obj_set_style_bg_color(object, color_use, LV_PART_MAIN);
 }
 
 //
@@ -232,66 +289,67 @@ void uiInit() {
 //
 
 static void selectAuton(lv_event_t* e) {
-	AutonObj* getAuton = (AutonObj*)lv_event_get_user_data(e);
-	lv_obj_t* target = lv_event_get_target(e);
-	for(int i = 0; i < lv_obj_get_child_cnt(autonTable); i++) {
-		lv_obj_t* auton = lv_obj_get_child(autonTable, i);
-		lv_obj_clear_state(auton, LV_STATE_CHECKED);
-	}
-	lv_obj_add_state(target, LV_STATE_CHECKED);
-	auton_sel.selector_callback = (*getAuton).callback;
+    AutonObj* getAuton = (AutonObj*)lv_event_get_user_data(e);
+    lv_obj_t* target = lv_event_get_target(e);
+    for(int i = 0; i < lv_obj_get_child_cnt(autonTable); i++) {
+        lv_obj_t* auton = lv_obj_get_child(autonTable, i);
+        lv_obj_clear_state(auton, LV_STATE_CHECKED);
+    }
+    lv_obj_add_state(target, LV_STATE_CHECKED);
+    auton_sel.selector_callback = (*getAuton).callback;
     auton_sel.selector_name = (*getAuton).name;
-	// Set currentField based on selected auton
-	if ((*getAuton).callback.target<void(*)()>() && *(*getAuton).callback.target<void(*)()>() == skills) {
-		currentField = Fields::SKILLS;
-	} else {
-		currentField = Fields::MATCH;
-	}
-	resetViewer(true);
-	print(1, "Auton: " + getAuton->name);
+    // Set currentField based on selected auton
+    if ((*getAuton).callback.target<void(*)()>() && *(*getAuton).callback.target<void(*)()>() == skills) {
+        currentField = Fields::SKILLS;
+    } else {
+        currentField = Fields::MATCH;
+    }
+    resetViewer(true);
+    print(1, "Auton: " + getAuton->name);
+    save_selected_auton_to_sd(getAuton->name);
 }
 
 static void autonUpEvent(lv_event_t* e) {
-	lv_obj_scroll_by_bounded(autonTable, 0, lv_obj_get_height(autonTable), LV_ANIM_ON); 
-	lv_obj_scroll_by_bounded(console_container, 0, lv_obj_get_height(console_container), LV_ANIM_ON); 
+    lv_obj_scroll_by_bounded(autonTable, 0, lv_obj_get_height(autonTable), LV_ANIM_ON); 
+    lv_obj_scroll_by_bounded(console_container, 0, lv_obj_get_height(console_container), LV_ANIM_ON); 
 }
 
 static void autonDownEvent(lv_event_t* e) {
-	lv_obj_scroll_by_bounded(autonTable, 0, -lv_obj_get_height(autonTable), LV_ANIM_ON); 
-	lv_obj_scroll_by_bounded(console_container, 0, -lv_obj_get_height(console_container), LV_ANIM_ON);}
+    lv_obj_scroll_by_bounded(autonTable, 0, -lv_obj_get_height(autonTable), LV_ANIM_ON); 
+    lv_obj_scroll_by_bounded(console_container, 0, -lv_obj_get_height(console_container), LV_ANIM_ON);}
 
 static void angleCheckCloseEvent(lv_event_t* e) { aligning = false; }
 
 lv_event_cb_t AngleCheckCloseEvent = angleCheckCloseEvent;
 
 static void angleCheckEvent(lv_event_t* e) {
-	angleViewer = lv_msgbox_create(NULL, "check alignment", "0°", NULL, true);
-	angleText = lv_msgbox_get_text(angleViewer);
-	aligning = true;
+    angleViewer = lv_msgbox_create(NULL, "check alignment", "0°", NULL, true);
+    angleText = lv_msgbox_get_text(angleViewer);
+    aligning = true;
 
-	lv_obj_add_event_cb(lv_msgbox_get_close_btn(angleViewer), AngleCheckCloseEvent, LV_EVENT_PRESSED, NULL);
-	lv_obj_add_style(lv_msgbox_get_close_btn(angleViewer), &pushback, LV_PART_MAIN);
-	lv_obj_add_style(angleViewer, &pushback, LV_PART_MAIN);
-	lv_obj_set_style_text_font(angleViewer, &lv_font_montserrat_30, LV_PART_MAIN);
-	lv_obj_set_style_text_font(lv_msgbox_get_title(angleViewer), &lv_font_montserrat_14, LV_PART_MAIN);
-	lv_obj_set_style_text_font(lv_msgbox_get_close_btn(angleViewer), &lv_font_montserrat_24, LV_PART_MAIN);
-	lv_obj_set_width(angleViewer, 300);
-	lv_obj_align(angleViewer, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_add_event_cb(lv_msgbox_get_close_btn(angleViewer), AngleCheckCloseEvent, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_style(lv_msgbox_get_close_btn(angleViewer), &pushback, LV_PART_MAIN);
+    lv_obj_add_style(angleViewer, &pushback, LV_PART_MAIN);
+    lv_obj_set_style_text_font(angleViewer, &lv_font_montserrat_30, LV_PART_MAIN);
+    lv_obj_set_style_text_font(lv_msgbox_get_title(angleViewer), &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_set_style_text_font(lv_msgbox_get_close_btn(angleViewer), &lv_font_montserrat_24, LV_PART_MAIN);
+    lv_obj_set_width(angleViewer, 300);
+    lv_obj_align(angleViewer, LV_ALIGN_CENTER, 0, 0);
 }
 
 static void pauseEvent(lv_event_t* e) {
-	auto event = lv_event_get_code(e);
-	if(event == LV_EVENT_PRESSING) playing = false;
-	if(event == LV_EVENT_CLICKED) playing = true;
+    auto event = lv_event_get_code(e);
+    if(event == LV_EVENT_PRESSING) playing = false;
+    if(event == LV_EVENT_CLICKED) playing = true;
 }
 
 static void colorEvent(lv_event_t* e) {
-	allianceColor = (Alliances)(((int)allianceColor + 1) % 3);
-	colorSet(allianceColor, allianceInd);
+    allianceColor = (Alliances)(((int)allianceColor + 1) % 3);
+    colorSet(allianceColor, allianceInd);
     if (allianceColor == RED) chassis.drive_angle_set(chassis.odom_theta_get() + 90);
     if (allianceColor == BLUE) chassis.drive_angle_set(chassis.odom_theta_get() + 180);
     if (allianceColor == NONE) chassis.drive_angle_set(chassis.odom_theta_get() - 270);
-	resetViewer(true);
+    resetViewer(true);
     print(2, std::string("Alliance: ") + allianceColorNames[(int)allianceColor]);
 }
 
@@ -341,12 +399,12 @@ static void toggleConsoleEvent(lv_event_t* e) {
     if (showConsole) {
         lv_obj_clear_flag(autonTable, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(console_container, LV_OBJ_FLAG_HIDDEN);
-		print("Auton Selector Selected");
+        print("Auton Selector Selected");
 
     } else {
         lv_obj_add_flag(autonTable, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(console_container, LV_OBJ_FLAG_HIDDEN);
-		print("Console Selected");
+        print("Console Selected");
     }
 }
 
@@ -394,7 +452,7 @@ void autoSelectorInit() {
     lv_obj_set_scrollbar_mode(console_container, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_width(console_label, 200);
     lv_label_set_long_mode(console_label, LV_LABEL_LONG_WRAP);
-	lv_obj_set_scrollbar_mode(console_label, LV_SCROLLBAR_MODE_ON);
+    lv_obj_set_scrollbar_mode(console_label, LV_SCROLLBAR_MODE_ON);
     lv_obj_set_style_text_font(console_label, &lv_font_montserrat_10, LV_PART_MAIN);
 
     // autonField setup
@@ -404,14 +462,14 @@ void autoSelectorInit() {
     lv_img_set_src(autonField, &matchField);
     // lv_img_set_angle(autonField, 900);
     lv_obj_add_flag(autonField, LV_OBJ_FLAG_CLICKABLE);
-	lv_obj_add_event_cb(autonField, AngleCheckEvent, LV_EVENT_SHORT_CLICKED, NULL);
-	lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_CLICKED, NULL);
-	lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_PRESSING, NULL);
+    lv_obj_add_event_cb(autonField, AngleCheckEvent, LV_EVENT_SHORT_CLICKED, NULL);
+    lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(autonField, PauseEvent, LV_EVENT_PRESSING, NULL);
     // autonRobot setup
     lv_obj_add_style(autonRobot, &pushback, LV_PART_MAIN);
     lv_img_set_src(autonRobot, &pfp2145);
-	lv_obj_set_style_bg_opa(autonRobot, 0, LV_PART_MAIN);
-	lv_obj_set_style_outline_width(autonRobot, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(autonRobot, 0, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(autonRobot, 0, LV_PART_MAIN);
     lv_obj_add_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
 
     // autonUp setup
@@ -479,4 +537,7 @@ void autoSelectorInit() {
 
     // Set color for allianceInd
     colorSet(allianceColor, allianceInd);
+
+    // Load selected auton from SD card (if present)
+    load_selected_auton_from_sd();
 }
