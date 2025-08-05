@@ -6,12 +6,6 @@
 
 const int KEY = 267267;
 
-enum Wait {
-    WAIT = 0,
-    QUICK = 1,
-    CHAIN = 2
-};
-
 class Coordinate {
     public: 
         double x = 0;
@@ -37,32 +31,31 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 
 // Set position wrappers
 void set_position(double x, double y);
-void set_position(double x, double y, double t);
+void set_position(double x, double y, double t = 0);
+
+enum Wait {
+    WAIT = 0,
+    QUICK = 1,
+    CHAIN = 2
+};
 
 // Wait wrappers
 void wait(Wait type);
-void wait_until(okapi::QLength distance);
-void wait_until(okapi::QAngle theta);
+void wait(int millis);
+void wait(int millis, bool ignore = false);
 void wait_until(double target);
 void wait_until(Coordinate coordinate);
-void wait(int millis);
-void wait(int millis, bool ignore);
 
 // Move to point wrappers
-void move_point(Coordinate newpoint, ez::drive_directions direction, int speed, e_angle_behavior turn_behavior, bool use_slew);
-void move_point(Coordinate newpoint, ez::drive_directions direction, int speed);
+void move_point(Coordinate newpoint, ez::drive_directions direction, int speed, bool slew = false);
 
 // Drive set wrappers
-void set_drive(double distance, int speed, bool slew);
-void set_drive(double distance, int speed);
-void set_drive(int speed1);
+void set_drive(double distance, int speed, bool slew = false, bool correction = false);
+void set_drive(int speed);
 
 // Turn set wrappers
-void set_turn(double theta, int speed, e_angle_behavior behavior, bool use_slew);
-void set_turn(double theta, int speed, bool use_slew);
-void set_turn(double theta, int speed);
-void set_turn(Coordinate point, drive_directions direction, int speed, e_angle_behavior behavior);
-void set_turn(Coordinate point, drive_directions direction, int speed);
+void set_turn(double theta, int speed, e_angle_behavior behavior = shortest, bool slew = false);
+void set_turn(Coordinate point, drive_directions direction, int speed, e_angle_behavior behavior = shortest, bool use_slew = false);
 void set_turn_relative(double theta, int speed, e_angle_behavior behavior);
 void set_turn_relative(double theta, int speed);
 

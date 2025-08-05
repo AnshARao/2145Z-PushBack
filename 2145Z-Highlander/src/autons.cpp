@@ -344,5 +344,5 @@ void measure_offsets() {
 void doNothing() {}
 
 void test() {
-
+  
 }
