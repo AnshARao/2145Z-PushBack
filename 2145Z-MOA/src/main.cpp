@@ -45,10 +45,10 @@ void initialize() {
     
     pros::Task PathViewerTask(pathViewerTask);
     pros::Task AngleCheckTask(angleCheckTask);
-
+    
     pros::Task RollerTask(roller_t);
     pros::Task MiscTask(misc_t);
-    pros::Task ColorSortTask(colorSort_t);
+    //pros::Task ColorSortTask(colorSort_t);
   
   print("Robot Initalized");
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");

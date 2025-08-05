@@ -372,8 +372,9 @@ void left7Odom() {
   set_loader(false);
   set_rollers(HOPPER_BOTTOM);
   wait(WAIT);
-  set_turn({-34, 47}, fwd, TURN_SPEED);
-  move_point({-34, 47}, fwd, DRIVE_SPEED);
+  set_turn({-34, 46.5}, fwd, TURN_SPEED);
+  wait(WAIT);
+  move_point({-34, 46.5}, fwd, DRIVE_SPEED);
   set_rollers(12000);
   stateHood = false;
   wait(WAIT);
@@ -400,16 +401,17 @@ void right7Odom() {
   //start touching alliance park zone, facing perpendicular to wall
   set_rollers(STOP);
   set_position(-50, -18, 180);
+  doColorSort = true;
 
- set_drive(26.25, DRIVE_SPEED, true);
+  set_drive(27, DRIVE_SPEED, true);
   set_loader(true);
-  set_rollers(6000);
+  set_rollers(INTAKE);
   wait(QUICK);
-  set_turn({-58, -44.25}, fwd, TURN_SPEED);
+  set_turn({-58, -45}, fwd, TURN_SPEED);
   wait(QUICK);
   set_drive(9, 127);
   wait(WAIT);
-  wait(3000);
+  wait(215);
 
   set_drive(-9, DRIVE_SPEED);
   wait(WAIT);
@@ -419,18 +421,18 @@ void right7Odom() {
   set_drive(16, DRIVE_SPEED);
   set_rollers(SCORE_TOP);  
   wait(WAIT);
-  wait(5000);
+  wait(3000);
 
   //score middle goal
   set_drive(-6, DRIVE_SPEED);
   wait(WAIT);
   move_point({-24, -23.5}, fwd, DRIVE_SPEED);
-  set_rollers(INTAKE);
+  set_rollers(6000);
   wait(CHAIN);
-  set_turn({-14.5, -13.5}, fwd, TURN_SPEED);
+  set_turn({-14.5, -14}, fwd, TURN_SPEED);
   wait(CHAIN);  
   wait(500);
-  move_point({-14.5, -13.5}, fwd, DRIVE_SPEED);
+  move_point({-14.5, -14}, fwd, DRIVE_SPEED);
   //set_rollers(SCORE_MID);
   stateBlocker_bot = false;
   set_rollers(-8000, vltg_top, 12000);
@@ -837,4 +839,6 @@ void skills() {
   set_turn({64, 0}, fwd, TURN_SPEED);
   wait(WAIT);
   set_drive(127);
+  wait(3000);
+  set_drive(0);
 }

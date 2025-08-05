@@ -92,7 +92,7 @@ void set_rollers(Rollers situation) {
             break;
         case INTAKE:
             set_rollers(12000);
-            doColorSort = true;
+            //doColorSort = true;
             stateHopper = false;
             stateHood = true;
             if (currentHopper == TOP) {
@@ -109,9 +109,11 @@ void set_rollers(Rollers situation) {
             stateBlocker_top = true;
             break;
         case OUTTAKE:
+            doColorSort = false;
             set_rollers(-12000);
             break;
         case SCORE_TOP:
+            doColorSort = false;
             switch (currentHopper) {
                 case TOP:
                     stateBlocker_top = false;
@@ -127,6 +129,7 @@ void set_rollers(Rollers situation) {
             set_rollers(12000);
             break;
         case SCORE_MID:
+            doColorSort = false;
             switch (matchState) {
                 case MatchStates::AUTO_PID:
                 case MatchStates::AUTO_ODOM:
@@ -173,29 +176,19 @@ void control_rollers() {
     if (ctrlLock && !override) return;
     if (controlla.get_digital(BUTTON_INTAKE)) {
         set_rollers(INTAKE);
+        //ColorSortTask.resume();
     }   else if (controlla.get_digital(BUTTON_OUTTAKE)) {
+        //ColorSortTask.suspend();
         set_rollers(OUTTAKE);
     }   else if (controlla.get_digital(BUTTON_SCORE_MID)) {
+        //ColorSortTask.suspend();
         set_rollers(SCORE_MID);
     }   else if (controlla.get_digital(BUTTON_SCORE_TOP)) {
+        //ColorSortTask.suspend();
         set_rollers(SCORE_TOP);
     }   else {
+        //ColorSortTask.suspend();
         set_rollers(STOP);
-    }
-}
-
-void control_rollers_old() {
-    if (matchState != DRIVER) return;
-    if (controlla.get_digital(BUTTON_INTAKE)) {
-        set_rollers(12000, vltg_top, -12000);
-    } else if (controlla.get_digital(BUTTON_OUTTAKE)) {
-        set_rollers(-12000);
-    } else if (controlla.get_digital(BUTTON_SCORE_MID)) {
-        set_rollers(12000, -12000);
-    } else if (controlla.get_digital(BUTTON_SCORE_TOP)) {
-        set_rollers(12000);
-    }   else {
-        set_rollers(0);
     }
 }
 
@@ -247,7 +240,7 @@ void roller_t() {
 #pragma region colorSort
 
 Alliances get_color_top() {
-    if (optical_top.get_proximity() > 40) {
+    if (optical_top.get_proximity() > 20) {
         if (optical_top.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -265,7 +258,7 @@ Alliances get_color_top() {
 }
 
 Alliances get_color_mid() {
-    if (optical_mid.get_proximity() > 40) {
+    if (optical_mid.get_proximity() > 20) {
                 if (optical_mid.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -284,7 +277,7 @@ Alliances get_color_mid() {
 }
 
 Alliances get_color_bot() {
-    if (optical_bot.get_proximity() > 40) {
+    if (optical_bot.get_proximity() > 20) {
                 if (optical_bot.get_plugged_type() == pros::DeviceType::none) {
             // If the optical sensor is not plugged in, return NONE
             return Alliances::NONE;
@@ -322,6 +315,7 @@ void colorSortLoop() {
     Alliances blockColor_bot = get_color_bot();
     colorSet(blockColor_bot, colorInd);
     if (matchState != DISABLED) {
+        if (doColorSort) {
         Rollers temp_roller = curRoller;
         if (wrongBlockDetected(blockColor_bot)) {
             ctrlLock = true;
@@ -335,16 +329,16 @@ void colorSortLoop() {
                 default:
                     break;
             }
-            int MAXSORTTIME = 1000;
-            while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
-                pros::delay(3);
-                sortTime += 3;
-            }
-            motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-            set_rollers(temp_roller);
-            stateBlocker_bot = true;
-            ctrlLock = false;
-            sortTime = 0; 
+            // int MAXSORTTIME = 1000;
+            // while (!rightBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
+            //     pros::delay(3);
+            //     sortTime += 3;
+            // }
+            // motor_roller_back.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+            // set_rollers(temp_roller);
+            // stateBlocker_bot = true;
+            // ctrlLock = false;
+            // sortTime = 0; 
         }
         else if (rightBlockDetected(blockColor_bot)) {
             //print("right color detected");
@@ -360,12 +354,15 @@ void colorSortLoop() {
                 default:
                     break;
             }
-            while (!wrongBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
-                pros::delay(3);
-                sortTime += 3;
-            }
-            set_rollers(temp_roller);
-            ctrlLock = false;
+            // while (!wrongBlockDetected(blockColor_bot) && sortTime < MAXSORTTIME) {
+            //     pros::delay(3);
+            //     sortTime += 3;
+            // }
+            // set_rollers(temp_roller);
+            // ctrlLock = false;
+        // }   else {
+        //     ctrlLock = false;
+        }
         }
     }
 }

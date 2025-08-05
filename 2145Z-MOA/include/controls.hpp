@@ -1,5 +1,8 @@
 #pragma once
 
+#include "EZ-Template/api.hpp"  // IWYU pragma: keep
+#include "api.h"    // IWYU pragma: keep
+
 // declaring global variables
 inline bool doColorSort = true;
 inline int sortTime = 0;
@@ -61,3 +64,7 @@ void score_until(Rollers situation, int blocks);
 void roller_t();
 void colorSort_t();
 void misc_t();
+
+inline pros::Task RollerTask(roller_t);
+inline pros::Task MiscTask(misc_t);
+inline pros::Task ColorSortTask(colorSort_t);
