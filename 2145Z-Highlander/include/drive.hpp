@@ -4,6 +4,7 @@
 #include "EZ-Template/util.hpp"
 #include "drive.hpp"
 #include "pros/colors.h"
+#include "subsystems.hpp"
 
 const int KEY = 267267;
 
@@ -41,21 +42,21 @@ enum Wait {
 };
 
 // Wait wrappers
-void wait(Wait type);
-void wait(int millis);
+void wait(Wait type = WAIT);
 void wait(int millis, bool ignore = false);
 void wait_until(double target);
 void wait_until(Coordinate coordinate);
 
 // Move to point wrappers
-void move_point(Coordinate newpoint, int speed, ez::drive_directions direction = fwd, bool slew = false);
+void set_mtp(Coordinate newpoint, int speed, ez::drive_directions direction = fwd, bool slew = false);
+void set_boom(Coordinate newpoint, int speed, ez::drive_directions direction = fwd, bool slew = false);
 
 // Drive set wrappers
-void set_drive(double distance, int speed, bool slew = false, bool correction = false);
+void set_drive(double distance, int speed = DRIVE_SPEED, bool slew = false, bool correction = true);
 void set_drive(int speed);
 
 // Turn set wrappers
-void set_turn(double theta, int speed, e_angle_behavior behavior = shortest, bool slew = false);
+void set_turn(double theta, int speed = TURN_SPEED, e_angle_behavior behavior = shortest, bool slew = false);
 void set_turn(Coordinate point, drive_directions direction, int speed, e_angle_behavior behavior = shortest, bool use_slew = false);
 void set_turn_relative(double theta, int speed, e_angle_behavior behavior);
 void set_turn_relative(double theta, int speed);

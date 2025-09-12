@@ -1,5 +1,12 @@
 #include "main.h"
+#include <string>
+#include "autons.hpp"
+#include "controls.hpp"
+#include "pros/misc.h"
+#include "pros/motors.h"
+#include "pros/rtos.hpp"
 #include "screen.hpp"
+#include "subsystems.hpp"
 
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
@@ -14,15 +21,34 @@ void initialize() {
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
   // Configure your chassis controls
-  chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
+  chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
   default_constants();
 
+  auton_sel.selector_populate({
+      {doNothing, "2145Z", pink},      
+      {elimsLeft, "Elims Left", red},
+      {elimsRight, "Elims Right", red},
+      {drive_example, "Move Forward", black},
+      {turn_example, "Turn Example", black},
+      {drive_and_turn, "Drive and Turn", black},
+      {skills, "Skills", black},
+      {leftAWP, "SAWP Left", green},
+      {rightAWP, "SAWP Right", green},
+
+    });
+
   // Initialize chassis and auton selector
   chassis.initialize();
   uiInit();
+  pros::Task pathViewer(pathViewerTask);
+  pros::Task angleChecker(angleCheckTask);
+
+  motor_intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  motor_scorer.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
 
@@ -78,8 +104,8 @@ void autonomous() {
   You can do cool curved motions, but you have to give your robot the best chance
   to be consistent
   */
-
-  ez::as::auton_selector.selected_auton_call();  // Calls selected auton from autonomous selector
+  matchState = AUTO;
+  auton_sel.selector_callback();
 }
 
 /**
@@ -194,14 +220,17 @@ void opcontrol() {
     ez_template_extras();
 
     chassis.opcontrol_tank();  // Tank control
-    // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
-    // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
-    // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
-    // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
+    //chassis.drive_set(controlla.get_analog(ANALOG_LEFT_Y) * 0.12, controlla.get_analog(ANALOG_RIGHT_Y) * 0.12);
+    //print(2, "Left: " + std::to_string(controlla.get_analog(ANALOG_LEFT_Y)));
+    //print(3, "Right: " + std::to_string(controlla.get_analog(ANALOG_RIGHT_Y)));
 
-    // . . .
-    // Put more user control code here!
-    // . . .
+    control_rollers();
+    control_piston(piston_loader, BUTTON_LOADER);
+    control_piston(piston_wing_left, BUTTON_WING_LEFT);
+    control_piston(piston_wing_right, BUTTON_WING_RIGHT);
+    print(1, "X: " + std::to_string(chassis.odom_x_get()));
+    print(2, "Y: " + std::to_string(chassis.odom_y_get()));
+    print(3, "A: " + std::to_string(chassis.odom_theta_get()));
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
