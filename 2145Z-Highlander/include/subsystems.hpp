@@ -50,7 +50,7 @@
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
 #define SWING_SPEED         110
-#define DRIVE_CURVE         12.0
+#define DRIVE_CURVE         10.0
 
 // Defining controller buttons
 #define BUTTON_INTAKE       pros::E_CONTROLLER_DIGITAL_R1
@@ -59,8 +59,9 @@
 #define BUTTON_SCORE_MID    pros::E_CONTROLLER_DIGITAL_L2
 
 #define BUTTON_LOADER        pros::E_CONTROLLER_DIGITAL_DOWN
-#define BUTTON_WING_LEFT     pros::E_CONTROLLER_DIGITAL_LEFT
-#define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_A
+#define BUTTON_WING_LEFT     pros::E_CONTROLLER_DIGITAL_Y
+#define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_RIGHT
+#define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_B
 
 
 #pragma endregion

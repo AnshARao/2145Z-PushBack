@@ -21,22 +21,23 @@ void initialize() {
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
   // Configure your chassis controls
-  chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
+  chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
   default_constants();
 
   auton_sel.selector_populate({
-      {doNothing, "2145Z", pink},      
+      {doNothing, "2145Z", pink},
+{leftAWP, "SAWP Left", green},
+      {rightAWP, "SAWP Right", green},      
       {elimsLeft, "Elims Left", red},
       {elimsRight, "Elims Right", red},
       {drive_example, "Move Forward", black},
       {turn_example, "Turn Example", black},
       {drive_and_turn, "Drive and Turn", black},
       {skills, "Skills", black},
-      {leftAWP, "SAWP Left", green},
-      {rightAWP, "SAWP Right", green},
+
 
     });
 
@@ -48,6 +49,8 @@ void initialize() {
 
   motor_intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   motor_scorer.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+  optical.set_led_pwm(100);
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
@@ -228,6 +231,7 @@ void opcontrol() {
     control_piston(piston_loader, BUTTON_LOADER);
     control_piston(piston_wing_left, BUTTON_WING_LEFT);
     control_piston(piston_wing_right, BUTTON_WING_RIGHT);
+    control_piston(piston_scorer, BUTTON_SCORER);
     print(1, "X: " + std::to_string(chassis.odom_x_get()));
     print(2, "Y: " + std::to_string(chassis.odom_y_get()));
     print(3, "A: " + std::to_string(chassis.odom_theta_get()));
