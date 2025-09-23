@@ -57,16 +57,41 @@ void set_rollers(RollerStates state) {
 }
 
 void control_rollers() {
+    // Non-blocking auto-outtake: when started, run OUTTAKE until optical senses an object
+    static bool auto_outtaking = false;                // persisted across calls
+    constexpr int PROXIMITY_THRESHOLD = 80;            // 0-255 from pros::Optical; tune as needed
+
+    // Default manual control when not auto-outtaking
     if (controlla.get_digital(BUTTON_INTAKE)) {
         set_rollers(INTAKE);
-    }   else if (controlla.get_digital(BUTTON_OUTTAKE)) {
+        auto_outtaking = false;
+        set_piston(piston_park, false);
+    } else if (controlla.get_digital(BUTTON_OUTTAKE)) {
         set_rollers(OUTTAKE);
-    }   else if (controlla.get_digital(BUTTON_SCORE_TOP)) {
+        auto_outtaking = false;
+    } else if (controlla.get_digital(BUTTON_SCORE_TOP)) {
         set_rollers(SCORE_TOP);
-    }   else if (controlla.get_digital(BUTTON_SCORE_MID)) {
+        auto_outtaking = false;
+    } else if (controlla.get_digital(BUTTON_SCORE_MID)) {
         set_rollers(SCORE_MID);
-    }   else {
+        auto_outtaking = false;
+    } else if (controlla.get_digital(BUTTON_OUTTAKE_AUTO)) {
+        auto_outtaking = true;
+    } else {
         set_rollers(STOP);
+    }
+
+    // If auto-outtaking, run the rollers in reverse and monitor the optical sensor non-blockingly
+    if (auto_outtaking) {
+        set_rollers(OUTTAKE);
+        int prox = optical.get_proximity();
+        // If proximity reading indicates an object close enough, stop and clear auto mode
+        if (prox >= PROXIMITY_THRESHOLD) {
+            auto_outtaking = false;
+            set_rollers(STOP);
+            set_piston(piston_park, true);
+        }
+        return; // keep other roller controls from interfering this cycle
     }
 }
 

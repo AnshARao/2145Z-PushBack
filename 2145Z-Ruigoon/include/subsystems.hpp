@@ -39,6 +39,7 @@
 #define PORT_PISTON_SCORER  'B'
 #define PORT_WING_LEFT      'C'
 #define PORT_WING_RIGHT     'D'
+#define PORT_PISTON_PARK    'E'
 
 // Defining robot constants
 #define DRIVE_DIAMETER      3.25
@@ -62,6 +63,9 @@
 #define BUTTON_WING_LEFT     pros::E_CONTROLLER_DIGITAL_Y
 #define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_RIGHT
 #define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_B
+
+// Unused button reserved for macros (auto-outtake) so the match outtake button keeps its manual behavior
+#define BUTTON_OUTTAKE_AUTO  pros::E_CONTROLLER_DIGITAL_A
 
 
 #pragma endregion
@@ -102,6 +106,7 @@ inline ez::Piston piston_scorer(PORT_PISTON_SCORER);
 inline ez::Piston piston_loader(PORT_LOADER);
 inline ez::Piston piston_wing_left(PORT_WING_LEFT);
 inline ez::Piston piston_wing_right(PORT_WING_RIGHT);
+inline ez::Piston piston_park(PORT_PISTON_PARK);
 
 // Chassis constructor
 inline ez::Drive chassis(
