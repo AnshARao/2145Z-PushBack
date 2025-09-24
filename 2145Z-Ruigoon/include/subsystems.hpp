@@ -8,6 +8,7 @@
 */
 
 #include <cstdint>  // IWYU pragma: keep
+#include <type_traits>
 #include "EZ-Template/piston.hpp"
 #include "pros/adi.hpp" // IWYU pragma: keep
 #include "pros/motors.hpp"
@@ -25,28 +26,28 @@
 #define PORT_RB 15
 
 // Defining subsystem motor ports
-#define PORT_INTAKE         21
+#define PORT_INTAKE         10
 #define PORT_SCORER         -2
 
 // Defining smartwire device ports
 #define PORT_IMU            13
 #define PORT_ODOM_HORIZ     11
 #define PORT_ODOM_VERT      3
-#define PORT_OPTICAL        0
+#define PORT_OPTICAL        21
 
 // Defining three wire ports
 #define PORT_LOADER         'A'
 #define PORT_PISTON_SCORER  'B'
 #define PORT_WING_LEFT      'C'
 #define PORT_WING_RIGHT     'D'
-#define PORT_PISTON_PARK    'E'
+#define PORT_PISTON_PARK    'C'
 
 // Defining robot constants
 #define DRIVE_DIAMETER      3.25
 #define TRACK_WIDTH         13.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.0
-#define OFFSET_VERT         -5.5
+#define OFFSET_VERT         0.5
 #define OFFSET_HORI         -2.125
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
@@ -64,8 +65,7 @@
 #define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_RIGHT
 #define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_B
 
-// Unused button reserved for macros (auto-outtake) so the match outtake button keeps its manual behavior
-#define BUTTON_OUTTAKE_AUTO  pros::E_CONTROLLER_DIGITAL_A
+#define BUTTON_OUTTAKE_AUTO  pros::E_CONTROLLER_DIGITAL_X
 
 
 #pragma endregion
@@ -102,7 +102,7 @@ inline pros::Optical  optical           (PORT_OPTICAL);
 
 //three wire port constructors
 
-inline ez::Piston piston_scorer(PORT_PISTON_SCORER);
+inline ez::Piston piston_scorer(PORT_PISTON_SCORER, true);
 inline ez::Piston piston_loader(PORT_LOADER);
 inline ez::Piston piston_wing_left(PORT_WING_LEFT);
 inline ez::Piston piston_wing_right(PORT_WING_RIGHT);

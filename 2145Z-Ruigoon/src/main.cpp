@@ -15,8 +15,6 @@
 
 
 void initialize() {
-  // Print our branding over your terminal :D
-  ez::ez_template_print();
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
@@ -29,11 +27,12 @@ void initialize() {
 
   auton_sel.selector_populate({
       {doNothing, "2145Z", pink},
-      {leftQual, "Left Qual", blue},
-      {leftAWP, "SAWP Left", green},
-      {rightAWP, "SAWP Right", green},      
       {left9, "Left 9", red},
       {right9, "Right 9", red},
+      {fourFive, "4 + 5 Left", blue},
+      {SAWP, "SAWP", blue},
+      {leftAWP, "4 + 3 Left", green},
+      {rightAWP, "4 + 3 Rights", green},      
       {drive_example, "Move Forward", black},
       {turn_example, "Turn Example", black},
       {drive_and_turn, "Drive and Turn", black},
@@ -50,6 +49,7 @@ void initialize() {
 
   motor_intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   motor_scorer.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  set_piston(piston_scorer, true);
 
   optical.set_led_pwm(100);
 

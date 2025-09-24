@@ -75,7 +75,76 @@ void drive_and_turn() {
   wait(CHAIN);
 }
 
-void leftQual() {
+void SAWP() {
+  set_position(-50, -17, 180);
+
+  set_piston(piston_loader, true);
+  set_mtp({-50, -46}, 80, fwd, true);
+  //set_drive(28.0, DRIVE_SPEED, true);
+  set_rollers(INTAKE);
+  wait(QUICK);
+
+  set_turn({-61, -46}, fwd, 100);
+  wait();
+
+  //set_mtp({-60.5, -47.5}, 125);
+  set_drive(11.0, 125);
+  wait();
+  wait(750);
+
+  set_mtp({-26, -47.5}, 70, rev);
+  wait();
+  set_rollers(SCORE_TOP);
+  wait(2500);
+  set_rollers(INTAKE);
+
+  set_piston(piston_loader, false);
+  set_swing(ez::LEFT_SWING, 20, 100, 10, cw);
+  wait(CHAIN);
+
+  set_mtp({-22, -24}, 70);
+  wait(QUICK);
+  set_piston(piston_loader, true);
+  
+  set_mtp({-22, 24}, 70, fwd, true);
+  wait(250);
+  set_piston(piston_loader, false);
+  wait(QUICK);
+  set_rollers(OUTTAKE);
+  set_piston(piston_loader, true);
+
+  set_boom({-14, 16, 315}, DRIVE_SPEED, rev);
+  wait();
+  set_piston(piston_scorer, false);
+
+  set_drive(-6.0);
+  wait();
+  set_rollers(SCORE_MID);
+  wait(2000);
+  set_rollers(OUTTAKE);
+  set_drive(7.0);
+  wait();
+  set_rollers(INTAKE);
+
+  set_boom({-54, 46, 270}, DRIVE_SPEED);
+  wait();
+
+  set_turn(270, TURN_SPEED);
+  wait();
+
+  set_drive(127);
+  wait(150);
+  wait();
+  wait(750);
+
+  set_drive(-38.0);
+  wait();
+  set_rollers(SCORE_TOP);
+  set_piston(piston_loader, false);
+
+}
+
+void fourFive() {
   set_position(-47, 16, 90);
 
   set_drive(4.0, 125);
@@ -87,45 +156,46 @@ void leftQual() {
   set_piston(piston_loader, true);
   wait();
 
-  set_mtp({-6, 42}, DRIVE_SPEED);
+  set_mtp({-5, 42}, DRIVE_SPEED);
   wait(325);
   set_piston(piston_loader, false);
   wait();
 
-  set_rollers(-4000);
   set_piston(piston_loader, true);
   wait(200);
 
   set_mtp({-24, 24}, DRIVE_SPEED, rev);
   wait();
+  set_rollers(OUTTAKE);
+  wait(250);
+  set_rollers(STOP);
+  set_piston(piston_scorer, false);
 
   //5303591943
 
   set_boom({-12.5, 15.5, 135}, DRIVE_SPEED, rev);
   wait();
-  set_piston(piston_scorer, false);
-  wait();
 
   set_drive(-6.0);
   wait();
   set_rollers(SCORE_MID);
-  wait(2000);
+  wait(1000);
+  set_rollers(OUTTAKE);
   set_drive(7.0);
   set_rollers(INTAKE);
   wait(CHAIN);
 
-  set_boom({-60, 46, 270}, DRIVE_SPEED, fwd, true);
-  wait(400);
-  set_piston(piston_loader, true);
+  set_boom({-54, 44, 270}, DRIVE_SPEED, fwd, true);
   wait();
-  wait(500);
-  set_mtp({-26, 46}, DRIVE_SPEED, rev);
+
+  set_drive(127);
+  wait(900);
+  
+  set_drive(-30.0);
   wait();
   set_rollers(SCORE_TOP);
-  wait(3000);
-  set_drive(20);
-
   set_piston(piston_loader, false);  
+  wait(3000);
 }
 
 void leftAWP() {
@@ -250,7 +320,7 @@ void left9() {
   set_mtp({-26, 47}, 125, rev);
   wait();
   set_rollers(SCORE_TOP);
-  wait(2500);
+  wait(2120);
   set_drive(4.0);
   wait();
   set_drive(-127);
@@ -294,7 +364,7 @@ set_position(-47, -16, 90);
   wait(2000);
   set_rollers(INTAKE);
 
-  set_boom({-60.5, -47, 270}, 120);
+  set_boom({-60.5, -47, 270}, 125);
   wait(400);
   set_piston(piston_loader, true);
   wait();
@@ -302,7 +372,7 @@ set_position(-47, -16, 90);
   set_mtp({-26, -47}, 125, rev);
   wait();
   set_rollers(SCORE_TOP);
-  wait(2500);
+  wait(2150);
     set_drive(4.0);
   wait();
   set_drive(-127);
