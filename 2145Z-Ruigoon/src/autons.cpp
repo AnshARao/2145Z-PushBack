@@ -145,21 +145,31 @@ void SAWP() {
 }
 
 void fourFive() {
+  // sets on brain sreen. Lowk needed
+  //(x, y, angle)
   set_position(-47, 16, 90);
 
-  set_drive(4.0, 125);
-  wait(CHAIN);
+  //(distance in inches *MAKE SURE ITS A DECIMAL*, speed)
+  set_drive(4.0, 125); //add decimal for distance
+  wait(CHAIN); //wait (QUICK or CHAIN) (chain is starting next movement before current movement is finished)
 
-  set_mtp({-13, 23.5}, 75, fwd, true);
-  set_rollers(INTAKE);
-  wait(650);
-  set_piston(piston_loader, true);
-  wait();
+  set_mtp({-13, 23.5}, 75, fwd, true); //Set move to point (Moves to cordinate, speed , fwd or rev, only true when the movement is bigger (long distance))
+  //slew makes it slow down at the end of movement
+  set_rollers(INTAKE); //whenever i want intake to move put this in
+  //Ex - set_rollers(Outtake); - makes rollers outtake
+  //Ex - set_rollers(Stop); - makes rollers stop
+  //Ex - set_rollers(Intake); - makes rollers intake
+  //Ex - set_rollers(Score_Mid); - makes rollers score at mid speed
+  //Ex - set_rollers(Score_Top); - makes rollers score at top speed
 
-  set_mtp({-5, 42}, DRIVE_SPEED);
-  wait(325);
-  set_piston(piston_loader, false);
-  wait();
+  wait(650);//wait in miliseconds
+  set_piston(piston_loader, true); //sets piston to true (out) (lilwill)
+  wait(); //waits until movement is done
+
+  set_mtp({-5, 42}, DRIVE_SPEED); //moves to point at drive speed
+  wait(325); //waits 325 miliseconds
+  set_piston(piston_loader, false);//sets piston to false (in) (lilwill)
+  wait(); //waits until movement is done
 
   set_piston(piston_loader, true);
   wait(200);
@@ -169,16 +179,17 @@ void fourFive() {
   set_rollers(OUTTAKE);
   wait(250);
   set_rollers(STOP);
-  set_piston(piston_scorer, false);
+  set_piston(piston_scorer, false); //sets piston to false (in) (scorer) (false is middle goal) (True is long goal)
 
   //5303591943
 
-  set_boom({-12.5, 15.5, 135}, DRIVE_SPEED, rev);
+  set_boom({-12.5, 15.5, 139}, DRIVE_SPEED, rev); //sets boom to point (x, y, angle), speed, fwd or rev 
+  //it is like a move to point but with angle
   wait();
 
-  set_drive(-6.0);
+  set_drive(-6.0); //drives backwards 6 inches (110 is speed)
   wait();
-  set_rollers(SCORE_MID);
+  set_rollers(SCORE_MID); 
   wait(1000);
   set_rollers(OUTTAKE);
   set_drive(7.0);
@@ -195,7 +206,8 @@ void fourFive() {
   wait();
   set_rollers(SCORE_TOP);
   set_piston(piston_loader, false);  
-  wait(3000);
+  wait(2200);
+  set_drive(6.0);
 }
 
 void leftAWP() {
@@ -277,7 +289,7 @@ void rightAWP() {
 
 void left9() {
   set_position(-47, 16, 90);
-
+  set_piston(piston_loader, false);
   set_drive(4.0, 125);
   wait(CHAIN);
 
@@ -322,8 +334,8 @@ void left9() {
   set_rollers(SCORE_TOP);
   wait(2120);
   set_drive(4.0);
-  wait();
-  set_drive(-127);
+  //wait();
+  //set_drive(-127);
   set_piston(piston_loader, false);
 }
 
@@ -373,9 +385,9 @@ set_position(-47, -16, 90);
   wait();
   set_rollers(SCORE_TOP);
   wait(2150);
-    set_drive(4.0);
-  wait();
-  set_drive(-127);
+    set_drive(6.0);
+  //wait();
+  //set_drive(-127);
   set_piston(piston_loader, false);
 }
 

@@ -88,6 +88,13 @@ void control_rollers() {
         // If proximity reading indicates an object close enough, stop and clear auto mode
         if (prox >= PROXIMITY_THRESHOLD) {
             auto_outtaking = false;
+            int timer = pros::millis();
+            while (timer < 1000) {
+                if (optical.get_proximity() < PROXIMITY_THRESHOLD) {
+                    set_rollers(STOP);
+                    set_piston(piston_park, true);
+                }
+            }
             set_rollers(STOP);
             set_piston(piston_park, true);
         }
