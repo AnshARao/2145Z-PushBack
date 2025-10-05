@@ -224,32 +224,40 @@ void set_mtp(Coordinate newpoint, int speed, drive_directions direction, bool sl
 	switch(matchState) {
 		case AUTO:
 			chassis.pid_odom_set({{newpoint.x * okapi::inch, newpoint.y * okapi::inch}, direction, speed}, slew);
-			break;
-		default:
-			break;
-	}
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, direction);
+			currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, direction);
 			currentPoint.x = newpoint.x;
 			currentPoint.y = newpoint.y;
 			currentPoint.left = speed * (direction == fwd ? 1 : -1);
 			currentPoint.right = speed * (direction == fwd ? 1 : -1);
 			autonPath.push_back(currentPoint);
+			break;
+		default:
+			set_turn(get_theta(currentPoint, newpoint, direction));
+			wait();
+			set_drive(get_distance(currentPoint, newpoint), speed, slew);
+			break;
+	}
 }
 
 void set_boom(Coordinate newpoint, int speed, drive_directions direction, bool slew) {
 	switch(matchState) {
 		case AUTO:
 			chassis.pid_odom_boomerang_set({{newpoint.x * okapi::inch, newpoint.y * okapi::inch, newpoint.t * okapi::degree}, direction, speed}, slew);
+				currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, direction);
+				currentPoint.x = newpoint.x;
+				currentPoint.y = newpoint.y;
+				currentPoint.left = speed * (direction == fwd ? 1 : -1);
+				currentPoint.right = speed * (direction == fwd ? 1 : -1);
+				autonPath.push_back(currentPoint);
 			break;
 		default:
+			set_turn(get_theta(currentPoint, newpoint, direction));
+			wait();
+			set_drive(get_distance(currentPoint, newpoint), speed, slew);
+			wait();
+			set_turn(newpoint.t, speed);
 			break;
 	}
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, direction);
-	currentPoint.x = newpoint.x;
-	currentPoint.y = newpoint.y;
-	currentPoint.left = speed * (direction == fwd ? 1 : -1);
-	currentPoint.right = speed * (direction == fwd ? 1 : -1);
-	autonPath.push_back(currentPoint);
 }
 
 //

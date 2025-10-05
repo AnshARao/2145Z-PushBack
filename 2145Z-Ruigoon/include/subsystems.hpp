@@ -34,6 +34,7 @@
 #define PORT_ODOM_HORIZ     11
 #define PORT_ODOM_VERT      3
 #define PORT_OPTICAL        21
+#define PORT_OPTICAL_2   4
 
 // Defining three wire ports
 #define PORT_LOADER         'A'
@@ -47,7 +48,7 @@
 #define TRACK_WIDTH         13.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER       2.0
-#define OFFSET_VERT         0.5
+#define OFFSET_VERT         1.0
 #define OFFSET_HORI         -2.125
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
@@ -99,6 +100,7 @@ inline pros::Imu      imu               (PORT_IMU);
 inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);
 inline pros::Rotation odom_vert         (PORT_ODOM_VERT);
 inline pros::Optical  optical           (PORT_OPTICAL);
+inline pros::Optical  optical_2      (PORT_OPTICAL_2);
 
 //three wire port constructors
 
@@ -129,7 +131,7 @@ inline void default_constants() {
   chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);     // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
-  chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
+  chassis.pid_odom_boomerang_constants_set(7.5, 0.0, 40.0);  // Angular control for boomerang motions
 
   // Exit conditions
   chassis.pid_turn_exit_condition_set(80_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);

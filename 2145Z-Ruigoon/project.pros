@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "2145Z-Ruigoon",
+    "project_name": "2145Z-Skills",
     "target": "v5",
     "templates": {
       "EZ-Template": {
@@ -425,7 +425,8 @@
     },
     "upload_options": {
       "description": "Ansh ruigoons",
-      "icon": "X"
+      "icon": "X",
+      "slot": 2
     },
     "use_early_access": false
   }
