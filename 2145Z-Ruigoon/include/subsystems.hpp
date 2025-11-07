@@ -50,20 +50,20 @@
 #define ODOM_DIAMETER       2.0
 #define OFFSET_VERT         1.0
 #define OFFSET_HORI         -2.125
+//-2.125
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
 #define SWING_SPEED         110
-#define DRIVE_CURVE         10.0
+#define DRIVE_CURVE         4.0
 
 // Defining controller buttons
 #define BUTTON_INTAKE       pros::E_CONTROLLER_DIGITAL_R1
 #define BUTTON_OUTTAKE      pros::E_CONTROLLER_DIGITAL_R2
-#define BUTTON_SCORE_TOP    pros::E_CONTROLLER_DIGITAL_L1
-#define BUTTON_SCORE_MID    pros::E_CONTROLLER_DIGITAL_L2
+#define BUTTON_SCORE        pros::E_CONTROLLER_DIGITAL_L1
 
 #define BUTTON_LOADER        pros::E_CONTROLLER_DIGITAL_DOWN
 #define BUTTON_WING_LEFT     pros::E_CONTROLLER_DIGITAL_Y
-#define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_RIGHT
+#define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_L2
 #define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_B
 
 #define BUTTON_OUTTAKE_AUTO  pros::E_CONTROLLER_DIGITAL_X
@@ -104,7 +104,7 @@ inline pros::Optical  optical_2      (PORT_OPTICAL_2);
 
 //three wire port constructors
 
-inline ez::Piston piston_scorer(PORT_PISTON_SCORER, true);
+inline ez::Piston piston_scorer(PORT_PISTON_SCORER);
 inline ez::Piston piston_loader(PORT_LOADER);
 inline ez::Piston piston_wing_left(PORT_WING_LEFT);
 inline ez::Piston piston_wing_right(PORT_WING_RIGHT);

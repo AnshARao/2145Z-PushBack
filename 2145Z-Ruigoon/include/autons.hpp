@@ -8,10 +8,13 @@ void drive_and_turn();
 
 void doNothing();
 void SAWP();
-void leftAWP();
-void rightAWP();
+void SAWP13();
+void SAWP15();
 void left9();
 void right9();
+void leftAWP();
+void rightAWP();
 void skills();
 
-void fourFive();
+void fourFiveLeft();
+void fourFiveRight();

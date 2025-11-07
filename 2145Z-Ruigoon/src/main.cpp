@@ -27,16 +27,15 @@ void initialize() {
 
   auton_sel.selector_populate({
       {doNothing, "2145Z", pink},
+      {skills, "Skills", gray},
+      {SAWP13, "13 SAWP", green},
+      {fourFiveLeft, "4 + 5 Left", blue},
+      {fourFiveRight, "4 + 5 Right", blue},
       {left9, "Left 9", red},
-      {right9, "Right 9", red},
-      {fourFive, "4 + 5 Left", blue},
-      {SAWP, "SAWP", blue},
-      {leftAWP, "4 + 3 Left", green},
-      {rightAWP, "4 + 3 Rights", green},      
+      {right9, "Right 9", red},   
       {drive_example, "Move Forward", black},
       {turn_example, "Turn Example", black},
       {drive_and_turn, "Drive and Turn", black},
-      {skills, "Skills", black},
 
 
     });
@@ -44,14 +43,16 @@ void initialize() {
   // Initialize chassis and auton selector
   chassis.initialize();
   uiInit();
+  auton_sel.selector_callback = fourFiveRight; // *TEMP*
+
   pros::Task pathViewer(pathViewerTask);
   pros::Task angleChecker(angleCheckTask);
 
   motor_intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   motor_scorer.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-  set_piston(piston_scorer, true);
 
   optical.set_led_pwm(100);
+
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
 }
@@ -191,6 +192,10 @@ void ez_template_extras() {
       chassis.drive_brake_set(preference);
     }
 
+    if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+      autonomous();
+    }
+
     // Allow PID Tuner to iterate
     chassis.pid_tuner_iterate();
   }
@@ -229,10 +234,10 @@ void opcontrol() {
     //print(3, "Right: " + std::to_string(controlla.get_analog(ANALOG_RIGHT_Y)));
 
     control_rollers();
-    control_piston(piston_loader, BUTTON_LOADER);
-    control_piston(piston_wing_left, BUTTON_WING_LEFT);
-    control_piston(piston_wing_right, BUTTON_WING_RIGHT);
-    control_piston(piston_scorer, BUTTON_SCORER);
+    control_piston_toggle(piston_loader, BUTTON_LOADER);
+    //control_piston_toggle(piston_wing_left, BUTTON_WING_LEFT);
+    control_piston_hold(piston_wing_right, BUTTON_WING_RIGHT);
+    control_piston_toggle(piston_scorer, BUTTON_SCORER);
     print(1, "X: " + std::to_string(chassis.odom_x_get()));
     print(2, "Y: " + std::to_string(chassis.odom_y_get()));
     print(3, "A: " + std::to_string(chassis.odom_theta_get()));
