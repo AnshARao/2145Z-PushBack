@@ -29,7 +29,6 @@ void intake_t() {
 
     while(true) {
         motor_intake.move_voltage(vltg_intake);
-        print(3, "Intake Voltage: " + std::to_string(vltg_intake));
         pros::delay(10);
         
 
@@ -75,7 +74,7 @@ void set_rollers(RollerStates state) {
             set_piston(piston_scorer, false);
             break;
         case OUTTAKE:
-            set_rollers(-7000);
+            set_rollers(-12000);
             break;
         case SCORE:
             set_rollers(12000);

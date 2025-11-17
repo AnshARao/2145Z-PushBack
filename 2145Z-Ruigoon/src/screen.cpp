@@ -74,7 +74,7 @@ LV_IMG_DECLARE(logo);
 string controllerInput = "";
 bool aligning = false;
 bool playing = true;
-bool showConsole = false;
+bool showConsole = true;
 static const char* allianceColorNames[] = {"Blue", "None", "Red"};
 
 AutonSel auton_sel;
@@ -197,6 +197,9 @@ void pathViewerTask() {
             pros::delay(1000);
             resetViewer(false);
         }
+        print(1, "X: " + std::to_string(chassis.odom_x_get()));
+        print(2, "Y: " + std::to_string(chassis.odom_y_get()));
+        print(3, "A: " + std::to_string(chassis.odom_theta_get()));
         pros::delay(10);
     }
 }

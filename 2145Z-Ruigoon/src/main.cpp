@@ -27,23 +27,24 @@ void initialize() {
 
   auton_sel.selector_populate({
       {doNothing, "2145Z", pink},
-      {skills, "Skills", gray},
       {SAWP13, "13 SAWP", green},
-      {fourFiveLeft, "4 + 5 Left", blue},
-      {fourFiveRight, "4 + 5 Right", blue},
+      {fourFiveLeft, "4 + 5 Left", purple},
+      {fourFiveRight, "4 + 5 Right", purple},
+      {left7, "Left 7", orange},
+      {right7, "Right 7", orange},
       {left9, "Left 9", red},
-      {right9, "Right 9", red},   
-      {drive_example, "Move Forward", black},
-      {turn_example, "Turn Example", black},
-      {drive_and_turn, "Drive and Turn", black},
+      {right9, "Right 9", red}, 
+      {sixThreeLeft, "6 + 3 Left", blue},
+      {sixThreeRight, "6 + 3 Right", blue},  
+      {skills, "Skills", gray},
 
-
+      {testing, "Testing", black}
     });
 
   // Initialize chassis and auton selector
   chassis.initialize();
   uiInit();
-  auton_sel.selector_callback = fourFiveRight; // *TEMP*
+  auton_sel.selector_callback = fourFiveLeft; // *TEMP*
 
   pros::Task pathViewer(pathViewerTask);
   pros::Task angleChecker(angleCheckTask);

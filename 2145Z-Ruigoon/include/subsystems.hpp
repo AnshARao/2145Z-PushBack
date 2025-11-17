@@ -26,7 +26,7 @@
 #define PORT_RB 15
 
 // Defining subsystem motor ports
-#define PORT_INTAKE         10
+#define PORT_INTAKE         9
 #define PORT_SCORER         -2
 
 // Defining smartwire device ports
@@ -37,10 +37,10 @@
 #define PORT_OPTICAL_2   4
 
 // Defining three wire ports
-#define PORT_LOADER         'A'
+#define PORT_LOADER         'G'
 #define PORT_PISTON_SCORER  'B'
 #define PORT_WING_LEFT      'C'
-#define PORT_WING_RIGHT     'D'
+#define PORT_WING_RIGHT     'H'
 #define PORT_PISTON_PARK    'C'
 
 // Defining robot constants
@@ -126,12 +126,12 @@ inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VER
 
 inline void default_constants() {
   // P, I, D, and Start I
-  chassis.pid_drive_constants_set(30.0, 0.0, 200.0);         // Fwd/rev constants, used for odom and non odom motions
+  chassis.pid_drive_constants_set(30.0, 0.0, 315.0);         // Fwd/rev constants, used for odom and non odom motions
   chassis.pid_heading_constants_set(11.0, 0.0, 20.0);        // Holds the robot straight while going forward without odom
-  chassis.pid_turn_constants_set(3.0, 0.05, 20.0, 15.0);     // Turn in place constants
+  chassis.pid_turn_constants_set(6.5, 0.05, 52.5, 15.0);     // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
-  chassis.pid_odom_boomerang_constants_set(7.5, 0.0, 40.0);  // Angular control for boomerang motions
+  chassis.pid_odom_boomerang_constants_set(6, 0.0, 50);  // Angular control for boomerang motions
 
   // Exit conditions
   chassis.pid_turn_exit_condition_set(80_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
@@ -145,12 +145,12 @@ inline void default_constants() {
 
   // Slew constants
   chassis.slew_turn_constants_set(3_deg, 70);
-  chassis.slew_drive_constants_set(3_in, 70);
+  chassis.slew_drive_constants_set(3_in, 90);
   chassis.slew_swing_constants_set(3_in, 80);
 
   // The amount that turns are prioritized over driving in odom motions
   // - if you have tracking wheels, you can run this higher.  1.0 is the max
-  chassis.odom_turn_bias_set(0.9);
+  chassis.odom_turn_bias_set(0.75);
 
   chassis.odom_look_ahead_set(7_in);           // This is how far ahead in the path the robot looks at
   chassis.odom_boomerang_distance_set(16_in);  // This sets the maximum distance away from target that the carrot point can be
