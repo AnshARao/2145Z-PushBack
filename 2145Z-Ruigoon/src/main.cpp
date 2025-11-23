@@ -42,7 +42,9 @@ void initialize() {
     });
 
   // Initialize chassis and auton selector
-  chassis.initialize();
+  chassis.opcontrol_curve_sd_initialize();
+  chassis.drive_imu_calibrate(false);
+  chassis.drive_sensor_reset();
   uiInit();
   auton_sel.selector_callback = fourFiveLeft; // *TEMP*
 
