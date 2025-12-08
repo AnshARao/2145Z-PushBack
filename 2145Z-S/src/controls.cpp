@@ -35,7 +35,7 @@ void set_tank(int left, int right) {
 }
 
 // gets the joystick inputs, scales them, then sets the motors to adjusted values
-void tank_drive(double scale, pros::Controller controller) {
+void tank_drive(double scale, pros::Controller& controller) {
     double lY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
     double rY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 

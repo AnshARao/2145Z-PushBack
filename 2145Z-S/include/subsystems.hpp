@@ -27,16 +27,18 @@ enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, STOP = 3};
 #pragma region constants
 
 //drive motor ports
-#define PORT_MOTOR_L1 0
-#define PORT_MOTOR_L2 0
-#define PORT_MOTOR_L3 0
-#define PORT_MOTOR_R1 0
-#define PORT_MOTOR_R2 0
-#define PORT_MOTOR_R3 0
+#define PORT_MOTOR_L1 -5
+#define PORT_MOTOR_L2 6
+#define PORT_MOTOR_L3 -10
+#define PORT_MOTOR_R1 8
+#define PORT_MOTOR_R2 -7
+#define PORT_MOTOR_R3 9
+
 
 //subsystem motor ports
-#define PORT_MOTOR_INTAKE1 0
-#define PORT_MOTOR_INTAKE2 0
+#define PORT_MOTOR_INTAKE1 12
+#define PORT_MOTOR_INTAKE2 -16
+#define PORT_MOTOR_INTAKE3 -17
 
 //smartwire ports
 #define PORT_IMU        0
@@ -67,14 +69,15 @@ enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, STOP = 3};
 #define SWING_SPEED 0
 
 //drive curve constant
-#define DRIVE_CURVE 0.0
+#define DRIVE_CURVE 1.0
 
 //button constants
-#define BUTTON_INTAKE   pros::E_CONTROLLER_DIGITAL
-#define BUTTON_OUTTAKE  pros::E_CONTROLLER_DIGITAL
-#define BUTTTON_SCORE   pros::E_CONTROLLER_DIGITAL
-#define BUTTON_LOADER   pros::E_CONTROLLER_DIGITAL
-#define BUTTON_WING     pros::E_CONTROLLER_DIGITAL
+#define BUTTON_INTAKE   pros::E_CONTROLLER_DIGITAL_R1
+#define BUTTON_OUTTAKE  pros::E_CONTROLLER_DIGITAL_R2
+#define BUTTON_SCORE   pros::E_CONTROLLER_DIGITAL_L1
+#define BUTTON_SCORE_MIDDLE pros::E_CONTROLLER_DIGITAL_L2
+#define BUTTON_LOADER   pros::E_CONTROLLER_DIGITAL_DOWN
+#define BUTTON_WING     pros::E_CONTROLLER_DIGITAL_B
 
 #pragma endregion
 
@@ -98,6 +101,7 @@ inline pros::MotorGroup motorgroup_R({PORT_MOTOR_R1, PORT_MOTOR_R2, PORT_MOTOR_R
 //subsystem motor constructors
 inline pros::Motor motor_intake1(PORT_MOTOR_INTAKE1, pros::v5::MotorGears::blue);
 inline pros::Motor motor_intake2(PORT_MOTOR_INTAKE2, pros::v5::MotorGears::blue);
+inline pros::Motor motor_intake3(PORT_MOTOR_INTAKE3, pros::v5::MotorGears::blue);
 
 //smartwire device constructors
 inline pros::Imu IMU(PORT_IMU);
@@ -108,8 +112,8 @@ inline pros::Distance distance2(PORT_DISTANCE2);
 inline pros::Optical optical(PORT_OPTICAL);
 
 //three wire port device constructors
-inline pros::adi::DigitalOut loader(PORT_LOADER);
-inline pros::adi::DigitalOut wing(PORT_WING);
+inline pros::adi::DigitalOut piston_loader(PORT_LOADER);
+inline pros::adi::DigitalOut piston_wing(PORT_WING);
 
 //lemlib chassis constructors
 

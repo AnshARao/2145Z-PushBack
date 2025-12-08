@@ -39,6 +39,28 @@ void opcontrol() {
   chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
   while (true) {
       tank_drive(DRIVE_CURVE, master);
+
+      if (master.get_digital(BUTTON_INTAKE)) {
+        motor_intake1.move(127);
+        motor_intake2.move(64);
+        motor_intake3.move(64);
+      } else if (master.get_digital(BUTTON_OUTTAKE)) {
+        motor_intake1.move(-127);
+        motor_intake2.move(-127);
+        motor_intake3.move(-127);
+      } else if (master.get_digital(BUTTON_SCORE)) {
+        motor_intake1.move(127);
+        motor_intake2.move(127);
+        motor_intake3.move(127);
+      } else if (master.get_digital(BUTTON_SCORE_MIDDLE)) {
+        motor_intake1.move(127);
+        motor_intake2.move(127);
+        motor_intake3.move(-127);
+      } else {
+        motor_intake1.move(0);
+        motor_intake2.move(0);
+        motor_intake3.move(0);
+      }
     pros::delay(10);
   }
 }
