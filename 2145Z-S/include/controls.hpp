@@ -4,6 +4,7 @@
 #include "pros/adi.hpp"
 #include "subsystems.hpp"
 
+inline bool state_loader = false;
 
 void intake_t();
 
@@ -21,3 +22,9 @@ void control_piston_hold(pros::adi::DigitalOut& piston, pros::controller_digital
 
 void set_tank(double left, double right);
 void tank_drive(double curve, pros::Controller& controller);
+
+void set_loader(bool state);
+void control_loader();
+void set_wing(bool state);
+void control_wing();
+void set_hood(bool state);

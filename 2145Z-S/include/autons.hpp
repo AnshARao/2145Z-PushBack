@@ -1,4 +1,8 @@
 #pragma once
+#include "controls.hpp"
+#include "drive.hpp"
+#include "pros/device.hpp"
+#include "pros/rtos.hpp"
 #include "subsystems.hpp"
 #include <math.h>
 
@@ -62,6 +66,60 @@ inline void tune(){
   chassis.turnToHeading(0, 3000);
   chassis.waitUntilDone();  
 };
+
+inline void SAWP() {
+
+    chassis.setPose(-48, -11, 180);
+
+    set_loader(true);
+    chassis.moveToPoint(-48, -47, 9999);
+    chassis.waitUntilDone();
+    chassis.turnToHeading(270, 9999);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-60, -47, 9999);
+    chassis.waitUntilDone();
+    pros::delay(500);
+    chassis.moveToPoint(-38, -48, 9999, {.forwards = false});
+    chassis.waitUntilDone();
+    set_rollers(SCORE);
+    pros::delay(500);
+}
+
+inline void right4() {
+    chassis.setPose(-48, -17, 90);
+    set_rollers(INTAKE);
+    chassis.moveToPoint(-22, -24, 2000);
+    chassis.waitUntilDone();
+    set_loader(true);
+    chassis.turnToPoint(0, 0, 1000);
+    chassis.waitUntilDone();
+    set_loader(false);
+    chassis.moveToPose(-12, -12, 45, 2000);
+    chassis.waitUntilDone();
+    set_rollers(-70);
+}
+
+inline void right9() {
+    chassis.setPose(-48, -17, 90);
+    set_rollers(INTAKE);
+    chassis.moveToPoint(-24, -24, 2000);
+    chassis.waitUntilDone();
+    set_loader(true);
+    pros::delay(100);
+    chassis.moveToPose(-50, -47, 270, 3000);
+    chassis.waitUntilDone();
+    chassis.moveToPoint(-60, -47, 500);
+    chassis.waitUntilDone();
+    pros::delay(500);
+    chassis.moveToPoint(-36, -48, 2000, {.forwards = false});
+    chassis.waitUntilDone();
+    set_loader(false);
+    set_rollers(SCORE);
+    pros::delay(500);
+    chassis.turnToHeading(180, 1000);
+    chassis.waitUntilDone();
+
+}
 
 inline void skills() {
   

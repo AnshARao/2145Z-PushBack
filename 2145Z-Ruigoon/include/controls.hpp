@@ -8,7 +8,7 @@ enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
 inline MatchStates matchState = DISABLED;
 enum Alliances {BLUE = 0, NONE = 1, RED = 2};
 inline Alliances allianceColor = Alliances::NONE; // for now
-enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, STOP = 3};
+enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, SCORE_MID = 3, STOP = 4};
 
 
 void intake_t();

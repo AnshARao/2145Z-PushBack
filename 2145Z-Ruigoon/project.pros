@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "2145Z-Main",
+    "project_name": "2145Z-Backup",
     "target": "v5",
     "templates": {
       "EZ-Template": {
@@ -424,7 +424,7 @@
       }
     },
     "upload_options": {
-      "description": "Ansh ruigoons",
+      "description": "Fuh ts",
       "icon": "X",
       "slot": 1
     },

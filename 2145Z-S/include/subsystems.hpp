@@ -16,57 +16,60 @@
 #include "pros/motors.hpp"
 #include "pros/optical.hpp"
 #include "pros/rotation.hpp"
+#include "subsystems.hpp"
 
 // declaring global variables
 enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
 inline MatchStates matchState = DISABLED;
 enum Alliances {BLUE = 0, NONE = 1, RED = 2};
 inline Alliances allianceColor = Alliances::NONE; // for now
-enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, STOP = 3};
+enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, SCORE_MID = 3, STOP = 4};
 
 #pragma region constants
 
 //drive motor ports
-#define PORT_MOTOR_L1 -5
-#define PORT_MOTOR_L2 6
-#define PORT_MOTOR_L3 -10
-#define PORT_MOTOR_R1 8
-#define PORT_MOTOR_R2 -7
-#define PORT_MOTOR_R3 9
+#define PORT_MOTOR_L1 -6
+#define PORT_MOTOR_L2 -19
+#define PORT_MOTOR_L3 -16
+#define PORT_MOTOR_R1 1
+#define PORT_MOTOR_R2 17
+#define PORT_MOTOR_R3 20
 
 
 //subsystem motor ports
-#define PORT_MOTOR_INTAKE1 12
-#define PORT_MOTOR_INTAKE2 -16
-#define PORT_MOTOR_INTAKE3 -17
+#define PORT_MOTOR_INTAKE1 -11
+#define PORT_MOTOR_INTAKE2 -3
+#define PORT_MOTOR_INTAKE3 -13
 
 //smartwire ports
-#define PORT_IMU        0
-#define PORT_ODOM_V     0
-#define PORT_ODOM_H     0
+#define PORT_IMU        21
+#define PORT_ODOM_V     12
+#define PORT_ODOM_H     14
 #define PORT_DISTNANCE1 0
 #define PORT_DISTANCE2  0
 #define PORT_OPTICAL    0
 
 //three wire ports
-#define PORT_LOADER 0
-#define PORT_WING   0
+#define PORT_LOADER 'H'
+#define PORT_WING   'F'
+#define PORT_HOOD   'G'
 
 //drive constants
-#define TRACK_WIDTH     0
-#define DRIVE_DIAMETER  0
-#define DRIVE_RPM       0
-#define HORI_DRIFT      0
+#define TRACK_WIDTH     10.5
+#define DRIVE_DIAMETER  3.25
+#define DRIVE_RPM       450
+#define HORI_DRIFT      2.0
 
 //odom constants
-#define ODOM_DIAMETER 0
-#define ODOM_OFFSET_V 0
-#define ODOM_OFFSET_H 0
+#define ODOM_DIAMETER_V 2.75
+#define ODOM_DIAMETER_H 2.0
+#define ODOM_OFFSET_V -0.25
+#define ODOM_OFFSET_H -1.5
 
 //auto speed constants
-#define DRIVE_SPEED 0
-#define TURN_SPEED  0
-#define SWING_SPEED 0
+#define DRIVE_SPEED 110
+#define TURN_SPEED  90
+#define SWING_SPEED 110
 
 //drive curve constant
 #define DRIVE_CURVE 1.0
@@ -75,9 +78,9 @@ enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, STOP = 3};
 #define BUTTON_INTAKE   pros::E_CONTROLLER_DIGITAL_R1
 #define BUTTON_OUTTAKE  pros::E_CONTROLLER_DIGITAL_R2
 #define BUTTON_SCORE   pros::E_CONTROLLER_DIGITAL_L1
-#define BUTTON_SCORE_MIDDLE pros::E_CONTROLLER_DIGITAL_L2
+#define BUTTON_SCORE_MIDDLE pros::E_CONTROLLER_DIGITAL_B
 #define BUTTON_LOADER   pros::E_CONTROLLER_DIGITAL_DOWN
-#define BUTTON_WING     pros::E_CONTROLLER_DIGITAL_B
+#define BUTTON_WING     pros::E_CONTROLLER_DIGITAL_L2
 
 #pragma endregion
 
@@ -114,6 +117,7 @@ inline pros::Optical optical(PORT_OPTICAL);
 //three wire port device constructors
 inline pros::adi::DigitalOut piston_loader(PORT_LOADER);
 inline pros::adi::DigitalOut piston_wing(PORT_WING);
+inline pros::adi::DigitalOut piston_hood(PORT_HOOD);
 
 //lemlib chassis constructors
 
@@ -129,34 +133,33 @@ inline lemlib::Drivetrain drivetrain(
 inline EmaFilter filter(.9);
 inline EmaFilter filter2(.9);
 
-inline lemlib::TrackingWheel odom_V(&rotation_V, &filter, ODOM_DIAMETER, ODOM_OFFSET_V);
-inline lemlib::TrackingWheel odom_H(&rotation_H, &filter2, ODOM_DIAMETER, ODOM_OFFSET_H);
+inline lemlib::TrackingWheel odom_V(&rotation_V, &filter, ODOM_DIAMETER_V, ODOM_OFFSET_V);
+inline lemlib::TrackingWheel odom_H(&rotation_H, &filter2, ODOM_DIAMETER_H, ODOM_OFFSET_H);
 
 inline lemlib::OdomSensors odomSensors(&odom_V, nullptr, &odom_H, nullptr, &IMU);
 
 
 // lateral PID controller
-inline lemlib::ControllerSettings lat_PID(10, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              3, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in inches
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
-                                              20 // maximum acceleration (slew)
-);
+inline lemlib::ControllerSettings lat_PID(6.7, // proportional gain (kP)
+    0, // integral gain (kI)
+    27 , // derivative gain (kD)
+    0, // anti windup
+    .5, // small error range, in inches
+    100, // small error range timeout, in milliseconds
+    1, // large error range, in inches
+    700, // large error range timeout, in milliseconds
+    0);
 
 // angular PID controller
-inline lemlib::ControllerSettings ang_PID(2, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              10, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in degrees
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in degrees
-                                              500, // large error range timeout, in milliseconds
-                                              0 // maximum acceleration (slew)
+inline lemlib::ControllerSettings ang_PID(1.75, // proportional gain (kP)
+      0, // integral gain (kI)
+      12, // derivative gain (kD)
+      0, // anti windup
+      .5, // small error range, in inches
+      150, // small error range timeout, in milliseconds
+      3, // large error range, in inches
+      600, // large error range timeout, in milliseconds
+      0 // maximum acceleration (slew)
 );
 
 // create the chassis

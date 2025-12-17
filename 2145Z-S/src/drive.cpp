@@ -150,6 +150,15 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 // Set position wrappers
 //
 
+void set_position(double x, double y) {
+	currentPoint.x = x;
+	currentPoint.y = y;
+	currentPoint.t = currentPoint.t;
+	
+	if(matchState != MatchStates::DISABLED) chassis.setPose(currentPoint.x, currentPoint.y, currentPoint.t);
+	autonPath.push_back(currentPoint);
+}
+
 void set_position(double x, double y, double t) {
 	currentPoint.x = x;
 	currentPoint.y = y;
@@ -199,7 +208,7 @@ void wait_until(double target) {
 void set_mtp(Coordinate newpoint, float speed, int timeout, bool fwd, bool slew) {
 	switch(matchState) {
 		case AUTO:
-			chassis.moveToPoint(newpoint.x, newpoint.y, timeout, {.forwards = fwd, .maxSpeed = speed}, slew); 
+			chassis.moveToPoint(newpoint.x, newpoint.y, timeout, {.forwards = fwd, .maxSpeed = speed}); 
 			currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, fwd);
 			currentPoint.x = newpoint.x;
 			currentPoint.y = newpoint.y;
@@ -210,7 +219,7 @@ void set_mtp(Coordinate newpoint, float speed, int timeout, bool fwd, bool slew)
 		default:
 			set_turn(get_theta(currentPoint, newpoint, fwd));
 			wait();
-			set_drive(get_distance(currentPoint, newpoint), speed, slew);
+			set_drive(get_distance(currentPoint, newpoint), speed);
 			break;
 	}
 }
@@ -236,6 +245,16 @@ void set_boom(Coordinate newpoint, int speed, int timeout, bool fwd, bool slew) 
 	}
 }
 
+void set_turn_drive(Coordinate newpoint, float speed, int timeout, bool fwd) {
+	chassis.straightlineToPoint(newpoint.x, newpoint.y, timeout, {.forwards = fwd, .maxSpeed = speed});
+	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, newpoint, fwd);
+			currentPoint.x = newpoint.x;
+			currentPoint.y = newpoint.y;
+			currentPoint.left = speed * (fwd == true ? 1 : -1);
+			currentPoint.right = speed * (fwd == true ? 1 : -1);
+			autonPath.push_back(currentPoint);
+}
+
 //
 // Drive set wrappers
 //
@@ -251,11 +270,13 @@ void set_drive(int speed) {
 
 void set_drive(double distance, int speed, int timeout, bool slew, bool correction) {
 	bool fwd = distance > 0 ? true : false;
-			float legs = distance / sqrt(2);
+			float legX = distance * sin(currentPoint.t);
+			float legY = distance * cos(currentPoint.t);
+
 			if (correction == false) {
-				chassis.moveToPoint(currentPoint.x + legs, currentPoint.y + legs, timeout);
+				chassis.moveToPoint(currentPoint.x + legX, currentPoint.y + legY, timeout);
 			} else {
-				chassis.moveToPose(currentPoint.x + legs, currentPoint.y + legs, currentPoint.t, timeout);
+				chassis.moveToPose(currentPoint.x + legX, currentPoint.y + legY, currentPoint.t, timeout);
 
 			}
 			currentPoint.x = chassis.getPose().x;

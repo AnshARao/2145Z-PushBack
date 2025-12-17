@@ -5,12 +5,75 @@
 #include "drive.hpp"
 #include "main.h"
 #include "pros/motors.h"
+#include "pros/rtos.hpp"
 #include "subsystems.hpp"
 
 /////
 // For installation, upgrading, documentations, and tutorials, check out our website!
 // https://ez-robotics.github.io/EZ-Template/
 /////
+
+void botb1() {
+  chassis.pid_turn_set(15, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(14.0, DRIVE_SPEED);
+  set_rollers(INTAKE);
+  chassis.pid_wait();
+  set_piston(piston_loader, true);
+
+  chassis.pid_turn_set(-50, TURN_SPEED);
+  pros::delay(100);
+  set_piston(piston_loader, false);
+  chassis.pid_wait_quick();
+  chassis.pid_drive_set(8.5, DRIVE_SPEED);
+  chassis.pid_wait_quick_chain();
+  set_rollers(-80);
+  chassis.pid_drive_set(-1, 127);
+  chassis.pid_wait_quick_chain();
+  chassis.pid_drive_set(1, 127);
+  chassis.pid_wait_quick_chain();
+}
+
+void botb2() {
+  chassis.pid_turn_set(15, TURN_SPEED);
+  chassis.pid_wait_quick();
+  chassis.pid_drive_set(14.0, DRIVE_SPEED);
+  set_rollers(INTAKE);
+  chassis.pid_wait_quick_chain();
+  set_piston(piston_loader, true);
+
+  chassis.pid_turn_set(-50, TURN_SPEED);
+  pros::delay(150);
+  set_piston(piston_loader, false);
+  chassis.pid_wait_quick();
+  chassis.pid_drive_set(8.5, 127);
+  set_rollers(-85);
+  chassis.pid_wait_quick_chain();
+  chassis.pid_drive_set(-1, 127);
+  chassis.pid_wait_quick_chain();
+
+  chassis.pid_drive_set(-26, 127);
+  set_rollers(INTAKE);
+  chassis.pid_wait();
+  set_piston(piston_loader, true);
+  chassis.pid_turn_set(180, 127);
+  chassis.pid_wait_quick();
+  chassis.pid_drive_set(12, DRIVE_SPEED);
+  chassis.pid_wait_quick();
+  pros::delay(300);
+  chassis.pid_drive_set(-27, 127);
+  chassis.pid_wait_quick_chain();
+  set_rollers(SCORE);
+  pros::delay(750);
+  chassis.pid_turn_set(90, TURN_SPEED);
+  set_piston(piston_loader, false);
+  chassis.pid_wait();
+  chassis.pid_drive_set(14, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_set(175, TURN_SPEED);
+  chassis.pid_wait_quick();
+  chassis.pid_drive_set(-12, 127);
+}
 
 
 void testing() {

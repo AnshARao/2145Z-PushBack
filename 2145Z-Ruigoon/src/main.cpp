@@ -1,7 +1,9 @@
 #include "main.h"
 #include <string>
+#include "EZ-Template/sdcard.hpp"
 #include "autons.hpp"
 #include "controls.hpp"
+#include "liblvgl/llemu.hpp"
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
@@ -18,43 +20,52 @@ void initialize() {
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
+  pros::lcd::initialize();
+
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
   default_constants();
+  
+  ez::as::auton_selector.autons_add({
+    {"botb 2", botb2},
+    {"botb 1", botb1},
+  });
 
-  auton_sel.selector_populate({
-      {doNothing, "2145Z", pink},
-      {SAWP13, "13 SAWP", green},
-      {fourFiveLeft, "4 + 5 Left", purple},
-      {fourFiveRight, "4 + 5 Right", purple},
-      {left7, "Left 7", orange},
-      {right7, "Right 7", orange},
-      {left9, "Left 9", red},
-      {right9, "Right 9", red}, 
-      {sixThreeLeft, "6 + 3 Left", blue},
-      {sixThreeRight, "6 + 3 Right", blue},  
-      {skills, "Skills", gray},
+  // auton_sel.selector_populate({
+  //     {doNothing, "2145Z", pink},
+  //     {botb1, "Botb 1", blue},
+  //     {SAWP13, "13 SAWP", green},
+  //     {fourFiveLeft, "4 + 5 Left", purple},
+  //     {fourFiveRight, "4 + 5 Right", purple},
+  //     {left7, "Left 7", orange},
+  //     {right7, "Right 7", orange},
+  //     {left9, "Left 9", red},
+  //     {right9, "Right 9", red}, 
+  //     {sixThreeLeft, "6 + 3 Left", blue},
+  //     {sixThreeRight, "6 + 3 Right", blue},  
+  //     {skills, "Skills", gray},
 
-      {testing, "Testing", black}
-    });
+  //     {testing, "Testing", black}
+  //   });
 
   // Initialize chassis and auton selector
   chassis.opcontrol_curve_sd_initialize();
-  chassis.drive_imu_calibrate(false);
+  chassis.drive_imu_calibrate(true);
   chassis.drive_sensor_reset();
-  uiInit();
-  auton_sel.selector_callback = fourFiveLeft; // *TEMP*
+  ez::as::initialize();
+  //uiInit();
+  //auton_sel.selector_callback = doNothing; // *TEMP*
+  //ez::as::auton_selector_initialize();
 
-  pros::Task pathViewer(pathViewerTask);
-  pros::Task angleChecker(angleCheckTask);
+  //pros::Task pathViewer(pathViewerTask);
+  //pros::Task angleChecker(angleCheckTask);
 
-  motor_intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  motor_scorer.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
-
-  optical.set_led_pwm(100);
+  motor_intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  motor_intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  motor_intake3.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
@@ -113,7 +124,8 @@ void autonomous() {
   to be consistent
   */
   matchState = AUTO;
-  auton_sel.selector_callback();
+  //auton_sel.selector_callback();
+  ez::as::auton_selector.selected_auton_call();  
 }
 
 /**

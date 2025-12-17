@@ -1,5 +1,7 @@
+#include "controls.hpp"
 #include "main.h"
 #include "pros/misc.h"
+#include "subsystems.hpp"
 #include <stdlib.h>
 #include <sys/types.h>
 
@@ -52,3 +54,78 @@ void tank_drive(double scale, pros::Controller& controller) {
 }
 
 #pragma endregion
+
+void set_wing(bool state) {
+    piston_wing.set_value(state);
+}
+
+void control_wing() {
+    if (master.get_digital(BUTTON_WING)) {
+        set_wing(true);
+    } else {
+        set_wing(false);
+    }
+}
+
+void set_loader(bool state) {
+    state_loader = state;
+    piston_loader.set_value(state_loader);
+}
+
+void control_loader() {
+    if (master.get_digital_new_press(BUTTON_LOADER)) {
+        set_loader(!state_loader);
+    }
+}
+
+void set_hood(bool state) {
+    piston_hood.set_value(state);
+}
+
+void set_rollers(int vltg1, int vltg2) {
+    motor_intake1.move(vltg1);
+    motor_intake2.move(vltg1);
+    motor_intake3.move(vltg2);
+} 
+
+void set_rollers(int vltg) {
+    motor_intake1.move(vltg);
+    motor_intake2.move(vltg);
+    motor_intake3.move(vltg);
+}
+
+void set_rollers(RollerStates state) {
+    switch (state) {
+        case INTAKE:
+            set_rollers(127);
+            set_hood(false);
+            break;
+        case OUTTAKE:
+            set_rollers(-127);
+            break;
+        case SCORE:
+            set_rollers(127);
+            set_hood(true);
+            break;
+        case SCORE_MID:
+            set_rollers(127, -127);
+            break;
+        case STOP:
+            set_rollers(0);
+            break;
+    }
+}
+
+void control_rollers() {
+    if (master.get_digital(BUTTON_INTAKE)) {
+        set_rollers(INTAKE);
+    } else if (master.get_digital(BUTTON_OUTTAKE)) {
+        set_rollers(OUTTAKE);
+    } else if (master.get_digital(BUTTON_SCORE)) {
+        set_rollers(SCORE);
+    } else if (master.get_digital(BUTTON_SCORE_MIDDLE)) {
+        set_rollers(SCORE_MID);
+    } else {
+        set_rollers(STOP);
+    }
+}

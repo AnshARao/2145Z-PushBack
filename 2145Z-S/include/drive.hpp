@@ -32,7 +32,7 @@ std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double loo
 
 // Set position wrappers
 void set_position(double x, double y);
-void set_position(double x, double y, double t = 0);
+void set_position(double x, double y, double t);
 
 enum Wait {
     WAIT = 0,
@@ -47,19 +47,20 @@ void wait_until(double target);
 void wait_until(Coordinate coordinate);
 
 // Move to point wrappers
-void set_mtp(Coordinate newpoint, int speed, bool fwd = true, bool slew = false);
-void set_boom(Coordinate newpoint, int speed, bool fwd = true, bool slew = false);
+void set_mtp(Coordinate newpoint, float speed, int timeout = 9999, bool fwd = true, bool slew = false);
+void set_boom(Coordinate newpoint, int speed, int timeout = 9999, bool fwd = true, bool slew = false);
+void set_turn_drive(Coordinate newpoint, float speed, int timeout = 9999, bool fwd = true);
 
 // Drive set wrappers
 void set_drive(double distance, int speed = DRIVE_SPEED, int timeout = 9999, bool slew = false, bool correction = true);
 void set_drive(int speed);
 
 // Turn set wrappers
-void set_turn(double theta, int speed = TURN_SPEED, lemlib::AngularDirection behavior = lemlib::AngularDirection::AUTO, bool slew = false);
-void set_turn(Coordinate point, bool fwd, int speed, lemlib::AngularDirection behavior = lemlib::AngularDirection::AUTO, bool use_slew = false);
+void set_turn(double theta, int speed = TURN_SPEED, int timeout = 9999, lemlib::AngularDirection behavior = lemlib::AngularDirection::AUTO, bool slew = false);
+void set_turn(Coordinate newpoint, bool fwd, int speed, int timeout = 9999, lemlib::AngularDirection behavior = lemlib::AngularDirection::AUTO, bool slew = false);
 void set_turn_relative(double theta, int speed, lemlib::AngularDirection behavior);
 void set_turn_relative(double theta, int speed);
 
 // Print path
-void get_path();
-void get_path_injected();
+void getPath();
+void getPathInjected();

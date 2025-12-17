@@ -21,63 +21,35 @@ int vltg_intake = 0;
 bool jam_toggle = true;
 bool jammed = false;
 
-void intake_t() {
-    
-    int jam_timer = 0;
-    const int jam_timer_threshold = 200;
-    const int min_velo_threshold = 5;
-
-    while(true) {
-        motor_intake.move_voltage(vltg_intake);
-        pros::delay(10);
-        
-
-        
-        if((abs)(motor_intake.get_actual_velocity()) < min_velo_threshold && !(vltg_intake <= 0) && jam_toggle/* && matchState == AUTO*/) {
-            jam_timer += 10;
-            if (jam_timer > jam_timer_threshold) {
-                jammed = true;
-                set_motor(motor_intake, -12000);
-                pros::delay(100);
-                set_motor(motor_intake, vltg_intake);
-                jam_timer = 0;
-                jammed = false;
-            } else {
-                jam_timer = 0;
-            }
-        } 
-    }
-}
-
-pros::Task intakeTask(intake_t);
-
 #pragma region motors
 
-void set_motor(pros::Motor& motor, int vltg) {
-    motor.move_voltage(vltg);
-}
-
 void set_rollers(int vltg1, int vltg2) {
-    vltg_intake = vltg1;
-    set_motor(motor_scorer, vltg2);
-}
+    motor_intake1.move(vltg1);
+    motor_intake2.move(vltg1);
+    motor_intake3.move(vltg2);
+} 
 
 void set_rollers(int vltg) {
-    vltg_intake = vltg;
-    set_motor(motor_scorer, vltg);
+    motor_intake1.move(vltg);
+    motor_intake2.move(vltg);
+    motor_intake3.move(vltg);
 }
 
 void set_rollers(RollerStates state) {
     switch (state) {
         case INTAKE:
-            set_rollers(12000, -6000);
+            set_rollers(127);
             set_piston(piston_scorer, false);
             break;
         case OUTTAKE:
-            set_rollers(-12000);
+            set_rollers(-127);
             break;
         case SCORE:
-            set_rollers(12000);
+            set_rollers(127);
+            set_piston(piston_scorer, true);
+            break;
+        case SCORE_MID:
+            set_rollers(127, -127);
             break;
         case STOP:
             set_rollers(0);
@@ -86,16 +58,14 @@ void set_rollers(RollerStates state) {
 }
 
 void control_rollers() {
-    if (jammed) return;
-
-
-    // Default manual control when not auto-outtaking
-    if (controlla.get_digital(BUTTON_INTAKE)) {
+    if (master.get_digital(BUTTON_INTAKE)) {
         set_rollers(INTAKE);
-    } else if (controlla.get_digital(BUTTON_OUTTAKE)) {
+    } else if (master.get_digital(BUTTON_OUTTAKE)) {
         set_rollers(OUTTAKE);
-    } else if (controlla.get_digital(BUTTON_SCORE)) {
+    } else if (master.get_digital(BUTTON_SCORE)) {
         set_rollers(SCORE);
+    } else if (master.get_digital(BUTTON_SCORE_MID)) {
+        set_rollers(SCORE_MID);
     } else {
         set_rollers(STOP);
     }

@@ -18,38 +18,40 @@
 #pragma region constants
 
 // Defining drive motor ports
-#define PORT_LT 16
-#define PORT_LM -14
-#define PORT_LB -18
-#define PORT_RT 20
-#define PORT_RM -19
-#define PORT_RB 15
+#define PORT_LT -6
+#define PORT_LM -19
+#define PORT_LB -16
+#define PORT_RT 1
+#define PORT_RM 17
+#define PORT_RB 20
 
 // Defining subsystem motor ports
-#define PORT_INTAKE         9
-#define PORT_SCORER         -2
+#define PORT_INTAKE         -11
+#define PORT_INTAKE2        -3
+#define PORT_INTAKE3        -13
 
 // Defining smartwire device ports
-#define PORT_IMU            13
-#define PORT_ODOM_HORIZ     11
-#define PORT_ODOM_VERT      3
-#define PORT_OPTICAL        21
-#define PORT_OPTICAL_2   4
+#define PORT_IMU            21
+#define PORT_ODOM_HORIZ     14
+#define PORT_ODOM_VERT      12
+#define PORT_OPTICAL        
+#define PORT_OPTICAL_2   
 
 // Defining three wire ports
-#define PORT_LOADER         'G'
-#define PORT_PISTON_SCORER  'B'
+#define PORT_LOADER         'H'
+#define PORT_PISTON_SCORER  'G'
 #define PORT_WING_LEFT      'C'
-#define PORT_WING_RIGHT     'H'
+#define PORT_WING_RIGHT     'F'
 #define PORT_PISTON_PARK    'C'
 
 // Defining robot constants
 #define DRIVE_DIAMETER      3.25
-#define TRACK_WIDTH         13.5
+#define TRACK_WIDTH         10.5
 #define DRIVE_RPM           450
-#define ODOM_DIAMETER       2.0
-#define OFFSET_VERT         1.0
-#define OFFSET_HORI         -2.125
+#define ODOM_DIAMETER_V       2.75
+#define ODOM_DIAMETER_H       2.0
+#define OFFSET_VERT         -0.25
+#define OFFSET_HORI         -1.5
 //-2.125
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
@@ -60,11 +62,12 @@
 #define BUTTON_INTAKE       pros::E_CONTROLLER_DIGITAL_R1
 #define BUTTON_OUTTAKE      pros::E_CONTROLLER_DIGITAL_R2
 #define BUTTON_SCORE        pros::E_CONTROLLER_DIGITAL_L1
+#define BUTTON_SCORE_MID    pros::E_CONTROLLER_DIGITAL_B
 
 #define BUTTON_LOADER        pros::E_CONTROLLER_DIGITAL_DOWN
 #define BUTTON_WING_LEFT     pros::E_CONTROLLER_DIGITAL_Y
 #define BUTTON_WING_RIGHT    pros::E_CONTROLLER_DIGITAL_L2
-#define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_B
+#define BUTTON_SCORER        pros::E_CONTROLLER_DIGITAL_RIGHT
 
 #define BUTTON_OUTTAKE_AUTO  pros::E_CONTROLLER_DIGITAL_X
 
@@ -91,16 +94,16 @@ inline pros::MotorGroup motorgroup_L({PORT_LT, PORT_LM, PORT_LB,});
 inline pros::MotorGroup motorgroup_R({PORT_RT, PORT_RM, PORT_RB,});
 
 // Subsystem motor constructors
-inline pros::Motor motor_intake   (PORT_INTAKE, pros::v5::MotorGears::blue);
-inline pros::Motor motor_scorer   (PORT_SCORER, pros::v5::MotorGears::blue);
-
+inline pros::Motor motor_intake1   (PORT_INTAKE, pros::v5::MotorGears::blue);
+inline pros::Motor motor_intake2  (PORT_INTAKE2, pros::v5::MotorGears::blue);
+inline pros::Motor motor_intake3  (PORT_INTAKE3, pros::v5::MotorGears::blue);
 
 // smartwire device constructors
 inline pros::Imu      imu               (PORT_IMU);
 inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);
 inline pros::Rotation odom_vert         (PORT_ODOM_VERT);
 inline pros::Optical  optical           (PORT_OPTICAL);
-inline pros::Optical  optical_2      (PORT_OPTICAL_2);
+inline pros::Optical  optical_2         (PORT_OPTICAL_2);
 
 //three wire port constructors
 
@@ -119,14 +122,14 @@ inline ez::Drive chassis(
     DRIVE_DIAMETER, // Wheel Diameter
     DRIVE_RPM); // Wheel RPM
 
-inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
-inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
+//inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER_H, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
+//inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER_V, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
 
 #pragma endregion
 
 inline void default_constants() {
   // P, I, D, and Start I
-  chassis.pid_drive_constants_set(30.0, 0.0, 315.0);         // Fwd/rev constants, used for odom and non odom motions
+  chassis.pid_drive_constants_set(30.0, 0.0, 250.0);         // Fwd/rev constants, used for odom and non odom motions
   chassis.pid_heading_constants_set(11.0, 0.0, 20.0);        // Holds the robot straight while going forward without odom
   chassis.pid_turn_constants_set(6.5, 0.05, 52.5, 15.0);     // Turn in place constants
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
