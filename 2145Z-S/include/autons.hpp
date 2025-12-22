@@ -57,6 +57,10 @@ inline void measure_offsets() {
     // Average the offsets
     vert_offset /= iterations;
     horz_offset /= iterations;
+
+    console1.printf("vert offset %2f", vert_offset);
+    console1.println("");
+    console1.printf("horz offset %2f", horz_offset);
 }
 
 inline void tune(){
@@ -66,6 +70,54 @@ inline void tune(){
   chassis.turnToHeading(0, 3000);
   chassis.waitUntilDone();  
 };
+
+inline void left45() {
+    chassis.setPose(-48, 17, 90);
+    set_rollers(INTAKE);
+    chassis.moveToPoint(-13, 24.5, 1000);
+    chassis.moveToPose(-8, 41, 15, 2000, {.minSpeed = 60});
+    chassis.waitUntilDone();
+    set_loader(true);
+    pros::delay(100);
+    chassis.moveToPoint(-16, 16, 1250, {.forwards = false});
+    chassis.turnToHeading(315, 1000);
+    chassis.waitUntilDone();
+    chassis.tank(-127, -127);
+    pros::delay(250);
+    chassis.tank(0, 0);
+    set_rollers(SCORE_MID);
+    pros::delay(500);
+    set_rollers(INTAKE);
+    chassis.moveToPoint(-47, 47, 2000);
+    chassis.turnToHeading(270, 1000);
+    chassis.waitUntilDone();
+    chassis.tank(110, 110);
+    pros::delay(250);
+    chassis.tank(0, 0);
+    pros::delay(1000);
+    chassis.tank(-127, -127);
+    pros::delay(250);
+    chassis.tank(0, 0);
+    set_rollers(SCORE);
+
+}
+
+inline void right63() {
+    chassis.setPose(-50, -17, 90);
+    set_rollers(INTAKE);
+    chassis.moveToPoint(-28, -25, 1500);
+    chassis.moveToPoint(-6.5, -49, 1500);
+    chassis.moveToPoint(-17, -29, 1000, {.forwards = false});
+    chassis.turnToHeading(45, 500);
+    chassis.moveToPoint(-9, -22, 1000);
+    set_rollers(OUTTAKE);
+    pros::delay(1000);
+    chassis.moveToPoint(-45, -55, 2000, {.forwards = false});
+    chassis.turnToHeading(270, 500);
+
+
+
+}
 
 inline void SAWP() {
 

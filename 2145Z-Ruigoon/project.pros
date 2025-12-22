@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "2145Z-Backup",
+    "project_name": "2145Z-Goon",
     "target": "v5",
     "templates": {
       "EZ-Template": {

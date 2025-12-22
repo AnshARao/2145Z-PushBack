@@ -20,8 +20,6 @@ void initialize() {
 
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
-  pros::lcd::initialize();
-
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
@@ -29,39 +27,31 @@ void initialize() {
 
   default_constants();
   
-  ez::as::auton_selector.autons_add({
-    {"botb 2", botb2},
-    {"botb 1", botb1},
-  });
+  //ez::as::auton_selector.autons_add({});
 
-  // auton_sel.selector_populate({
-  //     {doNothing, "2145Z", pink},
-  //     {botb1, "Botb 1", blue},
-  //     {SAWP13, "13 SAWP", green},
-  //     {fourFiveLeft, "4 + 5 Left", purple},
-  //     {fourFiveRight, "4 + 5 Right", purple},
-  //     {left7, "Left 7", orange},
-  //     {right7, "Right 7", orange},
-  //     {left9, "Left 9", red},
-  //     {right9, "Right 9", red}, 
-  //     {sixThreeLeft, "6 + 3 Left", blue},
-  //     {sixThreeRight, "6 + 3 Right", blue},  
-  //     {skills, "Skills", gray},
-
-  //     {testing, "Testing", black}
-  //   });
+  auton_sel.selector_populate({
+      {doNothing, "2145Z", pink},
+      {SAWP, "13 SAWP", green},
+      {sixThreeLeft, "6 + 3 Left", blue},
+      {sixThreeRight, "6 + 3 Right", blue},  
+      {fourFive, "4 + 5 middle", red},
+      {left7, "Left 7", orange},
+      {right7, "Right 7", orange},
+      {skills, "Skills", gray},
+      {measure_offsets, "measure offsets", purple},
+    });
 
   // Initialize chassis and auton selector
   chassis.opcontrol_curve_sd_initialize();
   chassis.drive_imu_calibrate(true);
   chassis.drive_sensor_reset();
-  ez::as::initialize();
-  //uiInit();
-  //auton_sel.selector_callback = doNothing; // *TEMP*
+  //ez::as::initialize();
+  uiInit();
+  auton_sel.selector_callback = fourFive; // *TEMP*
   //ez::as::auton_selector_initialize();
 
-  //pros::Task pathViewer(pathViewerTask);
-  //pros::Task angleChecker(angleCheckTask);
+  pros::Task pathViewer(pathViewerTask);
+  pros::Task angleChecker(angleCheckTask);
 
   motor_intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   motor_intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -124,8 +114,8 @@ void autonomous() {
   to be consistent
   */
   matchState = AUTO;
-  //auton_sel.selector_callback();
-  ez::as::auton_selector.selected_auton_call();  
+  auton_sel.selector_callback();
+  //ez::as::auton_selector.selected_auton_call();  
 }
 
 /**
@@ -250,9 +240,10 @@ void opcontrol() {
 
     control_rollers();
     control_piston_toggle(piston_loader, BUTTON_LOADER);
-    //control_piston_toggle(piston_wing_left, BUTTON_WING_LEFT);
-    control_piston_hold(piston_wing_right, BUTTON_WING_RIGHT);
+    control_piston_hold(piston_wing, BUTTON_WING);
+    control_piston_toggle(piston_park, BUTTON_PARK);
     control_piston_toggle(piston_scorer, BUTTON_SCORER);
+    control_piston_toggle(piston_descore, BUTTON_DESCORE);
     print(1, "X: " + std::to_string(chassis.odom_x_get()));
     print(2, "Y: " + std::to_string(chassis.odom_y_get()));
     print(3, "A: " + std::to_string(chassis.odom_theta_get()));

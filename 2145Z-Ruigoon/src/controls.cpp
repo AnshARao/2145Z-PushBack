@@ -23,6 +23,12 @@ bool jammed = false;
 
 #pragma region motors
 
+void set_rollers(int vltg1, int vltg2, int vltg3) {
+    motor_intake1.move(vltg1);
+    motor_intake2.move(vltg2);
+    motor_intake3.move(vltg3);
+}
+
 void set_rollers(int vltg1, int vltg2) {
     motor_intake1.move(vltg1);
     motor_intake2.move(vltg1);
@@ -38,7 +44,7 @@ void set_rollers(int vltg) {
 void set_rollers(RollerStates state) {
     switch (state) {
         case INTAKE:
-            set_rollers(127);
+            set_rollers(127, 64);
             set_piston(piston_scorer, false);
             break;
         case OUTTAKE:
@@ -49,7 +55,7 @@ void set_rollers(RollerStates state) {
             set_piston(piston_scorer, true);
             break;
         case SCORE_MID:
-            set_rollers(127, -127);
+            set_rollers(127, -95);
             break;
         case STOP:
             set_rollers(0);

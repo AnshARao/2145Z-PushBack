@@ -17,6 +17,9 @@
 #include "pros/optical.hpp"
 #include "pros/rotation.hpp"
 #include "subsystems.hpp"
+#include "robodash/api.h"
+
+inline rd::Console console1;
 
 // declaring global variables
 enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
@@ -63,8 +66,8 @@ enum RollerStates {INTAKE = 0, OUTTAKE = 1, SCORE = 2, SCORE_MID = 3, STOP = 4};
 //odom constants
 #define ODOM_DIAMETER_V 2.75
 #define ODOM_DIAMETER_H 2.0
-#define ODOM_OFFSET_V -0.25
-#define ODOM_OFFSET_H -1.5
+#define ODOM_OFFSET_V -0.21
+#define ODOM_OFFSET_H 0.55
 
 //auto speed constants
 #define DRIVE_SPEED 110
@@ -140,38 +143,56 @@ inline lemlib::OdomSensors odomSensors(&odom_V, nullptr, &odom_H, nullptr, &IMU)
 
 
 // lateral PID controller
-inline lemlib::ControllerSettings lat_PID(6.7, // proportional gain (kP)
-    0, // integral gain (kI)
-    27 , // derivative gain (kD)
-    0, // anti windup
-    .5, // small error range, in inches
-    100, // small error range timeout, in milliseconds
-    1, // large error range, in inches
-    700, // large error range timeout, in milliseconds
-    0);
+inline lemlib::ControllerSettings lat_PID(10, // proportional gain (kP)
+                                              0, // integral gain (kI)
+                                              3, // derivative gain (kD)
+                                              3, // anti windup
+                                              1, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
+                                              3, // large error range, in inches
+                                              500, // large error range timeout, in milliseconds
+                                              20 // maximum acceleration (slew)
+);
 
 // angular PID controller
-inline lemlib::ControllerSettings ang_PID(1.75, // proportional gain (kP)
-      0, // integral gain (kI)
-      12, // derivative gain (kD)
-      0, // anti windup
-      .5, // small error range, in inches
-      150, // small error range timeout, in milliseconds
-      3, // large error range, in inches
-      600, // large error range timeout, in milliseconds
-      0 // maximum acceleration (slew)
+inline lemlib::ControllerSettings ang_PID(2, // proportional gain (kP)
+                                              0, // integral gain (kI)
+                                              10, // derivative gain (kD)
+                                              3, // anti windup
+                                              1, // small error range, in degrees
+                                              100, // small error range timeout, in milliseconds
+                                              3, // large error range, in degrees
+                                              500, // large error range timeout, in milliseconds
+                                              0 // maximum acceleration (slew)
+);
+
+// input curve for throttle input during driver control
+inline lemlib::ExpoDriveCurve lat_curve(3, // joystick deadband out of 127
+                                     10, // minimum output where drivetrain will move out of 127
+                                     1.019 // expo curve gain
+);
+
+// input curve for steer input during driver control
+inline lemlib::ExpoDriveCurve ang_curve(3, // joystick deadband out of 127
+                                  10, // minimum output where drivetrain will move out of 127
+                                  1.03 // expo curve gain
 );
 
 // create the chassis
 inline lemlib::Chassis chassis(drivetrain, // drivetrain settings
                         lat_PID, // lateral PID settings
                         ang_PID, // angular PID settings
-                        odomSensors // odometry sensors
+                        odomSensors, // odometry sensors
+                        &lat_curve,
+                        &ang_curve
 );
 
 #pragma endregion
 
 #include "lib/lights.hpp"
+#include "lib/color.hpp"
+
+inline lib::Color color = lib::Color();
 
 inline std::vector<int> blueGradient = interpolateDouble(HSV(120, 0.8, 0.7), HSV(340, 0.8, 0.7), 120);
 inline std::vector<int> redGradient = interpolateDouble(HSV(310, 0.9, 0.7), HSV(400, 0.9, 0.7), 120);

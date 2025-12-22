@@ -58,8 +58,6 @@ lv_obj_t* console_label = lv_label_create(console_container);
 
 lv_style_t pushback;
 
-LV_IMG_DECLARE(red_alliance);
-LV_IMG_DECLARE(blue_alliance);
 LV_IMG_DECLARE(colorindOverlay);
 LV_IMG_DECLARE(pfp2145);
 LV_IMG_DECLARE(matchField);

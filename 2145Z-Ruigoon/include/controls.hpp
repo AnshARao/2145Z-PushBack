@@ -2,6 +2,7 @@
 
 #include "EZ-Template/api.hpp"  // IWYU pragma: keep
 #include "api.h"    // IWYU pragma: keep
+#include "controls.hpp"
 
 // declaring global variables
 enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
@@ -15,6 +16,7 @@ void intake_t();
 
 void set_motor(pros::Motor& motor, int vltg);
 
+void set_rollers(int vltg1, int vltg2, int vltg3);
 void set_rollers(int vltg1, int vltg2);
 void set_rollers(int vltg);
 void set_rollers(RollerStates state);

@@ -1,6 +1,6 @@
 #include "lib/lights.hpp"
 #include "pros/misc.h"
-#include "robotconfig.h"
+#include "subsystems.hpp"
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -170,21 +170,21 @@ std::vector<int> interpolateDouble(HSV start, HSV end, int length) {
 
 void lib::LightManager::loop() {
     while (true) {
-        arm->abstractInput(1.0 ? controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y) 
-                        || controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1) || controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)
-                        || controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) || controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) : 0.0);
+        arm->abstractInput(1.0 ? master.get_digital(pros::E_CONTROLLER_DIGITAL_Y) 
+                        || master.get_digital(pros::E_CONTROLLER_DIGITAL_R1) || master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)
+                        || master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) || master.get_digital(pros::E_CONTROLLER_DIGITAL_L2) : 0.0);
         arm->update();
         pros::delay(10);
-        intake->abstractInput(1.0 ? controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) || controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) : 0.0);
+        intake->abstractInput(1.0 ? master.get_digital(pros::E_CONTROLLER_DIGITAL_L1) || master.get_digital(pros::E_CONTROLLER_DIGITAL_L2) : 0.0);
         intake->update();
         pros::delay(10);
-        clamp->abstractInput(1.0 ? controller.get_digital(pros::E_CONTROLLER_DIGITAL_B) : 0.0);
+        clamp->abstractInput(1.0 ? master.get_digital(pros::E_CONTROLLER_DIGITAL_B) : 0.0);
         clamp->update();
         pros::delay(10);
-        left->abstractInput(std::max(abs(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), abs(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X))) / 100.0);
+        left->abstractInput(std::max(abs(master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), abs(master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X))) / 100.0);
         left->update();
         pros::delay(10);
-        right->abstractInput(std::max(abs(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), abs(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X))) / 100.0);
+        right->abstractInput(std::max(abs(master.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), abs(master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X))) / 100.0);
         right->update();
         pros::delay(10);
     }
@@ -196,7 +196,7 @@ void lib::FlowingGradient::update() {
     ticksPassed++; 
     for (int i = 0; i < length(); i++) {
         set_pixel(
-            teamColor == team::blue ? blueGradient[(i + ticksPassed) % blueGradient.size()]
+            allianceColor == BLUE ? blueGradient[(i + ticksPassed) % blueGradient.size()]
             : redGradient[(i + ticksPassed) % redGradient.size()],
             i);
     }
@@ -206,7 +206,7 @@ void lib::FlowingGradient::update() {
 
 void lib::BreathingGradient::update() {
     ticksPassed++; 
-    set_all( teamColor == team::blue ? blueGradient[ticksPassed % blueGradient.size()]
+    set_all( allianceColor == BLUE ? blueGradient[ticksPassed % blueGradient.size()]
             : redGradient[ticksPassed % redGradient.size()]);
 }
 
@@ -215,7 +215,7 @@ void lib::BreathingGradient::update() {
 void lib::Pulser::update() {
     alpha = std::clamp(alpha + delta, 0.0, 1.0);
     
-    set_all(teamColor == team::blue ? RgbToHex(hsvToRgb(lerpHSV(HSV(blue.h, blue.s, 0), blue, alpha)))
+    set_all(allianceColor == BLUE ? RgbToHex(hsvToRgb(lerpHSV(HSV(blue.h, blue.s, 0), blue, alpha)))
                 : RgbToHex(hsvToRgb(lerpHSV(HSV(red.h, red.s, 0), red, alpha))));
 }
 
@@ -223,7 +223,7 @@ void lib::Pulser::update() {
 
 void lib::EmaPulser::abstractInput(double input) {
     alpha = lerpf(alpha, fmin(1.0, input), 0.1);
-    set_all(teamColor == team::blue ? RgbToHex(hsvToRgb(lerpHSV(HSV(blue.h, blue.v, 0), blue, alpha)))
+    set_all(allianceColor == BLUE ? RgbToHex(hsvToRgb(lerpHSV(HSV(blue.h, blue.v, 0), blue, alpha)))
                 : RgbToHex(hsvToRgb(lerpHSV(HSV(red.h, red.v, 0), red, alpha))));
 }
 
@@ -235,7 +235,7 @@ void lib::AnimationReader::update() {
     
     for (int i = 0; i < length(); i++) {
         set_pixel(
-            teamColor == team::blue ? blueAnimation[i * animationLength + playPosition]
+            allianceColor == BLUE ? blueAnimation[i * animationLength + playPosition]
             : redAnimation[i * animationLength + playPosition],
             i);
     }

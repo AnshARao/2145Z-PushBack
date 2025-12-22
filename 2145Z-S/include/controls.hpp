@@ -5,6 +5,9 @@
 #include "subsystems.hpp"
 
 inline bool state_loader = false;
+inline int vltg_1 = 0;
+inline int vltg_2 = 0;
+inline int vltg_3 = 0;
 
 void intake_t();
 
