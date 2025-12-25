@@ -46,6 +46,7 @@ void set_rollers(RollerStates state) {
         case INTAKE:
             set_rollers(127, 64);
             set_piston(piston_scorer, false);
+            set_piston(piston_wing, true);
             break;
         case OUTTAKE:
             set_rollers(-127);
@@ -53,6 +54,7 @@ void set_rollers(RollerStates state) {
         case SCORE:
             set_rollers(127);
             set_piston(piston_scorer, true);
+            set_piston(piston_wing, false);
             break;
         case SCORE_MID:
             set_rollers(127, -95);
