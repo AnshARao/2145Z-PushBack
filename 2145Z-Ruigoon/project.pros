@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "2145Z-Goon",
+    "project_name": "2145Z-Ronalds Him",
     "target": "v5",
     "templates": {
       "EZ-Template": {
@@ -426,7 +426,7 @@
     "upload_options": {
       "description": "Fuh ts",
       "icon": "X",
-      "slot": 1
+      "slot": 3
     },
     "use_early_access": false
   }

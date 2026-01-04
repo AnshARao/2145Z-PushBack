@@ -124,7 +124,7 @@ void SAWP() {
 
   set_turn(357, DRIVE_SPEED); //.. into this turn...
   wait(CHAIN); //...motion chaining...
-  set_drive(42.0, 127); //...into this drive, which goes for the other 3 stack
+  set_drive(40.0, 127); //...into this drive, which goes for the other 3 stack
   set_piston(piston_loader, false); //put matchloader up
   wait(750); // wait for time
   set_piston(piston_loader, true); //put matchloader back down to secure the second 3 stack.
@@ -138,7 +138,7 @@ void SAWP() {
   wait();
 
   set_rollers(-OUTTAKE);
-  wait(100);
+  wait(200);
   set_rollers(SCORE_MID);
   wait(CHAIN);
   wait(800);
@@ -164,6 +164,7 @@ void SAWP() {
 
   wait(10000); //waiting 10 seconds for auto to finish so the wing can be put down, won't happen in game but only so the screenvieer thing doesn't put the wing up when the auto is selected.
   set_piston(piston_wing, false);
+  set_piston(piston_scorer, false);
 }
 
 
@@ -216,13 +217,13 @@ void sixThreeLeft() {
   wait(CHAIN);
   
   // **THE REST NEEDS TUNING**
-  set_drive(-4.0); // backs up from loader, might need to tune this
+  set_drive(-6.0); // backs up from loader, might need to tune this
   wait(CHAIN);
   set_piston(piston_loader, false);
 
-  set_turn({0,-8}, rev, TURN_SPEED); // this needs tuning
+  //set_turn({0,-8}, rev, TURN_SPEED); // this needs tuning
   // I think replacing above with...
-  //set_turn(315, TURN_SPEED);
+  set_turn(315, TURN_SPEED);
   //... would be much better, and then just tune the angle value from 315 degrees
   wait(QUICK);
   set_drive(-50.0, 127); // backing up into the goal, might be too big or too small
@@ -236,10 +237,13 @@ void sixThreeLeft() {
   wait(CHAIN);
   set_turn(270); //turns so snacky is in goal
   // *You MIGHT have to put the snacky down again, uncomment this line*
-  //set_piston(piston_wing, false);
+  set_piston(piston_wing, false);
   wait(CHAIN);
   set_drive(-16.0);
   wait();
+
+  set_piston(piston_wing, false);
+  set_piston(piston_scorer, false);
 }
 
 // this is literally the same as the top but mirrored, except for the end.
@@ -277,10 +281,11 @@ void sixThreeRight() {
   set_rollers(OUTTAKE);
   wait(150);
   set_rollers(SCORE);
-  wait(1750);
+  wait(1700);
   set_rollers(INTAKE);
 
   set_boom({-60, -48, 270}, 125);
+  set_rollers(INTAKE);
   set_piston(piston_loader, true);
   wait(CHAIN);
   // set_drive(-0.25);
@@ -290,11 +295,11 @@ void sixThreeRight() {
   set_piston(piston_loader, false);
 
   // This turns to the goal, should change it to an angle instead
-  set_turn({0,14}, fwd, TURN_SPEED);
+  //set_turn({0,14}, fwd, TURN_SPEED);
   //I think replace it with this line and tune the angle
-  //set_turn(45, TURN_SPEED);
+  set_turn(42.5, TURN_SPEED);
   wait();
-  set_drive(46.0, 127); //might be going too far or not far enough who knows, can tune
+  set_drive(48.0, 127); //might be going too far or not far enough who knows, can tune
   wait(QUICK);
   set_rollers(-12000);
   wait(100);
@@ -304,14 +309,17 @@ void sixThreeRight() {
   wait(1750);
   set_drive(1.0);
   wait();
-
-
-  set_drive(-20.0);
+ 
+  set_piston(piston_wing, false);
+  set_drive(-22.0);
   wait(CHAIN);
   set_turn(90);
   wait(CHAIN);
-  set_drive(12.0); //this last value might be too big or too small.
+  set_drive(17.0); //this last value might be too big or too small.
   wait();
+  set_turn(45);
+  wait();
+
 
   //if you want to try going down the alley you can replace the last chuck with this and tune the drive values
   /*
@@ -322,6 +330,8 @@ void sixThreeRight() {
   set_drive(-30.0); //this last value might be too big or too small.
   wait();
   */
+  set_piston(piston_wing, false);
+  set_piston(piston_scorer, false);
 }
 
 void fourFive() {
@@ -543,7 +553,7 @@ void left7() {
 
   // set_boom({-60.5, 47, 270}, 127);
   set_piston(piston_loader, true);
-  set_drive(22.0);
+  set_drive(5.0);
   wait();
   // set_drive(-1.0);
   // wait();
@@ -601,15 +611,21 @@ void right7() {
   wait(CHAIN);
 
   // set_boom({-60.5, -47, 270}, 125);
-  set_drive(20.0, 60);
+  set_drive(12.0, 80);
   set_piston(piston_loader, true);
   wait();
   // set_drive(1.0, 127);
   // wait(QUICK);
   // set_mtp({-26, -47}, 127, rev);
-  set_drive(-29.0, 127);
-  wait(400);
-  set_rollers(OUTTAKE);
+  set_drive(-2.0, 127);
+  wait(750);
+  set_turn(268);
+  wait();
+  set_rollers(OUTTAKE, 90);
+  set_drive(-27.0, 127);
+  wait(800);
+  /*set_rollers(INTAKE);
+  set_rollers(OUTTAKE);*/
   wait(100);
   set_rollers(SCORE);
   wait(CHAIN);
@@ -622,9 +638,13 @@ void right7() {
   wait();
   set_turn(260);
   wait();
-  set_drive(-18.0);
+  set_drive(-18.0, 127);
   wait();
   chassis.drive_brake_set(pros::E_MOTOR_BRAKE_HOLD);
+  set_piston(piston_wing, false);
+  set_piston(piston_scorer, false);
+  set_piston(piston_loader, false);
+
 }
 
 void skills() {
@@ -634,10 +654,22 @@ void skills() {
 
   set_position(-48, -12.5, 180);
 
-  set_drive(32.0, DRIVE_SPEED, true);
+  set_drive(80.0, DRIVE_SPEED, true);
   set_piston(piston_wing, true);
+  wait(CHAIN);
+  set_rollers(INTAKE);
   wait();
-  set_piston(piston_loader, true);
+  set_rollers(OUTTAKE);
+  wait(unjamTime);
+  set_rollers(SCORE);
+  wait(2750);
+  set_drive(80.0, DRIVE_SPEED, true);
+  wait();
+  set_drive(-5.0, DRIVE_SPEED, true);
+  wait();
+  set_drive(10.0, DRIVE_SPEED, true);
+  wait();
+  /*set_piston(piston_loader, true);
   set_turn(270);
   wait();
   set_drive(17.25, loadSpeed);
@@ -761,7 +793,7 @@ void skills() {
   set_drive(12.0, 127);
   wait();
   // set_drive(-6.0);
-  // wait();
+  // wait();*/
 }
 
 void skillsEnd() {

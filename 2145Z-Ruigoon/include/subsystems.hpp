@@ -39,8 +39,8 @@
 
 // Defining three wire ports
 #define PORT_LOADER         'H'
-#define PORT_PISTON_SCORER  'G'
-#define PORT_WING           'F'
+#define PORT_PISTON_SCORER  'C'
+#define PORT_WING           'B'
 #define PORT_PISTON_PARK    'E'
 #define PORT_DESCORE        'D'
 
