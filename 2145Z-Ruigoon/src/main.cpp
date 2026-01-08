@@ -1,6 +1,7 @@
 #include "main.h"
 #include <string>
 #include "EZ-Template/sdcard.hpp"
+#include "EZ-Template/util.hpp"
 #include "autons.hpp"
 #include "controls.hpp"
 #include "liblvgl/llemu.hpp"
@@ -31,12 +32,16 @@ void initialize() {
 
   auton_sel.selector_populate({
       {doNothing, "2145Z", pink},
-      {SAWP, "13 SAWP", green},
-      {sixThreeLeft, "6 + 3 Left", blue},
+      {SAWP13, "13 SAWP", green},
+      {SAWP10, "10 SAWP", green},
+      {right7, "Right 7", red},
+      {right4, "Right 4", red},
+      {right43, "Right 4 + 3", red},
       {sixThreeRight, "6 + 3 Right", blue},  
+      {sixThreeLeft, "6 + 3 Left", blue},
       {fourFive, "4 + 5 middle", red},
       {left7, "Left 7", orange},
-      {right7, "Right 7", orange},
+      {right7Odom, "Right 7 Odom", orange},
       {skills, "Skills", gray},
       {measure_offsets, "measure offsets", purple},
     });
@@ -47,7 +52,7 @@ void initialize() {
   chassis.drive_sensor_reset();
   //ez::as::initialize();
   uiInit();
-  auton_sel.selector_callback = fourFive; // *TEMP*
+  auton_sel.selector_callback = right43; // *TEMP*
   //ez::as::auton_selector_initialize();
 
   pros::Task pathViewer(pathViewerTask);
@@ -231,7 +236,7 @@ void opcontrol() {
 
   while (true) {
     // Gives you some extras to make EZ-Template ezier
-    ez_template_extras();
+    //ez_template_extras();
 
     chassis.opcontrol_tank();  // Tank control
     //chassis.drive_set(controlla.get_analog(ANALOG_LEFT_Y) * 0.12, controlla.get_analog(ANALOG_RIGHT_Y) * 0.12);
@@ -244,6 +249,15 @@ void opcontrol() {
     control_piston_toggle(piston_park, BUTTON_PARK);
     control_piston_toggle(piston_scorer, BUTTON_SCORER);
     control_piston_toggle(piston_descore, BUTTON_DESCORE);
+    if (piston_loader.get() == true) {
+      set_piston(piston_descore, false);
+    }
+    if (!pros::competition::is_connected()) {
+      if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+        autonomous();
+        chassis.drive_brake_set(MOTOR_BRAKE_COAST);
+      }
+    }
     print(1, "X: " + std::to_string(chassis.odom_x_get()));
     print(2, "Y: " + std::to_string(chassis.odom_y_get()));
     print(3, "A: " + std::to_string(chassis.odom_theta_get()));

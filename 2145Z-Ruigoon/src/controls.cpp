@@ -44,20 +44,19 @@ void set_rollers(int vltg) {
 void set_rollers(RollerStates state) {
     switch (state) {
         case INTAKE:
-            set_rollers(127, 64);
+            set_rollers(127, 32);
             set_piston(piston_scorer, false);
-            set_piston(piston_wing, true);
             break;
         case OUTTAKE:
-            set_rollers(-127);
+            set_rollers(-127, -127, 127);
             break;
         case SCORE:
             set_rollers(127);
             set_piston(piston_scorer, true);
-            set_piston(piston_wing, false);
             break;
         case SCORE_MID:
-            set_rollers(127, -95);
+            set_rollers(127, -127);
+            set_piston(piston_scorer, true);
             break;
         case STOP:
             set_rollers(0);

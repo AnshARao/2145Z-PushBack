@@ -2,8 +2,14 @@
 
 void default_constants();
 
+
+void right4();
+void right43();
+void right7();
+void right7Odom();
 void doNothing();
-void SAWP();
+void SAWP13();
+void SAWP10();
 void sixThreeLeft();
 void sixThreeRight();
 void fourFiveLeft();
