@@ -88,6 +88,99 @@ void measure_offsets() {
   print("vert: " + std::to_string(f_offset) + " , hori: " + std::to_string(r_offset));
 }
 
+void left4() { 
+  int loadSpeed = 50;
+  int unjamTime = 125;
+
+  set_position(-45, 12.5, 0);  // sets position on the field, dont worry about it.
+
+  set_drive(32.0); // goes forward 26" at max speed
+  wait(QUICK);  // waits for the drive movement to finish with motion chaining
+  set_piston(piston_loader, true);   // puts down the loader piston
+  set_turn(270);  // turns to 270 degrees
+  wait(QUICK); // turns and exits the turn quicker than usual
+  set_drive(14.5, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
+  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
+  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
+  wait(0); //waits an extra 100 ms to actually get the balls
+
+  set_drive(-31.0);
+  wait(QUICK);
+  set_rollers(SCORE);
+  wait(100);
+  set_rollers(OUTTAKE);
+  wait(100);
+  set_rollers(SCORE);
+  wait(600);
+  set_piston(piston_loader, false);
+  set_drive(3.0);
+  wait(CHAIN);
+  set_turn(180);
+  set_rollers(INTAKE);
+  wait(QUICK);
+  set_drive(12.0, 127);
+  wait();
+  set_turn(269, 127);
+  wait(QUICK);
+  set_drive(-16.0, 127);
+  wait(CHAIN);
+  set_turn(315);
+  wait(CHAIN);
+}
+
+void left43() { 
+  int loadSpeed = 50;
+  int unjamTime = 125;
+
+  set_position(-45, 12.5, 0);  // sets position on the field, dont worry about it.
+  set_drive(32.0); // goes forward 26" at max speed
+  wait();  // waits for the drive movement to finish with motion chaining
+  set_piston(piston_loader, true);   // puts down the loader piston
+  set_turn(270);  // turns to 270 degrees
+  wait(QUICK); // turns and exits the turn quicker than usual
+  set_drive(14.5, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
+  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
+  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
+  wait(0); //waits an extra 100 ms to actually get the balls
+
+  set_drive(-31.0);
+  wait(QUICK);
+  set_rollers(SCORE);
+  wait(100);
+  set_rollers(OUTTAKE);
+  wait(100);
+  set_rollers(SCORE);
+  wait(600);
+  set_piston(piston_loader, false);
+  set_drive(21.0);
+  set_rollers(INTAKE);
+  wait();
+  set_turn(135);
+  wait();
+  set_rollers(SCORE);
+  set_drive(20.0, 127);
+  wait(CHAIN);
+  set_drive(20.0, 32);
+  set_rollers(127, 0, 0);
+  wait();
+  set_turn(315);
+  wait();
+  set_drive(-12.0);
+  wait();
+  set_rollers(SCORE_MID);
+  wait(1000);
+  set_rollers(INTAKE);
+  set_drive(30.0);
+  wait(QUICK);
+
+  set_turn(269, 127);
+  wait(QUICK);
+  set_drive(-20.0, 127);
+  wait();
+  set_turn(315, 127);
+  wait(CHAIN);
+}
+
 void right4() { 
   int loadSpeed = 50;
   int unjamTime = 125;
@@ -95,7 +188,7 @@ void right4() {
   set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
 
   set_drive(26.5); // goes forward 26" at max speed
-  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
+  wait();  // waits for the drive movement to finish with motion chaining
   set_piston(piston_loader, true);   // puts down the loader piston
   set_turn(270);  // turns to 270 degrees
   wait(QUICK); // turns and exits the turn quicker than usual
@@ -126,7 +219,6 @@ void right4() {
   wait(CHAIN);
   set_turn(45);
   wait(CHAIN);
-
 }
 
 void right43() { 
@@ -154,26 +246,28 @@ void right43() {
   set_rollers(SCORE);
   wait(600);
   set_piston(piston_loader, false);
-  set_drive(14.0);
-  wait(CHAIN);
+  set_drive(21.0);
+  set_rollers(INTAKE);
+  wait();
   set_turn(45);
   wait();
-  set_rollers(INTAKE);
-  set_drive(30.0, 127);
+  set_rollers(SCORE);
+  set_drive(20.0, 127);
   wait(CHAIN);
-  set_drive(20.0, 64);
+  set_drive(32.0, 32);
+  set_rollers(127, 0, 0);
   wait();
   set_rollers(OUTTAKE);
-  wait(500);
+  wait(1000);
   set_rollers(INTAKE);
-  set_drive(-26.0);
+  set_drive(-30.0);
   wait(QUICK);
 
   set_turn(91, 127);
   wait(QUICK);
-  set_drive(16.0, 127);
-  wait(CHAIN);
-  set_turn(45);
+  set_drive(24.0, 127);
+  wait();
+  set_turn(45, 127);
   wait(CHAIN);
 }
 

@@ -2,7 +2,8 @@
 
 void default_constants();
 
-
+void left4();
+void left43();
 void right4();
 void right43();
 void right7();
