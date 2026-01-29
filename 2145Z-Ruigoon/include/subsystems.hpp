@@ -120,8 +120,8 @@ inline ez::Drive chassis(
     DRIVE_DIAMETER, // Wheel Diameter
     DRIVE_RPM); // Wheel RPM
 
-//inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER_H, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
-//inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER_V, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
+inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER_H, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
+inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER_V, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
 
 #pragma endregion
 

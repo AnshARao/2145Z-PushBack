@@ -18,5 +18,6 @@ void fourFiveRight();
 void left7();
 void right7();
 void skills();
+void skillsEnd();
 void fourFive();
 void measure_offsets();

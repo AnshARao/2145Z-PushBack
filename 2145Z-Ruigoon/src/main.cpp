@@ -26,26 +26,27 @@ void initialize() {
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(DRIVE_CURVE, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
-  default_constants();
-  
+  default_constants();  
   //ez::as::auton_selector.autons_add({});
 
   auton_sel.selector_populate({
       {doNothing, "2145Z", pink},
       {SAWP13, "13 SAWP", green},
-      {SAWP10, "10 SAWP", green},
-      {left4, "Left 4", blue},
-      {left43, "Left 4 + 3", blue},
+      // {SAWP10, "10 SAWP", green},
+      {left43, "Left 4 + 3", purple},
+      {right43, "Right 4 + 3", purple},
+      {left4, "Left 4", red},
       {right4, "Right 4", red},
-      {right43, "Right 4 + 3", red},
-      {right7, "Right 7", red},
-      {sixThreeRight, "6 + 3 Right", blue},  
-      {sixThreeLeft, "6 + 3 Left", blue},
-      {fourFive, "4 + 5 middle", red},
-      {left7, "Left 7", orange},
-      {right7Odom, "Right 7 Odom", orange},
       {skills, "Skills", gray},
-      {measure_offsets, "measure offsets", purple},
+      // {skillsEnd, "Skills End", black},
+
+      // {fourFive, "4 + 5 middle", black},
+      {left7, "Left 7", orange},
+      {right7, "Right 7", orange},
+      {right7Odom, "Right 7 Odom", orange},
+      {sixThreeRight, "6 + 3 Right", blue},  
+      // {sixThreeLeft, "6 + 3 Left", blue},
+      // {measure_offsets, "measure offsets", purple},
     });
 
   // Initialize chassis and auton selector
@@ -54,7 +55,7 @@ void initialize() {
   chassis.drive_sensor_reset();
   //ez::as::initialize();
   uiInit();
-  auton_sel.selector_callback = right43; // *TEMP*
+  auton_sel.selector_callback = right7Odom; // *TEMP*
   //ez::as::auton_selector_initialize();
 
   pros::Task pathViewer(pathViewerTask);
@@ -251,11 +252,15 @@ void opcontrol() {
     control_piston_toggle(piston_park, BUTTON_PARK);
     control_piston_toggle(piston_scorer, BUTTON_SCORER);
     control_piston_toggle(piston_descore, BUTTON_DESCORE);
+
+    if (controlla.get_digital_new_press(DIGITAL_UP)) {descoreMacroLeft();}
+    if (controlla.get_digital_new_press(DIGITAL_X)) {descoreMacroRight();}
+
     if (piston_loader.get() == true) {
       set_piston(piston_descore, false);
     }
     if (!pros::competition::is_connected()) {
-      if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+      if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         autonomous();
         chassis.drive_brake_set(MOTOR_BRAKE_COAST);
       }

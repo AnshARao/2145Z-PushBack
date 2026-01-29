@@ -26,3 +26,6 @@ void control_rollers();
 void set_piston(ez::Piston& piston, bool state);
 void control_piston_toggle(ez::Piston& piston, pros::controller_digital_e_t button);
 void control_piston_hold(ez::Piston& piston, pros::controller_digital_e_t button);
+
+void descoreMacroLeft();
+void descoreMacroRight();

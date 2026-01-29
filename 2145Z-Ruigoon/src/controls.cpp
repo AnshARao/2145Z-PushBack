@@ -101,3 +101,31 @@ void control_piston_hold(ez::Piston& piston, pros::controller_digital_e_t button
 }
 
 #pragma endregion
+
+void descoreMacroRight() {
+  set_drive(4.0);
+  wait(CHAIN);
+  set_rollers(INTAKE);
+  set_turn_relative(45, TURN_SPEED, cw);
+  wait(CHAIN);
+  set_drive(-6.0, 127);
+  wait(CHAIN);
+  set_turn_relative(45, TURN_SPEED, ccw);
+  wait(CHAIN);
+  set_drive(-18.0);
+  wait(CHAIN);
+}
+
+void descoreMacroLeft() {
+  set_drive(3.0);
+  wait(CHAIN);
+  set_turn_relative(90, TURN_SPEED, cw);
+  set_rollers(INTAKE);
+  wait(QUICK);
+  set_drive(12.0, 127);
+  wait();
+  set_turn_relative(91, TURN_SPEED, cw);
+  wait(QUICK);
+  set_drive(16.0, 127);
+  wait(CHAIN);
+}

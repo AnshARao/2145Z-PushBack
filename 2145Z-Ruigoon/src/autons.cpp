@@ -88,6 +88,136 @@ void measure_offsets() {
   print("vert: " + std::to_string(f_offset) + " , hori: " + std::to_string(r_offset));
 }
 
+// Signature Event Solo Autonomous Win Point
+void SAWP13() {
+
+  int loadSpeed = 60; // change this to less if it goes into the loader too quickly
+  int unjamTime = 100;
+
+  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
+
+  set_drive(26.5); // goes forward 26" at max speed
+  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
+  set_piston(piston_loader, true);   // puts down the loader piston
+  set_turn(270);  // turns to 270 degrees
+  wait(QUICK); // turns and exits the turn quicker than usual
+  set_drive(15.0, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
+  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
+  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
+  wait(0); //waits an extra 100 ms to actually get the balls
+
+  set_drive(-31.0);
+  wait(QUICK);
+  set_rollers(SCORE);
+  wait(50);
+  set_rollers(OUTTAKE);
+  wait(200);
+  set_rollers(SCORE);
+  wait(750);
+  set_piston(piston_loader, false);
+
+  set_turn(9); // turns to 10 degreees at max speed
+  wait(); // waits for the turn to end with regular exit conditions
+  set_drive(15.0); //drives 15" at max speed to 3 stack
+  wait_until(10.5); //10.5" after starting the drive...
+  set_piston(piston_loader, true); //... put down the match loader...
+  set_rollers(INTAKE); //...and set the rollers to intake instead of scoring. 
+  wait(CHAIN); // now finally wait for the drive to complete with motion chaining...
+
+  set_turn(355); //.. into this turn...
+  wait(CHAIN); //...motion chaining...
+  set_piston(piston_loader, false); //put matchloader up
+  set_drive(41.35, 85); //...into this drive, which goes for the other 3 stack
+  wait_until(34.0);
+  set_piston(piston_loader, true); //put matchloader back down to secure the second 3 stack.
+  wait();
+
+  //scoring on middle
+  set_turn(315.0);
+  wait();
+  set_drive(-17, 127);
+  wait();
+  set_rollers(OUTTAKE);
+  set_rollers(SCORE);
+  wait(100);
+  set_rollers(OUTTAKE);
+  wait(100);
+  set_rollers(SCORE_MID);  //wait(CHAIN);
+  wait(600);
+
+  // going back to other matchloader
+  set_drive(50.0, 90);
+  set_rollers(INTAKE);
+  wait();
+  set_piston(piston_loader, true);
+  set_turn(269);
+  wait();
+  set_drive(15.85, loadSpeed);
+  wait(QUICK);
+  wait(0);
+
+  // driving back and scoring on goal
+  set_drive(-35.5, 127);
+  wait(650);
+  set_rollers(SCORE);
+  wait(CHAIN);
+  wait(50);
+  set_rollers(OUTTAKE);
+  wait(200);
+  set_rollers(SCORE);
+
+  wait(5000);
+  set_piston(piston_loader, false);
+  set_piston(piston_wing, false);
+  set_rollers(INTAKE);
+}
+
+void SAWP10() {
+  int loadSpeed = 60; // change this to less if it goes into the loader too quickly
+  int unjamTime = 100;
+
+  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
+
+  set_drive(26.5, 127); // goes forward 26" at max speed
+  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
+  set_piston(piston_loader, true);   // puts down the loader piston
+  set_turn(270);  // turns to 270 degrees
+  wait(QUICK); // turns and exits the turn quicker than usual
+  set_drive(15.0, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
+  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
+  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
+  wait(75); //waits an extra 100 ms to actually get the balls
+
+  set_drive(-31.0); // drives back 31" at max speed
+  wait(700); // waits 750 ms *WHILE* driving, the drive hasn't finished yet
+  set_rollers(SCORE); // sets the robot to a scoring position while driving
+  wait(); // now waits for the robot to finish driving
+  set_piston(piston_loader, false); // sets the loader back up
+  wait(300); // waits 250 ms to make sure the balls are settled
+  set_rollers(OUTTAKE);
+  wait(100); // waits 100 ms to outtake
+  set_rollers(SCORE); // sets back to scoring position
+  wait(750); // waits 900 ms to score, lowk can lower this for time
+
+  set_turn(9); // turns to 10 degreees at max speed
+  wait(); // waits for the turn to end with regular exit conditions
+  set_drive(11.0); //drives 15" at max speed to 3 stack
+  set_rollers(INTAKE); //...and set the rollers to intake instead of scoring. 
+  wait(); // now finally wait for the drive to complete with motion chaining...
+  set_piston(piston_loader, true); //... put down the match loader...
+
+  set_turn(45);
+  wait();
+  set_drive(12.0);
+  wait();
+  set_rollers(OUTTAKE);
+}
+
+void doNothing() {
+  set_drive(4.0);
+  wait();
+}
+
 void left4() { 
   int loadSpeed = 50;
   int unjamTime = 125;
@@ -95,7 +225,7 @@ void left4() {
   set_position(-45, 12.5, 0);  // sets position on the field, dont worry about it.
 
   set_drive(32.0); // goes forward 26" at max speed
-  wait(QUICK);  // waits for the drive movement to finish with motion chaining
+  wait();  // waits for the drive movement to finish with motion chaining
   set_piston(piston_loader, true);   // puts down the loader piston
   set_turn(270);  // turns to 270 degrees
   wait(QUICK); // turns and exits the turn quicker than usual
@@ -170,7 +300,7 @@ void left43() {
   set_rollers(SCORE_MID);
   wait(1000);
   set_rollers(INTAKE);
-  set_drive(30.0);
+  set_drive(32.0);
   wait(QUICK);
 
   set_turn(269, 127);
@@ -188,7 +318,7 @@ void right4() {
   set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
 
   set_drive(26.5); // goes forward 26" at max speed
-  wait();  // waits for the drive movement to finish with motion chaining
+  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
   set_piston(piston_loader, true);   // puts down the loader piston
   set_turn(270);  // turns to 270 degrees
   wait(QUICK); // turns and exits the turn quicker than usual
@@ -204,7 +334,7 @@ void right4() {
   set_rollers(OUTTAKE);
   wait(100);
   set_rollers(SCORE);
-  wait(600);
+  wait(750);
   set_piston(piston_loader, false);
   set_drive(3.0);
   wait(CHAIN);
@@ -244,7 +374,7 @@ void right43() {
   set_rollers(OUTTAKE);
   wait(100);
   set_rollers(SCORE);
-  wait(600);
+  wait(750);
   set_piston(piston_loader, false);
   set_drive(21.0);
   set_rollers(INTAKE);
@@ -257,18 +387,132 @@ void right43() {
   set_drive(32.0, 32);
   set_rollers(127, 0, 0);
   wait();
+  set_rollers(INTAKE);
+  wait(100);
   set_rollers(OUTTAKE);
-  wait(1000);
+  wait(850);
   set_rollers(INTAKE);
   set_drive(-30.0);
   wait(QUICK);
 
-  set_turn(91, 127);
+  set_turn(92.5, 127);
   wait(QUICK);
-  set_drive(24.0, 127);
+  set_drive(26.0, 127);
   wait();
   set_turn(45, 127);
   wait(CHAIN);
+}
+
+void skills() {
+
+  int loadSpeed = 50;
+  int unjamTime = 125;
+
+  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
+
+  set_drive(26.5); // goes forward 26" at max speed
+  set_piston(piston_wing, true);
+  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
+  set_piston(piston_loader, true);   // puts down the loader piston
+  set_turn(270);  // turns to 270 degrees
+  wait(); // turns and exits the turn quicker than usual
+  set_drive(14.5, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
+  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
+  wait(); //waits for the robot to finish the movement where it goes in the loader.
+  wait(1000); //waits an extra 100 ms to actually get the balls
+
+  set_drive(-12.0);
+  wait(QUICK);
+  set_turn(45);
+  wait();
+
+  set_drive(21.0);
+  wait();
+  set_turn(89.5);
+  wait();
+  set_drive(70.0, DRIVE_SPEED);
+  wait();
+  set_turn(180);
+  wait();
+  set_drive(11.0);
+  wait();
+  set_turn(90);
+  wait();
+  set_drive(-14.0);
+  wait();
+
+  set_turn(89);
+  set_rollers(OUTTAKE);
+  wait(unjamTime);
+  set_rollers(SCORE);
+  wait(2500);
+  wait();
+
+  set_rollers(INTAKE);
+  set_drive(31.0, loadSpeed);
+  wait();
+  wait(1500);
+  set_drive(-31.0);
+  wait();
+  set_rollers(OUTTAKE);
+  wait(unjamTime);
+  set_rollers(SCORE);
+  wait(2500);
+
+  set_drive(12.0);
+  wait();
+  set_turn(0);
+  wait();
+  set_drive(96.0, DRIVE_SPEED, true);
+  wait();
+  set_piston(piston_loader, true);
+  set_turn(90);
+  set_rollers(INTAKE);
+  wait();
+
+  set_drive(18.0, loadSpeed);
+  wait();  
+  wait(1500);
+  set_drive(-14.0);
+  wait();
+
+  set_turn(225);
+  wait();
+  set_drive(24.0, DRIVE_SPEED, true);
+  set_piston(piston_loader, false);
+  wait();
+  set_turn(268);
+  wait();
+  set_drive(67.0, DRIVE_SPEED, true);
+  wait();
+  set_turn(0);
+  wait();
+  set_drive(10.0);
+  wait();
+  set_turn(270);
+  wait();
+  set_drive(-12.0);
+  wait();
+
+  set_rollers(OUTTAKE);
+  wait(unjamTime);
+  set_rollers(SCORE);
+  set_piston(piston_loader, true);
+  wait(2500);
+
+  set_rollers(INTAKE);
+  set_drive(31.0, loadSpeed);
+  wait();
+  wait(QUICK);
+  wait(1500);
+  set_drive(-31.0);
+  wait();
+  set_rollers(OUTTAKE);
+  wait(unjamTime);
+  set_rollers(SCORE);
+  wait(2750);
+
+  skillsEnd();
 }
 
 void right7Odom() {
@@ -283,10 +527,13 @@ void right7Odom() {
   set_piston(piston_loader, true);
   wait(QUICK);
 
-  set_drive(-15.0, 127);
-  wait(CHAIN);
+  // set_drive(-15.0, 127);
+  // wait(CHAIN);
 
-  set_mtp({-44, -47.5}, DRIVE_SPEED, fwd, true);
+  set_turn({-44, -48}, fwd, DRIVE_SPEED);
+  wait();
+
+  set_mtp({-44, -48}, DRIVE_SPEED, fwd, true);
     set_piston(piston_loader, true);
 
       set_piston(piston_loader, true);
@@ -315,25 +562,29 @@ void right7Odom() {
   wait(QUICK);
   wait(50);
   set_drive(-29.0, 127);
-  wait(300);
+  wait_until(-25.0);
   set_rollers(SCORE);
   wait(100);
   set_rollers(OUTTAKE);
   wait(100);
   set_rollers(SCORE);
   wait(CHAIN);
-  wait(1700);
+  wait(1800);
   set_piston(piston_loader, false);
 
-  set_turn(180);
+  set_drive(4.0);
+  wait(CHAIN);
   set_rollers(INTAKE);
-  wait();
-  set_drive(5.0, 127);
-  wait();
-  set_turn(260);
-  wait();
+  set_turn(315);
+  wait(CHAIN);
+  set_drive(-6.0, 127);
+  wait(CHAIN);
+  set_turn(270);
+  wait(CHAIN);
   set_drive(-18.0);
-  wait();
+  wait(CHAIN);
+  set_turn(315);
+  wait(CHAIN);
 
   chassis.drive_brake_set(pros::E_MOTOR_BRAKE_HOLD);
 }
@@ -390,131 +641,6 @@ void right7() {
   wait(1000);
   set_piston(piston_loader, false);
   set_rollers(INTAKE);
-}
-
-
-// Signature Event Solo Autonomous Win Point
-void SAWP13() {
-
-  int loadSpeed = 60; // change this to less if it goes into the loader too quickly
-  int unjamTime = 100;
-
-  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
-
-  set_drive(26.5, 127); // goes forward 26" at max speed
-  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
-  set_piston(piston_loader, true);   // puts down the loader piston
-  set_turn(270);  // turns to 270 degrees
-  wait(QUICK); // turns and exits the turn quicker than usual
-  set_drive(15.0, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
-  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
-  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
-  wait(75); //waits an extra 100 ms to actually get the balls
-
-  set_drive(-31.0); // drives back 31" at max speed
-  wait(700); // waits 750 ms *WHILE* driving, the drive hasn't finished yet
-  set_rollers(SCORE); // sets the robot to a scoring position while driving
-  wait(); // now waits for the robot to finish driving
-  set_piston(piston_loader, false); // sets the loader back up
-  wait(300); // waits 250 ms to make sure the balls are settled
-  set_rollers(OUTTAKE);
-  wait(100); // waits 100 ms to outtake
-  set_rollers(SCORE); // sets back to scoring position
-  wait(750); // waits 900 ms to score, lowk can lower this for time
-
-  set_turn(9); // turns to 10 degreees at max speed
-  wait(); // waits for the turn to end with regular exit conditions
-  set_drive(15.0); //drives 15" at max speed to 3 stack
-  wait_until(10.5); //10.5" after starting the drive...
-  set_piston(piston_loader, true); //... put down the match loader...
-  set_rollers(INTAKE); //...and set the rollers to intake instead of scoring. 
-  wait(CHAIN); // now finally wait for the drive to complete with motion chaining...
-
-  set_turn(355); //.. into this turn...
-  wait(CHAIN); //...motion chaining...
-  set_piston(piston_loader, false); //put matchloader up
-  set_drive(42.0, 85); //...into this drive, which goes for the other 3 stack
-  wait(750); // wait for time
-  set_piston(piston_loader, true); //put matchloader back down to secure the second 3 stack.
-  wait();
-
-  //scoring on middle
-  set_turn(315);
-  set_rollers(INTAKE);
-  wait();
-  set_drive(-16.25, 127);
-  wait();
-  set_rollers(SCORE);
-  wait(100);
-  set_rollers(127, -72);  //wait(CHAIN);
-  wait(700);
-
-  // going back to other matchloader
-  set_drive(50.0, 125);
-  set_rollers(INTAKE);
-  wait();
-  set_piston(piston_loader, true);
-  set_turn(269);
-  wait();
-  set_drive(16.0, loadSpeed);
-  wait(QUICK);
-  wait(80);
-
-  // driving back and scoring on goal
-  set_drive(-35.5, 127);
-  wait(650);
-  set_rollers(SCORE);
-  wait(CHAIN);
-  wait(100);
-  set_rollers(OUTTAKE);
-  wait(100);
-  set_rollers(SCORE);
-
-  wait(5000);
-  set_piston(piston_loader, false);
-  set_piston(piston_wing, false);
-  set_rollers(INTAKE);
-}
-
-void SAWP10() {
-  int loadSpeed = 60; // change this to less if it goes into the loader too quickly
-  int unjamTime = 100;
-
-  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
-
-  set_drive(26.5, 127); // goes forward 26" at max speed
-  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
-  set_piston(piston_loader, true);   // puts down the loader piston
-  set_turn(270);  // turns to 270 degrees
-  wait(QUICK); // turns and exits the turn quicker than usual
-  set_drive(15.0, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
-  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
-  wait(QUICK); //waits for the robot to finish the movement where it goes in the loader.
-  wait(75); //waits an extra 100 ms to actually get the balls
-
-  set_drive(-31.0); // drives back 31" at max speed
-  wait(700); // waits 750 ms *WHILE* driving, the drive hasn't finished yet
-  set_rollers(SCORE); // sets the robot to a scoring position while driving
-  wait(); // now waits for the robot to finish driving
-  set_piston(piston_loader, false); // sets the loader back up
-  wait(300); // waits 250 ms to make sure the balls are settled
-  set_rollers(OUTTAKE);
-  wait(100); // waits 100 ms to outtake
-  set_rollers(SCORE); // sets back to scoring position
-  wait(750); // waits 900 ms to score, lowk can lower this for time
-
-  set_turn(9); // turns to 10 degreees at max speed
-  wait(); // waits for the turn to end with regular exit conditions
-  set_drive(11.0); //drives 15" at max speed to 3 stack
-  set_piston(piston_loader, true); //... put down the match loader...
-  set_rollers(INTAKE); //...and set the rollers to intake instead of scoring. 
-  wait(CHAIN); // now finally wait for the drive to complete with motion chaining...
-}
-
-
-void doNothing() {
-  set_drive(4.0);
-  wait();
 }
 
 void sixThreeLeft() {
@@ -986,161 +1112,15 @@ void left7() {
   if (matchState != AUTO) set_piston(piston_loader, false);
 }
 
-
-void skills() {
-
-  int loadSpeed = 50;
-  int unjamTime = 125;
-
-  set_position(-45, -12.5, 180);  // sets position on the field, dont worry about it.
-
-  set_drive(26.5); // goes forward 26" at max speed
-  set_piston(piston_wing, true);
-  wait(CHAIN);  // waits for the drive movement to finish with motion chaining
-  set_piston(piston_loader, true);   // puts down the loader piston
-  set_turn(270);  // turns to 270 degrees
-  wait(QUICK); // turns and exits the turn quicker than usual
-  set_drive(14.5, loadSpeed); // drives 14.0" at loadspeed which was set at the start of the auto
-  set_rollers(INTAKE); // makes the robot start intaking (w/ storage)
-  wait(); //waits for the robot to finish the movement where it goes in the loader.
-  wait(1000); //waits an extra 100 ms to actually get the balls
-
-  set_drive(-12.0);
-  wait(QUICK);
-  set_turn(45);
-  wait();
-
-  set_drive(21.0);
-  wait();
-  set_turn(90);
-  wait();
-  set_drive(70.0, DRIVE_SPEED, true);
-  wait();
-  set_turn(180);
-  wait();
-  set_drive(10.0);
-  wait();
-  set_turn(90);
-  wait();
-  set_drive(-14.0);
-  wait();
-
-  set_rollers(OUTTAKE);
-  wait(unjamTime);
-  set_rollers(SCORE);
-  wait(2750);
-
-  set_rollers(INTAKE);
-  set_drive(31.0, loadSpeed);
-  wait();  
-  set_drive(-1.0);
-  wait();
-  set_drive(1.5, 127);
-  wait();
-  wait(1500);
-  set_drive(-31.0);
-  wait();
-  set_rollers(OUTTAKE);
-  wait(unjamTime);
-  set_rollers(SCORE);
-  wait(2750);
-
-  set_drive(12.0);
-  wait();
-  set_turn(0);
-  wait();
-  set_drive(98.0, DRIVE_SPEED, true);
-  wait();
-  set_piston(piston_loader, true);
-  set_turn(90);
-  set_rollers(INTAKE);
-  wait();
-
-  set_drive(20.0, loadSpeed);
-  wait();  
-  set_drive(-1.0);
-  wait();
-  set_drive(1.5, 127);
-  wait();
-  wait(1500);
-  set_drive(-12.0);
-  wait();
-
-  set_turn(225);
-  wait();
-  set_drive(20.0, DRIVE_SPEED, true);
-  set_piston(piston_loader, false);
-  wait();
-  set_turn(270);
-  wait();
-  set_drive(70.0, DRIVE_SPEED, true);
-  wait();
-  set_turn(0);
-  wait();
-  set_drive(13.0);
-  wait();
-  set_turn(270);
-  wait();
-  set_drive(-12.0);
-  wait();
-
-  set_rollers(OUTTAKE);
-  wait(unjamTime);
-  set_rollers(SCORE);
-  set_piston(piston_loader, true);
-  wait(2750);
-
-  set_rollers(INTAKE);
-  set_drive(31.0, loadSpeed);
-  wait();
-  set_drive(-1.0);
-  wait(QUICK);
-  set_drive(1.5, 127);
-  wait(QUICK);
-  wait(1500);
-  set_drive(-31.0);
-  wait();
-  set_rollers(OUTTAKE);
-  wait(unjamTime);
-  set_rollers(SCORE);
-  wait(2750);
-
-  set_swing(ez::RIGHT_SWING, 179, DRIVE_SPEED, 60);
-  set_piston(piston_loader, false);
-  wait();
-  set_drive(24.0, 127);
-  wait();
-  set_piston(piston_loader, true);
-  wait(200);
-  set_piston(piston_loader, false);
-  set_rollers(OUTTAKE);
-  set_drive(12.0, 127);
-  wait();
-  set_rollers(INTAKE);
-  // set_drive(-6.0);
-  // wait();
-    set_piston(piston_wing, false);
-
-}
-
 void skillsEnd() {
-  set_position(0,0, 270);
-  set_drive(18.0, 80);
+  set_position(0, 0, 270);
+  set_drive(12.0);
   set_piston(piston_loader, false);
   wait();
-  set_turn(210);
+  set_turn(205);
   wait();
-  set_drive(32.0, 90);
+  set_drive(60.0, 127, false, false);
   wait();
-  set_turn(190, 90);
-  wait();
-  set_drive(8.0,127);
-  wait();
-
-  set_piston(piston_loader, true);
-  wait(200);
-  set_piston(piston_loader, false);
-  set_rollers(OUTTAKE);
-  set_drive(28.0, 127);
-  wait();
+  set_piston(piston_wing, false);
+  set_rollers(INTAKE);
 }
