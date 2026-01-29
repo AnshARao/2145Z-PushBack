@@ -26,7 +26,7 @@
 #define PORT_RB 17
 
 // Defining subsystem motor ports
-#define PORT_INTAKE         -9
+#define PORT_INTAKE         -6
 #define PORT_INTAKE2        -19
 #define PORT_INTAKE3        -18
 
