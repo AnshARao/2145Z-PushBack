@@ -1,10 +1,10 @@
 {
 	"project": {
-		"name": "2145-RW",
+		"name": "RW-Template",
 		"slot": 1,
-		"description": "Nick couldn't pick up his girl",
+		"description": "Empty V5 C++ Project",
 		"platform": "V5",
-		"creationDate": "Wed, 04 Feb 2026 21:47:05 GMT",
+		"creationDate": "Thu, 05 Feb 2026 17:04:48 GMT",
 		"language": "cpp",
 		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {

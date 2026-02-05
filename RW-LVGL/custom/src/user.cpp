@@ -3,10 +3,6 @@
 #include "../custom/include/autonomous.h"
 #include "../custom/include/robot-config.h"
 
-#ifdef USE_LVGL
-#include "v5lvgl.h"
-#endif
-
 // Modify autonomous, driver, or pre-auton code below
 
 void runAutonomous() {
@@ -74,40 +70,9 @@ void runDriver() {
   }
 }
 
-#ifdef USE_LVGL
-// LVGL example: button + label. Called once after v5_lv_init().
-static void lvgl_btn_cb(lv_event_t * e) {
-  lv_obj_t * label = (lv_obj_t *)lv_event_get_user_data(e);
-  if (label)
-    lv_label_set_text(label, "Button pressed!");
-}
-
-static void lvgl_example_screen(void) {
-  lv_obj_t * scr = lv_scr_act();
-  lv_obj_t * label = lv_label_create(scr);
-  lv_label_set_text(label, "LVGL 8.4 Ready");
-  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 40);
-
-  lv_obj_t * btn = lv_btn_create(scr);
-  lv_obj_align(btn, LV_ALIGN_CENTER, 0, 20);
-  lv_obj_set_size(btn, 120, 50);
-  lv_obj_add_event_cb(btn, lvgl_btn_cb, LV_EVENT_CLICKED, label);
-
-  lv_obj_t * btn_label = lv_label_create(btn);
-  lv_label_set_text(btn_label, "Click me");
-  lv_obj_align(btn_label, LV_ALIGN_CENTER, 0, 0);
-}
-#endif
-
 void runPreAutonomous() {
     // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-
-#ifdef USE_LVGL
-  // Start LVGL and show example screen (button + label on Brain)
-  v5_lv_init();
-  lvgl_example_screen();
-#endif
   
   // Calibrate inertial sensor
   inertial_sensor.calibrate();
@@ -118,9 +83,7 @@ void runPreAutonomous() {
   }
 
   double current_heading = inertial_sensor.heading();
-#ifndef USE_LVGL
   Brain.Screen.print(current_heading);
-#endif
   
   // odom tracking
   resetChassis();
