@@ -1,0 +1,18 @@
+{
+	"project": {
+		"name": "2145-RW",
+		"slot": 1,
+		"description": "Nick couldn't pick up his girl",
+		"platform": "V5",
+		"creationDate": "Wed, 04 Feb 2026 21:47:05 GMT",
+		"language": "cpp",
+		"sdkVersion": "V5_20240802_15_00_00",
+		"cpp": {
+			"includePath": []
+		}
+	},
+	"extension": {
+		"version": "0.8.2026011200",
+		"json": 1
+	}
+}
