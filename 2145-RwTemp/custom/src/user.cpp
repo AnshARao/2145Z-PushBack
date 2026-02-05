@@ -5,7 +5,7 @@
 
 // Modify autonomous, driver, or pre-auton code below
 
-int auton_selected = 2;
+int auton_selected = 1;
 
 std::string getAutoName(int auton_num) {
   switch(auton_num) {
@@ -227,16 +227,23 @@ void runDriver() {
     } else {
       stop(coast);
     }
-    
-    if (button_right_arrow)
+
+    if (button_left_arrow)
     {
       resetPositionBack();
       resetPositionLeft();
       Brain.Screen.printAt(1, 40, "X: %.2f, Y: %.2f, T: %.2f", x_pos, y_pos, inertial_sensor.heading());
     }
+    
+    if (button_right_arrow)
+    {
+      resetPositionBack();
+      resetPositionRight();
+      Brain.Screen.printAt(1, 40, "X: %.2f, Y: %.2f, T: %.2f", x_pos, y_pos, inertial_sensor.heading());
+    }
 
-    controller_1.ButtonLeft.pressed(leftDescore);
-    controller_1.ButtonA.pressed(rightDescore);
+    //controller_1.ButtonLeft.pressed(leftDescore);
+    //controller_1.ButtonA.pressed(rightDescore);
 
     wait(10, msec); 
   }

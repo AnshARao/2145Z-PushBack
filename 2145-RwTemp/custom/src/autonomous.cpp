@@ -71,9 +71,11 @@ void soloAwp() {
   Brain.Screen.printAt(1, 20, "X: %.2f, Y: %.2f, T: %.2f", x_pos, y_pos, inertial_sensor.heading());
   intake();
   moveToPoint(-48, 3, 1, 500, false);
-  moveToPoint(-48, -45.5, -1, 1000, true);
+  stop(coast);
+  moveToPoint(-48, -46.5, -1, 2000, true);
   loader.set(true);
   turnToAngle(-90, 500, true);
+  intake();
   driveTo(30, 1000, true);
   correct_angle = -89;
   driveTo(-32, 1000, true);
@@ -100,13 +102,12 @@ void soloAwp() {
   intake1.spin(forward, 1, volt);
   turnToAngle(-45, 1000, true);  
   score_mid();
-  wait(500, msec);
+  wait(250, msec);
   outtake();
-  wait(100, msec);
+  wait(75, msec);
   score_mid();
   resetPositionFront();
-  wait(500, msec);
-
+  wait(250, msec);
 
   intake();
   driveTo(53, 2000, true);
@@ -271,7 +272,7 @@ void loader_async_63L() {
 
 void sixThreeLeft() {
   resetPositionBack();
-  resetPositionRight();
+  resetPositionLeft();
   intake();
   thread la1 = thread(loader_async_63L);
   wing.set(true);
@@ -282,7 +283,7 @@ void sixThreeLeft() {
   correct_angle = normalizeTarget(-80);
   driveTo(-10, 1000, false);
   correct_angle = normalizeTarget(-170);
-  driveTo(9, 1000, false);
+  driveTo(9, 1000, true);
 
   moveToPoint(-48, -48, 1, 2000, true);
   turnToAngle(-180, 1000, true);
@@ -301,10 +302,21 @@ void sixThreeLeft() {
   score();
   wait(650, msec);
 
-  driveTo(6, 1000, false);
-  turnToPoint(-10, -6, -1, 1000);
+  driveTo(4, 1000, false);
+  correct_angle = normalizeTarget(-90);
+  driveTo(-4, 1000, false);
+  correct_angle = normalizeTarget(-135);
+  driveTo(-48, 2000, true);
   score_mid();
+  intake3.spin(reverse, 4, volt);
 
+  wait(1000, msec);
+
+  driveTo(40, 2000, true);
+  wing.set(false);
+  turnToAngle(-180, 1000, true);
+  driveTo(-26, 2000, true);
+  stopChassis(hold);
 }
 
 void loader_async_63R() {
@@ -322,15 +334,25 @@ void sixThreeRight() {
   intake();
   thread la1 = thread(loader_async_63R);
   wing.set(true);
-  boomerang(50, -5.75, 1, 70, 0.2, 2000, true, 9);
-  correct_angle = normalizeTarget(40);
-  driveTo(-12, 1000, false);
 
-  boomerang(57.5, -56, 1, 180, 0.2, 2000, true, 9);
-  driveTo(-1000, 1300, false);
+  moveToPoint(29.5, -17, 1, 2000, false);
+
+  boomerang(52, -4, 1, 70, 0.2, 2000, true);
+  correct_angle = normalizeTarget(80);
+  driveTo(-8, 1000, false);
+  correct_angle = normalizeTarget(170);
+  driveTo(9, 1000, true);
+
+  moveToPoint(68, -46, 1, 2000, true);
+  turnToAngle(180, 1000, true);
+  intake();
+  driveTo(1000, 1000, false, 6);
+  correct_angle = normalizeTarget(179);
+
+  driveTo(-100, 1000, false);
+  turnToAngle(180, 1000, true);
   outtake();
   wait(100, msec);
-  resetPositionRight();
   score();
   wait(500, msec);
   outtake();
@@ -338,27 +360,20 @@ void sixThreeRight() {
   score();
   wait(650, msec);
 
-  correct_angle = normalizeTarget(181);
-  intake();
-  driveTo(1000, 500, false, 9);
-  driveTo(1000, 1000, false, 6);
-
-  driveTo(-4, 1000, true);
-  boomerang(13, -16, 1, -45, 0.2, 2000, true);
-  //turnToAngle(-50, 800, true);
-  loader.set(false);
-  driveTo(60, 1500, true);
-  outtake();
-  intake3.spin(reverse, 12, volt);
-  wait(500, msec);
-  intake();
-  wait(100, msec);
-  outtake();
-  wait(500, msec);
-  intake();
-  wait(100, msec);
+  driveTo(4, 1000, false);
+  correct_angle = normalizeTarget(-90);
+  driveTo(4, 1000, false);
+  correct_angle = normalizeTarget(-45);
+  driveTo(48, 2000, true);
   outtake();
 
+  wait(1000, msec);
+
+  driveTo(-40, 2000, true);
+  wing.set(false);
+  turnToAngle(0, 1000, true);
+  driveTo(14, 2000, true);
+  stopChassis(hold);
 }
 
 void loader_async_skills() {
