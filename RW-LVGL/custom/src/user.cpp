@@ -6,7 +6,7 @@
 // Modify autonomous, driver, or pre-auton code below
 
 void runAutonomous() {
-  int auton_selected = 3;
+  int auton_selected = 1;
   switch(auton_selected) {
     case 1:
       exampleAuton();
@@ -73,6 +73,11 @@ void runDriver() {
 void runPreAutonomous() {
     // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+
+#ifdef USE_LVGL
+  // Start LVGL on Brain screen (display + touch). Build your UI after this.
+  v5_lv_init();
+#endif
   
   // Calibrate inertial sensor
   inertial_sensor.calibrate();

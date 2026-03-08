@@ -1,10 +1,10 @@
 {
 	"project": {
-		"name": "RW-Template",
+		"name": "2145 Goon",
 		"slot": 1,
 		"description": "Empty V5 C++ Project",
 		"platform": "V5",
-		"creationDate": "Thu, 05 Feb 2026 17:04:48 GMT",
+		"creationDate": "Thu, 12 Feb 2026 19:55:51 GMT",
 		"language": "cpp",
 		"sdkVersion": "V5_20240802_15_00_00",
 		"cpp": {
@@ -12,7 +12,7 @@
 		}
 	},
 	"extension": {
-		"version": "0.8.2026011200",
+		"version": "0.8.2026020401",
 		"json": 1
 	}
 }

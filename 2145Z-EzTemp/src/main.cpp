@@ -55,7 +55,7 @@ void initialize() {
   chassis.drive_sensor_reset();
   //ez::as::initialize();
   uiInit();
-  auton_sel.selector_callback = right7Odom; // *TEMP*
+  auton_sel.selector_callback = right43; // *TEMP*
   //ez::as::auton_selector_initialize();
 
   pros::Task pathViewer(pathViewerTask);

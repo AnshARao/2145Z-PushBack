@@ -5,7 +5,7 @@
 
 // Modify autonomous, driver, or pre-auton code below
 
-int auton_selected = 1;
+int auton_selected =1;
 
 std::string getAutoName(int auton_num) {
   switch(auton_num) {
@@ -15,7 +15,7 @@ std::string getAutoName(int auton_num) {
     case 4: return "left7";
     case 5: return "right7";
     case 6: return "skills";
-    case 7: return "Left Descore";
+    case 7: return "Park";
     case 8: return "Right Descore";
     case 9: return "Skills";
     default: return "Drive Forward";
@@ -27,7 +27,7 @@ std::string autoName = getAutoName(auton_selected);
 void runAutonomous() {
   switch(auton_selected) {
     case 1:
-      soloAwp();
+      right7();
       break;
     case 2:
       sixThreeLeft();
@@ -45,10 +45,10 @@ void runAutonomous() {
       skills();
       break;
     case 7:
-      descoreLeft();
+      right4();
       break;
     case 8:
-      descoreRight();
+      left43();
       break;
     case 9:
       skills();
@@ -97,7 +97,7 @@ void intake() {
 void outtake() {
   intake1.spin(reverse, 12, volt);
   intake2.spin(reverse, 12, volt);
-  intake3.spin(forward, 12, volt);
+  intake3.spin(forward, 2, volt);
 }
 
 void score() {
@@ -111,6 +111,13 @@ void score_mid() {
   intake1.spin(forward, 12, volt);
   intake2.spin(forward, 12, volt);
   intake3.spin(reverse, 12, volt);
+  hood.set(true);
+}
+
+void score_mid_slow() {
+  intake1.spin(forward, 12, volt);
+  intake2.spin(forward, 12, volt);
+  intake3.spin(reverse, 3, volt);
   hood.set(true);
 }
 
@@ -224,6 +231,8 @@ void runDriver() {
       score();
     } else if (button_b) {
       score_mid();
+    } else if (button_x) {
+      score_mid_slow();
     } else {
       stop(coast);
     }

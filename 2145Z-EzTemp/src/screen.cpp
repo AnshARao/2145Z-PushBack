@@ -79,59 +79,6 @@ static const char* allianceColorNames[] = {"Blue", "None", "Red"};
 
 AutonSel auton_sel;
 
-// SD card file path for selected auton
-constexpr const char* SD_SELECTED_AUTON_FILE = "/usd/selected_auton.txt";
-
-// Helper: Find AutonObj by name
-AutonObj* find_auton_by_name(const std::string& name) {
-    for (auto& auton : auton_sel.autons) {
-        if (auton.name == name) return &auton;
-    }
-    return nullptr;
-}
-
-// Load selected auton from SD card (if present)
-void load_selected_auton_from_sd() {
-    if (!pros::usd::is_installed()) {
-        auton_sel.selector_callback = doNothing;
-        auton_sel.selector_name = "no name";
-        print(1, "SD card not found. Defaulting to doNothing.");
-        return;
-    }
-    FILE* file = fopen(SD_SELECTED_AUTON_FILE, "r");
-    if (!file) {
-        auton_sel.selector_callback = doNothing;
-        auton_sel.selector_name = "no name";
-        print(1, "No auton file. Defaulting to doNothing.");
-        return;
-    }
-    char buffer[128] = {0};
-    fgets(buffer, sizeof(buffer), file);
-    fclose(file);
-    std::string auton_name(buffer);
-    // Remove trailing newline
-    auton_name.erase(auton_name.find_last_not_of("\r\n") + 1);
-    AutonObj* found = find_auton_by_name(auton_name);
-    if (found) {
-        auton_sel.selector_callback = found->callback;
-        auton_sel.selector_name = found->name;
-        print(1, "Loaded auton: " + found->name);
-    } else {
-        auton_sel.selector_callback = doNothing;
-        auton_sel.selector_name = "no name";
-        print(1, "Auton not found. Defaulting to doNothing.");
-    }
-}
-
-// Save selected auton to SD card
-void save_selected_auton_to_sd(const std::string& name) {
-    if (!pros::usd::is_installed()) return;
-    FILE* file = fopen(SD_SELECTED_AUTON_FILE, "w");
-    if (!file) return;
-    fprintf(file, "%s\n", name.c_str());
-    fclose(file);
-}
-
 void AutonSel::selector_populate(vector<AutonObj> auton_list) { autons.insert(autons.end(), auton_list.begin(), auton_list.end()); }
 
 void angleCheckTask() {

@@ -57,7 +57,7 @@ digital_out loader = digital_out(Brain.ThreeWirePort.H);
 // ============================================================================
 
 // Distance between the middles of the left and right wheels of the drive (in inches)
-double distance_between_wheels = 10.5;
+double distance_between_wheels = 9.5;
 
 // motor to wheel gear ratio * wheel diameter (in inches) * pi
 double wheel_distance_in = (36.0 / 48.0) * 3.17 * M_PI;
@@ -67,7 +67,7 @@ double wheel_distance_in = (36.0 / 48.0) * 3.17 * M_PI;
 // turn_*     : PID for turning in place
 // heading_correction_* : PID for heading correction during linear movement
 double distance_kp = 1.1, distance_ki = 0.1, distance_kd = 11.78;
-double turn_kp = 0.3, turn_ki = 0, turn_kd = 2.4;
+double turn_kp = 0.3, turn_ki = 0, turn_kd = 2.5;
 double heading_correction_kp = 0.6, heading_correction_ki = 0, heading_correction_kd = 4;
 
 // Enable or disable the use of tracking wheels

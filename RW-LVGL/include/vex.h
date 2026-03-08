@@ -14,6 +14,7 @@
 
 #include "v5.h"
 #include "v5_vcs.h"
+#include "v5lvgl.h"
 
 #include "../custom/include/robot-config.h"
 
