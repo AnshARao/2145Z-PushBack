@@ -4,28 +4,53 @@
 #include "subsystems/intake.hpp"
 #include "subsystems/misc.hpp"
 
-void doNothing() {}
+void doNothing() {
+    set_position(0, 0, 0);
+    set_drive(0.00001, 10000.0);
+}
 
 void skills() {
     
 }
 
-void right7() {
-    chassis.setPose(0, 0, 0);
+void test1() {
+    set_position(0, 0, 0);
+
+}
+
+void sawp() {
+    set_position(-48, -12, 0);
+    resetLeft();
+    resetBack();
     intake();
-    chassis.moveToPoint(8, 23, 2000);
-    chassis.waitUntilDone();
+    set_drive(4.0, 2000);
+    set_point(-48.0, -48.0, 2000, {.forwards = false});
     setLoader(true);
-    chassis.moveToPoint(40, -3, 2000);
-    setLoader(true);
-    chassis.turnToHeading(180, 500);
-    chassis.moveToPoint(40, -14, 2000);
-    chassis.waitUntilDone();
-    chassis.moveToPoint(40, 20, 2000, {.forwards = false});
+    set_turn(270.0, 2000);
+    set_point(-60.0, -48.0, 2000);
+    wait(300);
+    set_drive(-30.0, 2000);
     score();
-    pros::delay(2000);
-    chassis.moveToPoint(40, 1, 1000);
-    chassis.turnToHeading(200, 500);
-    chassis.moveToPose(50, 24, 180, 3000, {.forwards = false});
-    chassis.setBrakeMode(MOTOR_BRAKE_HOLD);
+    wait(500);
+    resetFront();
+    resetLeft();
+    setLoader(false);
+    set_drive(4.0, 1000);
+    set_turn(30.0, 2000);
+    resetBack();
+    intake();
+    set_point(-24.0, -24.0, 2000, {.forwards = true, .maxSpeed = 90});
+    resetLeft();
+    set_point(-24.0, 24.0, 2000, {.forwards = true, .maxSpeed = 90});
+    setLoader(true);
+    resetLeft();
+    set_turn(-45.0, 2000);
+    set_drive(24.0, 2000);
+    set_pose(-48.0, 48.0, 270.0, 2000);
+    set_drive(-30.0, 2000);
+    score();
+}
+
+void right7() {
+
 }

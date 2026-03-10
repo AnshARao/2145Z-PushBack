@@ -45,15 +45,23 @@ Coordinate get_point(Coordinate startPoint, double v_left, double v_right, doubl
 std::vector<Coordinate> injectPoint(Coordinate startPoint, Coordinate endPoint, lemlib::AngularDirection direction, double left, double right, double theta, double lookAhead);
 std::vector<Coordinate> injectPath(std::vector<Coordinate> coordList, double lookAhead);
 
+void set_position(double x, double y, double t);
+
 void wait();
 void wait(double ms);
 void wait_until(float dist);
 void wait_until(Coordinate target);
 
 void set_raw(int speed);
-void set_drive(double distance, double timeout, float speed, bool sync = true);
-void set_drive(double distance, double timeout, float speed, float minSpeed, float earlyExitRange, bool sync = true);
-void set_turn(double angle, double timeout, int speed, bool sync = true, AngularDirection direction = AngularDirection::AUTO);
-void set_turn(double angle, double timeout, int speed, int minSpeed, float earlyExitRange, bool sync = true, AngularDirection direction = AngularDirection::AUTO);
-void set_turn(float x, float y, int timeout, int speed, bool sync = true, AngularDirection direction = AngularDirection::AUTO);
-void set_turn(float x, float y, int timeout, int speed, int minSpeed, float earlyExitRange, bool sync = true, AngularDirection direction = AngularDirection::AUTO);
+void set_drive(float distance, float timeout, lemlib::MoveToPointParams params = {}, bool sync = true);
+void set_turn(float theta, int timeout, lemlib::TurnToHeadingParams params = {}, bool async = true);
+void set_turn(float x, float y, int timeout, lemlib::TurnToPointParams params = {}, bool async = true);
+void set_point(float x, float y, int timeout, lemlib::MoveToPointParams params = {}, bool sync = true);
+void set_pose(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params = {}, bool sync = true);
+void set_swing(float theta, DriveSide lockedSide, int timeout, lemlib::SwingToHeadingParams params = {},bool sync = true);
+void set_swing(float x, float y, DriveSide lockedSide, int timeout, lemlib::SwingToPointParams params = {}, bool sync = true);
+
+void resetLeft();
+void resetRight();
+void resetBack();
+void resetFront();

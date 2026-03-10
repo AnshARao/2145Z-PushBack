@@ -5,14 +5,11 @@
 #include "screen.hpp"
 
 pros::Motor intake1(2, pros::v5::MotorGears::blue);
+pros::Motor intake2(4, pros::v5::MotorGears::blue);
 
-pros::Motor intake2(1, pros::v5::MotorGears::blue);
-//pros::Motor intake2(1, pros::v5::MotorGears::green);
-//pros::Motor intake3(3, pros::v5::MotorGears::green);
-
-pros::adi::DigitalOut hood('A', false);
-pros::adi::DigitalOut tunnel('E', false);
-pros::adi::DigitalOut intakeLift('C', false);
+pros::adi::DigitalOut hoodDown('E', false);
+pros::adi::DigitalOut stopper('B', false);
+pros::adi::DigitalOut intakeLift('G', false);
 
 bool midSlow = false;
 
@@ -20,10 +17,9 @@ void intake() {
     if (curMatchState != DISABLED) {
         intake1.move(127);
         intake2.move(127);
-        //intake3.move(0);
-        hood.set_value(false);
-        tunnel.set_value(false);
-        intakeLift.set_value(false);
+        hoodDown.set_value(true);
+        stopper.set_value(true);
+        //intakeLift.set_value(false);
     }
 }
 
@@ -33,12 +29,10 @@ void outtake() {
             intakeLift.set_value(true);
             intake1.move_velocity(-51);
             intake2.move(-127);
-            //intake3.move(-127);
         } else {
             intakeLift.set_value(false);
             intake1.move(-127);
             intake2.move(-127);
-            //intake3.move(-127);
         }
     }
 }
@@ -48,10 +42,9 @@ void score() {
         intakeLift.set_value(true);
         intake1.move(127);
         intake2.move(127);
-        //intake3.move(127);
-        hood.set_value(true);
-        tunnel.set_value(false);
-        intakeLift.set_value(false);
+        hoodDown.set_value(false);
+        stopper.set_value(false);
+        //intakeLift.set_value(false);
     }
 }
 
@@ -59,18 +52,14 @@ void scoreMiddle() {
     if (curMatchState != DISABLED) {
         if (midSlow) {
             intake1.move(127);
-            intake2.move_velocity(-100);
-            //intake2.move(127);
-            //intake3.move_velocity(-100);
+            intake2.move_velocity(100);
         } else {
             intake1.move(127);
-            intake2.move(-127);
-            //intake2.move(127);
-            //intake3.move(-127);
+            intake2.move(127);
         }
-        hood.set_value(false);
-        tunnel.set_value(true);
-        intakeLift.set_value(false);
+        hoodDown.set_value(true);
+        stopper.set_value(false);
+        //intakeLift.set_value(false);
     }
 }
 
@@ -78,7 +67,6 @@ void stop() {
     if (curMatchState != DISABLED) {
         intake1.move(0);
         intake2.move(0);
-        //intake3.move(0);
     }
 }
 

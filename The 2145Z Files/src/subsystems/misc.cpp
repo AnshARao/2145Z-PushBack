@@ -2,9 +2,9 @@
 #include "main.h"
 #include "pros/adi.hpp"
 
-pros::adi::DigitalOut loader('G', false);
-pros::adi::DigitalOut wing('B', false);
-pros::adi::DigitalOut descore('E', false);
+pros::adi::DigitalOut loader('F', false);
+pros::adi::DigitalOut wing('H', false);
+pros::adi::DigitalOut descore('A', false);
 
 bool loaderState = false;
 
@@ -42,3 +42,4 @@ void miscControl() {
         setDescore(false);
     }
 }
+

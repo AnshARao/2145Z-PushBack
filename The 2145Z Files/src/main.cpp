@@ -1,5 +1,6 @@
 #include "main.h"
 #include "autos.hpp"
+#include "pros/misc.h"
 #include "screen.hpp"
 #include "subsystems/misc.hpp"
 #include "lemlib/api.hpp" // IWYU pragma: keep
@@ -12,12 +13,14 @@ void initialize() {
 
 	auton_sel.selector_populate({
 		{doNothing, "2145Z"},
-		{right7, "Right 7", green},
+		{test1, "Test 1", red},
+		{sawp, "Solo Awp"},
 		{skills, "Skills", black},
 	});
 
-	chassis.calibrate();
 	uiInit();
+	auton_sel.selector_callback = sawp;
+
 
 	pros::Task angleCheck(angleCheckTask);
 	pros::Task pathViewer(pathViewerTask);
@@ -29,9 +32,6 @@ void initialize() {
 	double initial = chassis.getPose().theta;
 	pros::delay(100);
 	if(std::abs(chassis.getPose().theta - initial) > 1) drifting = true;
-
-	// Initialize auton selector, and tasks
-	uiInit();
 
 	controlla.rumble(!imu.is_calibrating() && !drifting ? "." : "---");
 }
@@ -57,6 +57,10 @@ void opcontrol() {
 		tank_drive(7);
 		intakeControl();
 		miscControl();
+		if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+			resetLeft();
+			resetBack();
+		}
 		pros::delay(10);
 	}
 }

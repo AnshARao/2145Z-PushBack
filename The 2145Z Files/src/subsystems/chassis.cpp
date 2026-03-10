@@ -1,7 +1,10 @@
 #include "lemlib/chassis/chassis.hpp"
+#include "fmt/format.h"
 #include "lemlib/api.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
 #include "main.h"
+#include "pros/distance.hpp"
+#include <cmath>
 #include <vector>
 
 pros::Controller controlla(pros::E_CONTROLLER_MASTER);
@@ -33,7 +36,7 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
 // lateral PID controller
 lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              3, // derivative gain (kD)
+                                              25, // derivative gain (kD)
                                               3, // anti windup
                                               1, // small error range, in inches
                                               100, // small error range timeout, in milliseconds
@@ -42,17 +45,17 @@ lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
                                               20 // maximum acceleration (slew)
 );
 
-// angular PID controller
 lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              10, // derivative gain (kD)
+                                              13, // derivative gain (kD)
                                               3, // anti windup
-                                              1, // small error range, in degrees
+                                              1, // small error range, in inches
                                               100, // small error range timeout, in milliseconds
-                                              3, // large error range, in degrees
+                                              3, // large error range, in inches
                                               500, // large error range timeout, in milliseconds
                                               0 // maximum acceleration (slew)
-);
+);                           
+
 
 // create the chassis
 lemlib::Chassis chassis(drivetrain, // drivetrain settings
@@ -87,6 +90,84 @@ void tank_drive(double curve) {
 
     // Set robot to l_stick and r_stick, check joystick threshold, set active brake
     set_tank(l_stick, r_stick);
+}
+
+pros::Distance distanceFront(5);
+pros::Distance distanceBack(1);
+pros::Distance distanceLeft(3);
+pros::Distance distanceRight(9);
+
+float offsetFront = 0;
+float offsetBack = 4.0;
+float offsetLeft = 4.0;
+float offsetRight = 4.0;
+
+float halfField = 70.25;
+
+void reset(pros::Distance sensor, float sensorOffset, float headingOffset) {
+	if (curMatchState == DISABLED) {
+		return;
+	}
+	// convert mm to inches
+	float dist = sensor.get_distance() / 25.4f;
+	// check if the distance is valid
+	if (dist < 0 || dist > 150) {
+		print("invalid distance sensor reading");
+		return;
+	}
+	float heading = (chassis.getPose().theta * 0.0174533f); // deg→rad, abs
+    while (heading > (1.57079632679f / 2.0f)) heading -= 1.57079632679f; // ≤ 45°
+
+	float resetDist = (dist + sensorOffset) * cosf(heading);
+
+	float sensorHeading = fabs(chassis.getPose().theta + headingOffset);
+	sensorHeading = (int)(sensorHeading + 360) % 360;
+
+	// Determine which wall we're facing and which axis to reset
+    bool resettingX = false;
+    double wallSign = 1.0;
+    
+    if (315 <= sensorHeading || sensorHeading <= 45) {
+        // Top wall - reset Y position
+        resettingX = false;
+        wallSign = 1.0;
+    }
+    else if (45 < sensorHeading && sensorHeading <= 135) {
+        // Right wall - reset X position
+        resettingX = true;
+        wallSign = 1.0;
+    }
+    else if (135 < sensorHeading && sensorHeading <= 225) {
+        // Bottom wall - reset Y position
+        resettingX = false;
+        wallSign = -1.0;
+    }
+    else {
+        // Left wall - reset X position
+        resettingX = true;
+        wallSign = -1.0;
+    }
+
+	float newPos = wallSign * (halfField - resetDist);
+
+	if (resettingX) {
+		chassis.setPose(newPos, chassis.getPose().y, chassis.getPose().theta);
+	} else {
+		chassis.setPose(chassis.getPose().x, newPos, chassis.getPose().theta);
+	}
+}
+
+void resetFront() {
+	reset(distanceFront, offsetFront, 0);
+}
+void resetBack() {
+	reset(distanceBack, offsetBack, 180);
+}
+void resetLeft() {
+	reset(distanceLeft, offsetLeft, 270);
+}
+void resetRight() {
+	reset(distanceRight, offsetRight, 90);
 }
 
 Coordinate currentPoint = {0, 0, 0};
@@ -265,209 +346,126 @@ void set_raw(int speed) {
 	autonPath.push_back(currentPoint);
 } 
 
-void set_drive(double distance, double timeout, float speed, bool sync) {
-    bool forwards = distance >= 0;
-    if (curMatchState != DISABLED) {
-        chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0),
+
+void set_drive(float distance, float timeout, lemlib::MoveToPointParams params, bool sync) {
+	if (curMatchState != DISABLED) {
+		chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0),
                               chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0),
-                              timeout, { .forwards = forwards, .maxSpeed = speed}, !sync);
-    }
-    currentPoint = get_point(currentPoint, distance);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
+                              timeout, params, !sync);
+	}
+	currentPoint = get_point(currentPoint, distance);
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
+	currentPoint.right = params.maxSpeed * (params.forwards	 ? 1 : -1);
 	autonPath.push_back(currentPoint);
 }
 
-void set_drive(double distance, double timeout, float speed, float minSpeed, float earlyExitRange, bool sync) {
-    bool forwards = distance >= 0;
-    if (curMatchState != DISABLED) {
-        chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0),
-                              chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0),
-                              timeout, { .forwards = forwards, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-    }
-    currentPoint = get_point(currentPoint, distance);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
-}
-
-inline double turn_shortest(double target, double current) {
+double turn_shortest(double target, double current) {
 	double delta = target - current;
 	delta = fmod(delta + 540.0, 360.0) - 180.0;
 	return delta;
 }
 
-void set_turn(float angle, int timeout, int speed, bool sync, AngularDirection direction) {
-    if (curMatchState != DISABLED) {
-        chassis.turnToHeading(angle, timeout, {.direction = direction, .maxSpeed = speed}, !sync);
-    }
-
-	if (direction == AngularDirection::AUTO) direction = (turn_shortest(angle, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
-	currentPoint.t = angle;
-	currentPoint.left  = speed;
-	currentPoint.right = -speed;
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_turn(float angle, int timeout, int speed, int minSpeed, float earlyExitRange, bool sync, AngularDirection direction) {
-    if (curMatchState != DISABLED) {
-        chassis.turnToHeading(angle, timeout, {.direction = direction, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-    }
-
-	if (direction == AngularDirection::AUTO) direction = (turn_shortest(angle, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
-	currentPoint.t = angle;
-	currentPoint.left  = speed;
-	currentPoint.right = -speed;
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_turn(float x, float y, int timeout, int speed, bool forwards, bool sync, AngularDirection direction) {
+void set_turn(float theta, int timeout, lemlib::TurnToHeadingParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.turnToPoint(x, y, timeout, {.forwards = forwards, .direction = direction, .maxSpeed = speed}, !sync);
+		chassis.turnToHeading(theta, timeout, params, !sync);
 	}
 
-	if (direction == AngularDirection::AUTO) direction = (turn_shortest(atan2(y, x), currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
+
+	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
+	if (params.direction == lemlib::AngularDirection::CCW_COUNTERCLOCKWISE) params.maxSpeed *= -1;
+
+	currentPoint.t = theta;
+	currentPoint.left = params.maxSpeed;
+	currentPoint.right = -params.maxSpeed;
+	currentPoint.behavior = params.direction;
+	autonPath.push_back(currentPoint);
+}
+
+void set_turn(float x, float y, int timeout, lemlib::TurnToPointParams params, bool sync) {
+	if (curMatchState != DISABLED) {
+		chassis.turnToPoint(x, y, timeout, params, !sync);
+	}
 	currentPoint.x = x;
 	currentPoint.y = y;
 	currentPoint.t = atan2(y, x);
-	currentPoint.left  = speed;
-	currentPoint.right = -speed;
-	currentPoint.behavior = direction;
+	currentPoint.left = params.maxSpeed;
+	currentPoint.right = -params.maxSpeed;
+	currentPoint.behavior = params.direction;
 	autonPath.push_back(currentPoint);
 }
 
-void set_turn(float x, float y, int timeout, int speed, bool forwards, int minSpeed, float earlyExitRange, bool sync, AngularDirection direction) {
+void set_point(float x, float y, int timeout, lemlib::MoveToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.turnToPoint(x, y, timeout, {.forwards = forwards, .direction = direction, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
+		chassis.moveToPoint(x, y, timeout, params, !sync);
 	}
-	if (direction == AngularDirection::AUTO) direction = (turn_shortest(atan2(y, x), currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
+	currentPoint.x = x;
+	currentPoint.y = y;
+	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, params.forwards ? DriveDirection::FWD : DriveDirection::REV);
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
+	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1);
+	autonPath.push_back(currentPoint);
+}
+
+void set_pose(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params, bool sync) {
+	if (curMatchState != DISABLED) {
+		chassis.moveToPose(x, y, theta, timeout, params, !sync);
+	}
+	currentPoint.x = x;
+	currentPoint.y = y;
+	currentPoint.t = theta;
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
+	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1);
+	autonPath.push_back(currentPoint);
+}
+
+void set_swing(float theta, DriveSide lockedSide, int timeout, lemlib::SwingToHeadingParams params, bool sync) {
+	if (curMatchState != DISABLED) {
+		chassis.swingToHeading(theta, lockedSide, timeout, params, !sync);
+	}
+	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
+	if (params.direction == lemlib::AngularDirection::CCW_COUNTERCLOCKWISE) params.maxSpeed *= -1;
+
+	currentPoint.t = theta;
+	currentPoint.left = params.maxSpeed;
+	currentPoint.right = -params.maxSpeed;
+	autonPath.push_back(currentPoint);
+
+	/*
+	// Convert main/opposite voltages to left/right voltages
+	double right = side == RIGHT_SWING ? main : opp;
+	double left = side == LEFT_SWING ? main : opp;
+	right = util::clamp(right, 117);
+	left = util::clamp(left, 117);
+
+	// Convert voltage to velocity
+	double v_left = getVelocity(left);
+	double v_right = getVelocity(right);
+	double v_all = (v_left + v_right) / 2;
+
+	// Get radius and arc length
+	double new_t = theta - currentPoint.t;
+	fmod(new_t, 360);
+	if(new_t < 0) new_t += 360;
+	double radius = (v_right + v_left) / (v_right - v_left) * (ROBOT_WIDTH / 2);
+	double arcLength = radius * new_t * M_PI / 180.0;
+
+	currentPoint = getPoint(currentPoint, v_left, v_right, getTimeToPoint(arcLength, v_all));
+
+	currentPoint.left = left;
+	currentPoint.right = right;
+	currentPoint.behavior = behavior;
+	autonPath.push_back(currentPoint);
+	*/
+}
+
+void set_swing(float x, float y, DriveSide lockedSide, int timeout, lemlib::SwingToPointParams params, bool sync) {
+	if (curMatchState != DISABLED) {
+		chassis.swingToPoint(x, y, lockedSide, timeout, params, !sync);
+	}
 	currentPoint.x = x;
 	currentPoint.y = y;
 	currentPoint.t = atan2(y, x);
-	currentPoint.left  = speed;
-	currentPoint.right = -speed;
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_point(float x, float y, int timeout, float speed, bool forwards, bool sync) {
-	if (curMatchState != DISABLED) {
-		chassis.moveToPoint(x, y, timeout, {.forwards = forwards, .maxSpeed = speed}, !sync);
-	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, forwards ? DriveDirection::FWD : DriveDirection::REV);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
-}
-
-void set_point(float x, float y, int timeout, float speed, bool forwards, float minSpeed, float earlyExitRange, bool sync) {
-	if (curMatchState != DISABLED) {
-		chassis.moveToPoint(x, y, timeout, {.forwards = forwards, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, forwards ? DriveDirection::FWD : DriveDirection::REV);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
-}
-
-void set_pose(float x, float y, float theta, float speed, int timeout, bool forwards, bool sync) {
-	if (curMatchState != DISABLED) {
-		chassis.moveToPose(x, y, theta, timeout, {.forwards = forwards, .maxSpeed = speed}, !sync);
-	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, forwards ? DriveDirection::FWD : DriveDirection::REV);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
-}
-
-void set_pose(float x, float y, float theta, float speed, int timeout, bool forwards, float minSpeed, float earlyExitRange, bool sync) {
-	if (curMatchState != DISABLED) {
-		chassis.moveToPose(x, y, theta, timeout, {.forwards = forwards, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, forwards ? DriveDirection::FWD : DriveDirection::REV);
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
-}
-
-void set_swing(float angle, int timeout, float speed, DriveSide side, bool forwards, bool sync, AngularDirection direction) {
-	if (curMatchState != DISABLED) {
-		chassis.swingToHeading(angle, side, timeout, {.direction = direction, .maxSpeed = speed}, !sync);
-	}
-	bool right = side == DriveSide::RIGHT ? true : false;
-	turn_shortest(angle, currentPoint.t) < currentPoint.t ? direction = AngularDirection::CCW_COUNTERCLOCKWISE : direction = AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-
-	currentPoint.t = angle;
-	currentPoint.left = speed * (right ? 1 : -1);
-	currentPoint.right = speed * (right ? -1 : 1);
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_swing(float angle, int timeout, float speed, DriveSide side, bool forwards, float minSpeed, float earlyExitRange, bool sync, AngularDirection direction) {
-	if (curMatchState != DISABLED) {
-		chassis.swingToHeading(angle, side, timeout, {.direction = direction, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-	}
-	bool right = side == DriveSide::RIGHT ? true : false;
-	turn_shortest(angle, currentPoint.t) < currentPoint.t ? direction = AngularDirection::CCW_COUNTERCLOCKWISE : direction = AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
-	currentPoint.t = angle;
-	currentPoint.left = speed * (right ? 1 : -1);
-	currentPoint.right = speed * (right ? -1 : 1);
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_swing(float x, float y, int timeout, float speed, DriveSide side, bool forwards, bool sync, AngularDirection direction) {
-	if (curMatchState != DISABLED) {
-		chassis.swingToPoint(x, y, side, timeout, {.direction = direction, .maxSpeed = speed}, !sync);
-	}
-	bool right = side == DriveSide::RIGHT ? true : false;
-	turn_shortest(atan2(y, x), currentPoint.t) < currentPoint.t ? direction = AngularDirection::CCW_COUNTERCLOCKWISE : direction = AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = atan2(y, x);
-	currentPoint.left = speed * (right ? 1 : -1);
-	currentPoint.right = speed * (right ? -1 : 1);
-	currentPoint.behavior = direction;
-	autonPath.push_back(currentPoint);
-}
-
-void set_swing(float x, float y, int timeout, float speed, DriveSide side, bool forwards, float minSpeed, float earlyExitRange, bool sync, AngularDirection direction) {
-	if (curMatchState != DISABLED) {
-		chassis.swingToPoint(x, y, side, timeout, {.direction = direction, .maxSpeed = speed, .minSpeed = minSpeed, .earlyExitRange = earlyExitRange}, !sync);
-	}
-	bool right = side == DriveSide::RIGHT ? true : false;
-	turn_shortest(atan2(y, x), currentPoint.t) < currentPoint.t ? direction = AngularDirection::CCW_COUNTERCLOCKWISE : direction = AngularDirection::CW_CLOCKWISE;
-	if (direction == AngularDirection::CCW_COUNTERCLOCKWISE) speed *= -1;
-	
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = atan2(y, x);
-	currentPoint.left = speed * (right ? 1 : -1);
-	currentPoint.right = speed * (right ? -1 : 1);
-	currentPoint.behavior = direction;
+	currentPoint.left = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? 1 : -1);
+	currentPoint.right = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? -1 : 1);
 	autonPath.push_back(currentPoint);
 }

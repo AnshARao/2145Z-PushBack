@@ -1,12 +1,14 @@
 #include <cstddef>
 #include <string>
 #include "autos.hpp"
+//#include "liblvgl/core/lv_obj_style_gen.h"
 #include "liblvgl/display/lv_display.h"
+#include "liblvgl/widgets/image/lv_image.h"
 #include "subsystems/chassis.hpp"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
 #include "liblvgl/core/lv_obj_scroll.h"
-#include "liblvgl/core/lv_obj_style.h"
+// #include "liblvgl/core/lv_obj_style.h"
 #include "liblvgl/font/lv_font.h"
 #include "liblvgl/font/lv_symbol_def.h"
 #include "liblvgl/misc/lv_anim.h"
@@ -182,10 +184,11 @@ void pathViewerTask() {
         }
         if(pathIter < pathDisplay.size() && pathDisplay.size() > 1 && playing) {
             lv_obj_remove_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 97, 95 - (1.5 * pathDisplay[pathIter].y));
+            lv_obj_set_pos(autonRobot, (1.5 * pathDisplay[pathIter].x) + 80, 77 - (1.5 * pathDisplay[pathIter].y));
             if(pathIter < pathDisplay.size() - 1) {
                 lv_image_set_rotation(autonRobot, 10 * (pathDisplay[pathIter].t));
                 if(pathDisplay[pathIter].left == KEY)
+                
                     pros::delay(pathDisplay[pathIter].right);
                 else {
                     double velocity = get_velocity(pathDisplay[pathIter].left) + get_velocity(pathDisplay[pathIter].right) / 2;
@@ -416,11 +419,13 @@ static void toggleConsoleEvent(lv_event_t* e) {
 
 void autoSelectorInit() {
     // logoImg setup
-    lv_obj_set_size(logoImg, 51, 51);
+    lv_obj_set_size(logoImg, 56, 56);
     lv_obj_set_pos(logoImg, 183, 5);
     lv_obj_add_flag(logoImg, LV_OBJ_FLAG_CLICKABLE);
     lv_image_set_src(logoImg, &logo);
     lv_image_set_rotation(logoImg, 0);
+    lv_obj_set_style_image_recolor(logoImg, theme_accent, LV_PART_MAIN);
+    lv_obj_set_style_image_recolor_opa(logoImg, 255, LV_PART_MAIN);
     lv_obj_add_event_cb(logoImg, toggleConsoleEvent, LV_EVENT_CLICKED, NULL);
 
     // autonTable setup
@@ -476,6 +481,7 @@ void autoSelectorInit() {
     lv_image_set_src(autonRobot, &logo);
     lv_obj_set_style_bg_opa(autonRobot, 0, LV_PART_MAIN);
     lv_obj_set_style_outline_width(autonRobot, 0, LV_PART_MAIN);
+    lv_image_set_scale(autonRobot, 128);
     lv_obj_add_flag(autonRobot, LV_OBJ_FLAG_HIDDEN);
 
     // autonUp setup
