@@ -34,26 +34,27 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateral_controller(10, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              25, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in inches
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
-                                              20 // maximum acceleration (slew)
+lemlib::ControllerSettings lateral_controller(
+	6.5, // proportional gain (kP)
+	0, // integral gain (kI)
+	20, // derivative gain (kD)
+	0, // anti windup
+	1.0, // small error range, in inches
+	100, // small error range timeout, in milliseconds
+	3.0, // large error range, in inches
+	300, // large error range timeout, in milliseconds
+	0 // maximum acceleration (slew)
 );
 
-lemlib::ControllerSettings angular_controller(2, // proportional gain (kP)
-                                              0, // integral gain (kI)
-                                              13, // derivative gain (kD)
-                                              3, // anti windup
-                                              1, // small error range, in inches
-                                              100, // small error range timeout, in milliseconds
-                                              3, // large error range, in inches
-                                              500, // large error range timeout, in milliseconds
-                                              0 // maximum acceleration (slew)
+lemlib::ControllerSettings angular_controller(5, // proportional gain (kP)
+    0, // integral gain (kI)
+    20, // derivative gain (kD)
+	3, // anti windup
+	1.0, // small error range, in inches
+	100, // small error range timeout, in milliseconds
+	3.0, // large error range, in inches
+	300, // large error range timeout, in milliseconds
+	0 // maximum acceleration (slew)
 );                           
 
 
@@ -91,39 +92,43 @@ void tank_drive(double curve) {
     // Set robot to l_stick and r_stick, check joystick threshold, set active brake
     set_tank(l_stick, r_stick);
 }
-
-pros::Distance distanceFront(5);
+// distance sensors
+pros::Distance distanceFront(8);
 pros::Distance distanceBack(1);
 pros::Distance distanceLeft(3);
 pros::Distance distanceRight(9);
-
-float offsetFront = 0;
-float offsetBack = 4.0;
-float offsetLeft = 4.0;
-float offsetRight = 4.0;
-
-float halfField = 70.25;
+// distance offsets
+float offsetFront = 7.2;
+float offsetBack = 3.2;
+float offsetLeft = 3.4;
+float offsetRight = 3.4;
 
 void reset(pros::Distance sensor, float sensorOffset, float headingOffset) {
-	if (curMatchState == DISABLED) {
-		return;
-	}
-	// convert mm to inches
-	float dist = sensor.get_distance() / 25.4f;
-	// check if the distance is valid
-	if (dist < 0 || dist > 150) {
-		print("invalid distance sensor reading");
-		return;
-	}
+
+	float halfField = 70.25; // half of the field width in inches
+
+	if (curMatchState == DISABLED) return; // does not play on brain screen
+	// get distance and convert mm to inches
+	float dist = sensor.get_distance() / 25.4f; 
+
+	if (dist < 0 || dist > 150) return; // check if the distance is valid
+
+	// get heading and convert degrees to radians
 	float heading = (chassis.getPose().theta * 0.0174533f); // deg→rad, abs
+
+	// if heading is greater than 45 degrees, subtract 45 degrees for cos function
     while (heading > (1.57079632679f / 2.0f)) heading -= 1.57079632679f; // ≤ 45°
 
+	// calculate the distance to reset
 	float resetDist = (dist + sensorOffset) * cosf(heading);
 
-	float sensorHeading = fabs(chassis.getPose().theta + headingOffset);
-	sensorHeading = (int)(sensorHeading + 360) % 360;
+	// Direction the sensor is pointing in world frame (0=+Y/top, 90=+X/right, 180=-Y/bottom, 270=-X/left).
+	// Use signed angle so quadrant is correct (no fabs).
+	float sh = chassis.getPose().theta + headingOffset;
+	int sensorHeading = (int)sh;
+	sensorHeading = (sensorHeading % 360 + 360) % 360;
 
-	// Determine which wall we're facing and which axis to reset
+	// determine which wall we're facing and which axis to reset
     bool resettingX = false;
     double wallSign = 1.0;
     
@@ -147,13 +152,16 @@ void reset(pros::Distance sensor, float sensorOffset, float headingOffset) {
         resettingX = true;
         wallSign = -1.0;
     }
-
+	// calculate the new position
 	float newPos = wallSign * (halfField - resetDist);
 
+	double theta = chassis.getPose().theta;
 	if (resettingX) {
-		chassis.setPose(newPos, chassis.getPose().y, chassis.getPose().theta);
+		chassis.setPose(newPos, chassis.getPose().y, theta);
+		currentPoint.x = newPos;
 	} else {
-		chassis.setPose(chassis.getPose().x, newPos, chassis.getPose().theta);
+		chassis.setPose(chassis.getPose().x, newPos, theta);
+		currentPoint.y = newPos;
 	}
 }
 
@@ -334,101 +342,114 @@ void wait_until(float dist) {
 	}
 }
 
+// function to set the raw speed
 void set_raw(int speed) {
 	bool forwards = speed >= 0;
 	if (curMatchState != DISABLED) {
-		left_motor_group.move_voltage(speed * (forwards ? 1 : -1) * 12000);
-		right_motor_group.move_voltage(speed * (forwards ? 1 : -1) * 12000);
+		left_motor_group.move_voltage(speed * 12000); // set the left speed
+		right_motor_group.move_voltage(speed  * 12000); // set the right speed
 	}
-	currentPoint.left = speed * (forwards ? 1 : -1);
-	currentPoint.right = speed * (forwards ? 1 : -1);
-	currentPoint.t = currentPoint.t;
-	autonPath.push_back(currentPoint);
+	currentPoint.left = speed * (forwards ? 1 : -1); // set the left speed
+	currentPoint.right = speed * (forwards ? 1 : -1); // set the right speed
+	currentPoint.t = currentPoint.t; // set the theta
+	autonPath.push_back(currentPoint); // add the current point to the path
 } 
 
-
+// function to set the drive
 void set_drive(float distance, float timeout, lemlib::MoveToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0),
-                              chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0),
+		chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0), // get the x
+                              chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0), // get the y
                               timeout, params, !sync);
 	}
-	currentPoint = get_point(currentPoint, distance);
-	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
-	currentPoint.right = params.maxSpeed * (params.forwards	 ? 1 : -1);
-	autonPath.push_back(currentPoint);
+	currentPoint = get_point(currentPoint, distance); // get the point
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1); // set the left speed
+	currentPoint.right = params.maxSpeed * (params.forwards	 ? 1 : -1); // set the right speed
+	autonPath.push_back(currentPoint); // add the current point to the path
 }
 
+// function to determine if cw or ccw is the shortest way to turn
 double turn_shortest(double target, double current) {
-	double delta = target - current;
-	delta = fmod(delta + 540.0, 360.0) - 180.0;
+	double delta = target - current; // get the difference between the target and current
+	delta = fmod(delta + 540.0, 360.0) - 180.0; // wrap around to 0-360 and subtract 180
 	return delta;
 }
 
+// function to set the turn to heading
 void set_turn(float theta, int timeout, lemlib::TurnToHeadingParams params, bool sync) {
 	if (curMatchState != DISABLED) {
 		chassis.turnToHeading(theta, timeout, params, !sync);
 	}
 
-
-	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
+	// determine the direction to turn
+	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? 
+	lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
+	// if the direction is ccw, multiply the max speed by -1 for the brain screen
 	if (params.direction == lemlib::AngularDirection::CCW_COUNTERCLOCKWISE) params.maxSpeed *= -1;
 
-	currentPoint.t = theta;
-	currentPoint.left = params.maxSpeed;
-	currentPoint.right = -params.maxSpeed;
-	currentPoint.behavior = params.direction;
-	autonPath.push_back(currentPoint);
+	// set the current point
+	currentPoint.t = theta; // set the theta
+	currentPoint.left = params.maxSpeed; // set the left speed
+	currentPoint.right = -params.maxSpeed; // set the right speed
+	currentPoint.behavior = params.direction; // set the behavior
+	autonPath.push_back(currentPoint); // add the current point to the path
 }
 
+// function to set the turn to point
 void set_turn(float x, float y, int timeout, lemlib::TurnToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
 		chassis.turnToPoint(x, y, timeout, params, !sync);
 	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = atan2(y, x);
-	currentPoint.left = params.maxSpeed;
-	currentPoint.right = -params.maxSpeed;
-	currentPoint.behavior = params.direction;
-	autonPath.push_back(currentPoint);
+	currentPoint.x = x; // set the x
+	currentPoint.y = y; // set the y
+	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y},
+		 params.forwards ? DriveDirection::FWD : DriveDirection::REV); // set the theta
+	currentPoint.left = params.maxSpeed; // set the left speed
+	currentPoint.right = -params.maxSpeed; // set the right speed
+	currentPoint.behavior = params.direction; // set the behavior
+	autonPath.push_back(currentPoint); // add the current point to the path
 }
-
+// function to set the point
 void set_point(float x, float y, int timeout, lemlib::MoveToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.moveToPoint(x, y, timeout, params, !sync);
+		chassis.moveToPoint(x, y, timeout, params, !sync); // move to the point
 	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, params.forwards ? DriveDirection::FWD : DriveDirection::REV);
-	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
-	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
+	currentPoint.x = x; // set the x
+	currentPoint.y = y; // set the y
+	currentPoint.t = get_theta({currentPoint.x, currentPoint.y}, {x, y}, 
+		params.forwards ? DriveDirection::FWD : DriveDirection::REV); // set the theta
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1); // set the left speed
+	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1); // set the right speed
+	autonPath.push_back(currentPoint); // add the current point to the path
 }
 
+// function to set the pose
 void set_pose(float x, float y, float theta, int timeout, lemlib::MoveToPoseParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.moveToPose(x, y, theta, timeout, params, !sync);
+		chassis.moveToPose(x, y, theta, timeout, params, !sync); // move to the pose
 	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = theta;
-	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
-	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1);
-	autonPath.push_back(currentPoint);
+	currentPoint.x = x; // set the x
+	currentPoint.y = y; // set the y
+	currentPoint.t = theta; // set the theta
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1); // set the left speed
+	currentPoint.right = params.maxSpeed * (params.forwards ? 1 : -1); // set the right speed
+	autonPath.push_back(currentPoint); // add the current point to the path
 }
 
+// function to set the swing to heading
 void set_swing(float theta, DriveSide lockedSide, int timeout, lemlib::SwingToHeadingParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.swingToHeading(theta, lockedSide, timeout, params, !sync);
+		chassis.swingToHeading(theta, lockedSide, timeout, params, !sync); // swing to the heading
 	}
-	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE;
-	if (params.direction == lemlib::AngularDirection::CCW_COUNTERCLOCKWISE) params.maxSpeed *= -1;
+	params.direction = (turn_shortest(theta, currentPoint.t) < currentPoint.t) ? 
+	lemlib::AngularDirection::CCW_COUNTERCLOCKWISE : lemlib::AngularDirection::CW_CLOCKWISE; // determine the direction to swing
+	// if the direction is ccw, multiply the max speed by -1 for the brain screen
+	if (params.direction == lemlib::AngularDirection::CCW_COUNTERCLOCKWISE) params.maxSpeed *= -1; 
 
-	currentPoint.t = theta;
-	currentPoint.left = params.maxSpeed;
-	currentPoint.right = -params.maxSpeed;
-	autonPath.push_back(currentPoint);
+	currentPoint.t = theta; // set the theta
+	currentPoint.left = params.maxSpeed; // set the left speed
+	currentPoint.right = -params.maxSpeed; // set the right speed
+	autonPath.push_back(currentPoint); // add the current point to the path
 
 	/*
 	// Convert main/opposite voltages to left/right voltages
@@ -458,14 +479,15 @@ void set_swing(float theta, DriveSide lockedSide, int timeout, lemlib::SwingToHe
 	*/
 }
 
+// function to set the swing to point
 void set_swing(float x, float y, DriveSide lockedSide, int timeout, lemlib::SwingToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.swingToPoint(x, y, lockedSide, timeout, params, !sync);
+		chassis.swingToPoint(x, y, lockedSide, timeout, params, !sync); // swing to the point
 	}
-	currentPoint.x = x;
-	currentPoint.y = y;
-	currentPoint.t = atan2(y, x);
-	currentPoint.left = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? 1 : -1);
-	currentPoint.right = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? -1 : 1);
-	autonPath.push_back(currentPoint);
+	currentPoint.x = x; // set the x
+	currentPoint.y = y; // set the y
+	currentPoint.t = atan2(y, x); // set the theta
+	currentPoint.left = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? 1 : -1); // set the left speed
+	currentPoint.right = params.maxSpeed * (lockedSide == DriveSide::RIGHT ? -1 : 1); // set the right speed
+	autonPath.push_back(currentPoint); // add the current point to the path
 }

@@ -21,6 +21,7 @@
 #include "pros/misc.hpp"
 #include <fstream>
 #include <sstream>
+#include "subsystems/chassis.hpp"
 
 /**
  * @file screen.cpp
@@ -142,9 +143,9 @@ void angleCheckTask() {
     while(true) {
         if(aligning) {
             auto target = autonPath.size() > 0 ? autonPath[0].t : 0;
-            auto current = fmod(chassis.getPose().theta, 360);
+            auto current = fmod((double)chassis.getPose().theta, 360.0);
             lv_label_set_text(angleText,
-                              (to_string_with_precision(current, 2) + " °" + "\ntarget: " + to_string_with_precision(target, 2)).c_str());
+                              (fmt::to_string(current) + " °" + "\ntarget: " + fmt::to_string(target)).c_str());
             if(target + 0.15 >= current && target - 0.15 <= current)
                 lv_obj_set_style_bg_color(angleViewer, green, LV_PART_MAIN);
             else
@@ -205,6 +206,10 @@ void pathViewerTask() {
         print(1, "X: " + std::to_string(chassis.getPose().x));
         print(2, "Y: " + std::to_string(chassis.getPose().y));
         print(3, "A: " + std::to_string(chassis.getPose().theta));
+        print(4, "Forward Distance: " + fmt::to_string(distanceFront.get_distance() / 25.4f));
+        print(5, "Backward Distance: " + fmt::to_string(distanceBack.get_distance() / 25.4f));
+        print(6, "Left Distance: " + fmt::to_string(distanceLeft.get_distance() / 25.4f));
+        print(7, "Right Distance: " + fmt::to_string(distanceRight.get_distance() / 25.4f));
         pros::delay(10);
     }
 }

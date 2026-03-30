@@ -46,9 +46,10 @@
 // More includes here...
 #include "autons.hpp"
 #include "subsystems.hpp"
-#include "controls.hpp"
 #include "drive.hpp"
 #include "screen.hpp"
+#include "intake.hpp"
+#include "misc.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

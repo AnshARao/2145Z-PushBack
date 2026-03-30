@@ -18,22 +18,17 @@
 #pragma region constants
 
 // Defining drive motor ports
-#define PORT_LF -12
-#define PORT_LM -13
-#define PORT_LB -20
-#define PORT_RF 14
-#define PORT_RM 16
-#define PORT_RB 17
-
-// Defining subsystem motor ports
-#define PORT_INTAKE         -6
-#define PORT_INTAKE2        -19
-#define PORT_INTAKE3        -18
+#define PORT_LF -11
+#define PORT_LM -12
+#define PORT_LB -13
+#define PORT_RF 18
+#define PORT_RM -19
+#define PORT_RB 20
 
 // Defining smartwire device ports
-#define PORT_IMU            21
-#define PORT_ODOM_HORIZ     11
-#define PORT_ODOM_VERT      15
+#define PORT_IMU            10
+#define PORT_ODOM_HORIZ     
+#define PORT_ODOM_VERT      
 #define PORT_OPTICAL        
 #define PORT_OPTICAL_2      
 
@@ -46,7 +41,7 @@
 
 // Defining robot constants
 #define DRIVE_DIAMETER      3.25
-#define TRACK_WIDTH         10.5
+#define TRACK_WIDTH         9.5
 #define DRIVE_RPM           450
 #define ODOM_DIAMETER_V       2.75
 #define ODOM_DIAMETER_H       2.0
@@ -56,7 +51,6 @@
 #define DRIVE_SPEED         110
 #define TURN_SPEED          90
 #define SWING_SPEED         110
-#define DRIVE_CURVE         4.0
 
 // Defining controller buttons
 #define BUTTON_INTAKE       pros::E_CONTROLLER_DIGITAL_R1
@@ -91,25 +85,12 @@ inline pros::Motor motor_RB     (PORT_RB, pros::v5::MotorGears::blue);
 inline pros::MotorGroup motorgroup_L({PORT_LF, PORT_LM, PORT_LB,});
 inline pros::MotorGroup motorgroup_R({PORT_RF, PORT_RM, PORT_RB,});
 
-// Subsystem motor constructors
-inline pros::Motor motor_intake1   (PORT_INTAKE, pros::v5::MotorGears::blue);
-inline pros::Motor motor_intake2  (PORT_INTAKE2, pros::v5::MotorGears::blue);
-inline pros::Motor motor_intake3  (PORT_INTAKE3, pros::v5::MotorGears::blue);
-
 // smartwire device constructors
 inline pros::Imu      imu               (PORT_IMU);
 inline pros::Rotation odom_horiz        (PORT_ODOM_HORIZ);
 inline pros::Rotation odom_vert         (PORT_ODOM_VERT);
 inline pros::Optical  optical           (PORT_OPTICAL);
 inline pros::Optical  optical_2         (PORT_OPTICAL_2);
-
-//three wire port constructors
-
-inline ez::Piston piston_scorer(PORT_PISTON_SCORER);
-inline ez::Piston piston_loader(PORT_LOADER);
-inline ez::Piston piston_wing(PORT_WING);
-inline ez::Piston piston_park(PORT_PISTON_PARK);
-inline ez::Piston piston_descore(PORT_DESCORE);
 
 // Chassis constructor
 inline ez::Drive chassis(
@@ -119,10 +100,6 @@ inline ez::Drive chassis(
     PORT_IMU,   // IMU Port
     DRIVE_DIAMETER, // Wheel Diameter
     DRIVE_RPM); // Wheel RPM
-
-inline ez::tracking_wheel horiz_tracker(PORT_ODOM_HORIZ, ODOM_DIAMETER_H, OFFSET_HORI);  // This tracking wheel is perpendicular to the drive wheels
-inline ez::tracking_wheel vert_tracker(PORT_ODOM_VERT, ODOM_DIAMETER_V, OFFSET_VERT);   // This tracking wheel is parallel to the drive wheels
-
 #pragma endregion
 
 inline void default_constants() {

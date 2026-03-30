@@ -2,6 +2,12 @@
 
 void doNothing();
 void skills();
-void right7();
 void test1();
-void sawp();
+void sawp();    
+void left43mid();
+void left43long();
+void left7();
+void right43();
+void right7();
+void skills2();
+void skills3();

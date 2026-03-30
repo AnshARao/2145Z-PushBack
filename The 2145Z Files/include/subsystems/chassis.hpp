@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lemlib/api.hpp"
+#include "pros/distance.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/imu.hpp"
 #include "lemlib/chassis/chassis.hpp"
@@ -65,3 +66,8 @@ void resetLeft();
 void resetRight();
 void resetBack();
 void resetFront();
+
+extern pros::Distance distanceFront;
+extern pros::Distance distanceBack;
+extern pros::Distance distanceLeft;
+extern pros::Distance distanceRight;

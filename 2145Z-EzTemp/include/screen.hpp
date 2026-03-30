@@ -3,7 +3,8 @@
 #include "EZ-Template/api.hpp"  // IWYU pragma: keep
 #include "api.h"    // IWYU pragma: keep
 #include "autons.hpp"
-#include "controls.hpp"
+#include "intake.hpp'
+#include "misc.hpp"
 
 const lv_color32_t theme_color = lv_color_hex(0xffade7);
 const lv_color32_t theme_accent = lv_color_hex(0xffffff);

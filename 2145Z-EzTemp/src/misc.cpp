@@ -12,7 +12,6 @@ bool descoreState = false;
 void setLoader(bool state) {
     if (curMatchState != DISABLED) {
         loader.set_value(state);
-        loaderState = state;
     }
 }
 
@@ -25,7 +24,6 @@ void setWing(bool state) {
 void setDescore(bool state) {
     if (curMatchState != DISABLED) {
         descore.set_value(state);
-        descoreState = state;
     }
 }
 

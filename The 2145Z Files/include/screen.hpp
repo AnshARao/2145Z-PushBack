@@ -71,7 +71,7 @@ void uiInit();
 // Auton Selector UI
 void autoSelectorInit();
 
-inline const int STRUCTURED_LINES = 7;
+inline const int STRUCTURED_LINES = 9;
 
 inline static std::string structured_log[STRUCTURED_LINES];
 inline static std::vector<std::string> unstructured_log;

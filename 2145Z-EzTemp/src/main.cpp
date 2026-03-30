@@ -61,9 +61,9 @@ void initialize() {
   pros::Task pathViewer(pathViewerTask);
   pros::Task angleChecker(angleCheckTask);
 
-  motor_intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  motor_intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-  motor_intake3.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+  intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+
 
 
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
