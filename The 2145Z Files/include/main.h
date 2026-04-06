@@ -46,6 +46,13 @@
 // More includes here...
 #include "autons.hpp"
 #include "subsystems.hpp"
+#include "chassis.hpp"
+#include "screen.hpp"
+#include "intake.hpp"
+#include "misc.hpp"
+
+enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
+inline MatchStates matchState = DISABLED;
 
 
 /**
