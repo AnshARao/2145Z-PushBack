@@ -26,7 +26,8 @@ void doNothing() {
 
 void test1() {
     set_position(0, 0, 0);
-    set_turn(90.0, 10000);
+    set_turn(90.0, 3000);
+    set_turn(0.0, 3000);
 }
 
 void sawp() {
@@ -89,6 +90,24 @@ void sawp() {
     scoreMiddle();
 }
 
+void left43midMID() {
+   // start
+   set_position(-48, 18, 90.0);
+   resetLeft();
+   resetBack();
+   intake();
+
+   // intake 3 stack 
+   set_point(-25, 22, 1000, {.minSpeed = 40}, false);
+   wait_until(10.0);
+   setLoader(true);
+   wait();
+
+   // score long goal
+   set_point(-26, 48.0, 2000, {.forwards = false});
+
+}
+
 void left43mid() {
     // start
     set_position(-48, 18, 90.0);
@@ -97,18 +116,17 @@ void left43mid() {
     intake();
 
     // intake 3 stack 
-    set_point(-23, 22, 1000, {.minSpeed = 30}, false);
+    set_point(-23, 22, 1000, {.minSpeed = 40}, false);
     wait(500);
     setLoader(true);
     wait();
 
     // get matchloader
-    set_turn(315.0, 1000, {.minSpeed = 20, .earlyExitRange = 20.0});
-    set_point(-54, 48.0, 3000);
+    set_turn(315.0, 1000, {.minSpeed = 40, .earlyExitRange = 20.0});
+    set_point(-54, 46.0, 3000);
     set_turn(270.0, 1000, {.minSpeed = 20});
-    // resetRight();
-    // resetFront();
-    set_drive(20.0, 1050, {.maxSpeed = 60});
+    set_point(-64.0, 46.0, 3000);
+
 
     set_point(-24, chassis.getPose().y, 1400, {.forwards = false, .maxSpeed = 60});
     set_raw(-127);
@@ -124,7 +142,7 @@ void left43mid() {
     // set_turn(0.0, 1000);
 
     set_turn(180, 2000);
-    set_drive(11, 2000, {.minSpeed = 40});
+    set_drive(10, 2000, {.minSpeed = 40});
     set_turn(315.0, 2000);
     setLoader(false);
     set_drive(-28, 1000, {.forwards = false, .minSpeed = 60});
@@ -137,51 +155,7 @@ void left43mid() {
 }
 
 void left43long() {
-    // start
-    set_position(-48, 18, 90.0);
-    resetLeft();
-    resetBack();
-    intake();
 
-    // intake 3 stack 
-    set_point(-23, 22, 1000, {.minSpeed = 30}, false);
-    wait(500);
-    setLoader(true);
-    wait();
-
-    // get matchloader
-    set_turn(315.0, 1000, {.minSpeed = 20, .earlyExitRange = 20.0});
-    set_point(-54, 48.0, 3000);
-    set_turn(270.0, 1000, {.minSpeed = 20});
-    // resetRight();
-    // resetFront();
-    set_drive(20.0, 1000);
-
-    set_point(-24, chassis.getPose().y, 1400, {.forwards = false, .maxSpeed = 60});
-    set_raw(-127);
-    outtake();
-    wait(200);
-    score();
-    wait(800);
-    outtake();
-    wait(150);
-    stop();
-    // setLoader(false);
-    // set_drive(6.0, 1000, {.minSpeed = 50, .earlyExitRange = 1.0});
-    // set_turn(0.0, 1000);
-
-    set_turn(180, 2000);
-    set_drive(12, 2000, {.minSpeed = 40});
-    set_turn(315.0, 2000);
-    setLoader(false);
-    set_drive(-28, 800, {.forwards = false, .minSpeed = 60});
-    scoreMiddle();
-    intake2.move_velocity(200);
-    wait(1500);
-    set_drive(36, 2000);
-    set_turn(270, 1000);
-    set_drive(-28, 2000, {.forwards = false, .minSpeed = 110});
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
 }
 
 void left7() {
@@ -281,7 +255,7 @@ void skills() {
     resetLeft();
     resetBack();
     intake();
-    setWing(true);
+    setWingBack(true);
 
     // intake 3 stack and score middle
     set_point(-23, 22, 1000, {.minSpeed = 30}, false);

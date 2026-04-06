@@ -32,12 +32,14 @@ void initialize() {
 	intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	hoodDown.set_value(true);
+	setWingFront(false);
+	setWingBack(false);
 
 	controlla.clear();
 
 	bool drifting = false;
 	double initial = chassis.getPose().theta;
-	pros::delay(100);
+	wait(500);
 	if(std::abs(chassis.getPose().theta - initial) > 1) drifting = true;
 
 	controlla.rumble(!imu.is_calibrating() && !drifting ? "." : "---");

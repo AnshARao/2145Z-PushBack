@@ -2,19 +2,22 @@
 #include "fmt/format.h"
 #include "lemlib/api.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
+#include "lemlib/pid.hpp"
 #include "main.h"
 #include "pros/distance.hpp"
+#include "pros/rtos.hpp"
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
 pros::Controller controlla(pros::E_CONTROLLER_MASTER);
 // imu
-pros::Imu imu(10);
+pros::Imu imu(9);
 
 // left motor group
-pros::MotorGroup left_motor_group({-11, -12, 13}, pros::MotorGears::blue);
+pros::MotorGroup left_motor_group({-18, 19, -20}, pros::MotorGears::blue);
 // right motor group
-pros::MotorGroup right_motor_group({18, -19, 20}, pros::MotorGears::blue);
+pros::MotorGroup right_motor_group({15, -16, 17}, pros::MotorGears::blue);
 
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
@@ -33,29 +36,27 @@ lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel 1, set to null
                             &imu // inertial sensor
 );
 
-// lateral PID controller
-lemlib::ControllerSettings lateral_controller(
-	6.5, // proportional gain (kP)
-	0, // integral gain (kI)
-	20, // derivative gain (kD)
-	0, // anti windup
-	1.0, // small error range, in inches
-	100, // small error range timeout, in milliseconds
-	3.0, // large error range, in inches
-	300, // large error range timeout, in milliseconds
-	0 // maximum acceleration (slew)
+lemlib::ControllerSettings lateral_controller(6.5, // proportional gain (kP)
+                                              0, // integral gain (kI)
+                                              20, // derivative gain (kD)
+                                              3, // anti windup
+                                              1, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
+                                              3, // large error range, in inches
+                                              500, // large error range timeout, in milliseconds
+                                              20 // maximum acceleration (slew)
 );
 
-lemlib::ControllerSettings angular_controller(5, // proportional gain (kP)
-    0, // integral gain (kI)
-    20, // derivative gain (kD)
-	3, // anti windup
-	1.0, // small error range, in inches
-	100, // small error range timeout, in milliseconds
-	3.0, // large error range, in inches
-	300, // large error range timeout, in milliseconds
-	0 // maximum acceleration (slew)
-);                           
+lemlib::ControllerSettings angular_controller(5.0, // proportional gain (kP)
+                                              0, // integral gain (kI)
+                                              36.0, // derivative gain (kD)
+                                              3, // anti windup
+                                              1, // small error range, in inches
+                                              100, // small error range timeout, in milliseconds
+                                              3, // large error range, in inches
+                                              500, // large error range timeout, in milliseconds
+                                              0 // maximum acceleration (slew)
+);                         
 
 
 // create the chassis
@@ -93,13 +94,13 @@ void tank_drive(double curve) {
     set_tank(l_stick, r_stick);
 }
 // distance sensors
-pros::Distance distanceFront(8);
-pros::Distance distanceBack(1);
-pros::Distance distanceLeft(3);
-pros::Distance distanceRight(9);
+pros::Distance distanceFront(1);
+pros::Distance distanceBack(6);
+pros::Distance distanceLeft(5);
+pros::Distance distanceRight(8);
 // distance offsets
-float offsetFront = 7.2;
-float offsetBack = 3.2;
+float offsetFront = 6.5;
+float offsetBack = 4.0;
 float offsetLeft = 3.4;
 float offsetRight = 3.4;
 
@@ -355,17 +356,123 @@ void set_raw(int speed) {
 	autonPath.push_back(currentPoint); // add the current point to the path
 } 
 
-// function to set the drive
+void set_raw(int speed1, int speed2) {
+	bool forwards1 = speed1 >= 0;
+	bool forwards2 = speed2 >= 0;
+	if (curMatchState != DISABLED) {
+		left_motor_group.move_voltage(speed1 * 12000); // set the left speed
+		right_motor_group.move_voltage(speed2  * 12000); // set the right speed
+	}
+	currentPoint.left = speed1 * (forwards1 ? 1 : -1); // set the left speed
+	currentPoint.right = speed2 * (forwards2 ? 1 : -1); // set the right speed
+	currentPoint.t = currentPoint.t; // set the theta
+	autonPath.push_back(currentPoint); // add the current point to the path
+} 
+
+namespace {
+
+double wheel_inches_per_motor_degree() {
+	return M_PI * static_cast<double>(drivetrain.wheelDiameter) / 360.0;
+}
+
+double angle_wrap_180(double deg) {
+	double x = std::fmod(deg + 180.0, 360.0);
+	if (x < 0.0) x += 360.0;
+	return x - 180.0;
+}
+
+double avg_traveled_inches(double left_start_deg, double right_start_deg) {
+	const double dl = left_motor_group.get_position() - left_start_deg;
+	const double dr = right_motor_group.get_position() - right_start_deg;
+	const double k = wheel_inches_per_motor_degree();
+	return 0.5 * (dl + dr) * k;
+}
+
+void scale_to_max(float& l, float& r, float lim) {
+	const float m = std::max(std::fabs(l), std::fabs(r));
+	if (m > lim && m > 1e-6f) {
+		const float s = lim / m;
+		l *= s;
+		r *= s;
+	}
+}
+
+} // namespace
+
+// Encoder-average distance PID + IMU heading hold (EZ/RW style). Blocking.
+void set_drive_pid(float distance_inches, int timeout_ms, lemlib::MoveToPointParams params) {
+	if (curMatchState == DISABLED) return;
+
+	lemlib::PID distPid(lateral_controller.kP, lateral_controller.kI, lateral_controller.kD, lateral_controller.windupRange);
+	lemlib::PID headPid(angular_controller.kP, angular_controller.kI, angular_controller.kD, angular_controller.windupRange);
+
+	const double l0 = left_motor_group.get_position();
+	const double r0 = right_motor_group.get_position();
+	const double start_heading = imu.get_rotation();
+
+	const uint32_t t0 = pros::millis();
+	float prev_l = 0;
+	float prev_r = 0;
+	const float slew_step = lateral_controller.slew;
+	int settle_count = 0;
+
+	while (true) {
+		const uint32_t now = pros::millis();
+		if (now - t0 >= static_cast<uint32_t>(timeout_ms)) break;
+
+		const double traveled = avg_traveled_inches(l0, r0);
+		const double err = static_cast<double>(distance_inches) - traveled;
+
+		if (params.minSpeed > 0.0f && std::fabs(err) < static_cast<double>(params.earlyExitRange)) break;
+
+		float lin = distPid.update(static_cast<float>(err));
+		if (params.minSpeed > 0.0f && std::fabs(lin) < params.minSpeed && std::fabs(err) > 0.05) {
+			lin = (err > 0.0 ? 1.0f : -1.0f) * params.minSpeed;
+		}
+
+		const float h_err = static_cast<float>(angle_wrap_180(imu.get_rotation() - start_heading));
+		const float corr = headPid.update(h_err);
+
+		float l_out = lin + corr;
+		float r_out = lin - corr;
+
+		if (slew_step > 0.0f) {
+			l_out = std::clamp(l_out, prev_l - slew_step, prev_l + slew_step);
+			r_out = std::clamp(r_out, prev_r - slew_step, prev_r + slew_step);
+		}
+
+		scale_to_max(l_out, r_out, params.maxSpeed);
+
+		left_motor_group.move_voltage(static_cast<std::int32_t>(l_out * (12000.0 / 127.0)));
+		right_motor_group.move_voltage(static_cast<std::int32_t>(r_out * (12000.0 / 127.0)));
+		prev_l = l_out;
+		prev_r = r_out;
+
+		if (std::fabs(err) < 0.35) {
+			settle_count++;
+			if (settle_count >= 15) break;
+		} else {
+			settle_count = 0;
+		}
+
+		pros::delay(10);
+	}
+
+	left_motor_group.brake();
+	right_motor_group.brake();
+}
+
+// function to set the drive (LemLib moveToPoint)
 void set_drive(float distance, float timeout, lemlib::MoveToPointParams params, bool sync) {
 	if (curMatchState != DISABLED) {
-		chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0), // get the x
-                              chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0), // get the y
+		chassis.moveToPoint(chassis.getPose().x + distance * cos((-chassis.getPose().theta+90) * M_PI / 180.0),
+                              chassis.getPose().y + distance * sin((-chassis.getPose().theta+90) * M_PI / 180.0),
                               timeout, params, !sync);
 	}
-	currentPoint = get_point(currentPoint, distance); // get the point
-	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1); // set the left speed
-	currentPoint.right = params.maxSpeed * (params.forwards	 ? 1 : -1); // set the right speed
-	autonPath.push_back(currentPoint); // add the current point to the path
+	currentPoint = get_point(currentPoint, distance);
+	currentPoint.left = params.maxSpeed * (params.forwards ? 1 : -1);
+	currentPoint.right = params.maxSpeed * (params.forwards	 ? 1 : -1);
+	autonPath.push_back(currentPoint);
 }
 
 // function to determine if cw or ccw is the shortest way to turn

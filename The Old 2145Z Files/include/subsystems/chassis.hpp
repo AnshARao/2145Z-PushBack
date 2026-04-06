@@ -54,7 +54,10 @@ void wait_until(float dist);
 void wait_until(Coordinate target);
 
 void set_raw(int speed);
+void set_raw(int speed1, int speed2);
+
 void set_drive(float distance, float timeout, lemlib::MoveToPointParams params = {}, bool sync = true);
+void set_drive_pid(float distance_inches, int timeout_ms, lemlib::MoveToPointParams params = {});
 void set_turn(float theta, int timeout, lemlib::TurnToHeadingParams params = {}, bool async = true);
 void set_turn(float x, float y, int timeout, lemlib::TurnToPointParams params = {}, bool async = true);
 void set_point(float x, float y, int timeout, lemlib::MoveToPointParams params = {}, bool sync = true);

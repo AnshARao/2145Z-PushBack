@@ -2,9 +2,10 @@
 #include "main.h"
 #include "pros/adi.hpp"
 
-pros::adi::DigitalOut loader('F', false);
-pros::adi::DigitalOut wing('H', false);
-pros::adi::DigitalOut descore('A', false);
+pros::adi::DigitalOut loader('G', false);
+pros::adi::DigitalOut wingBack('E', false);
+pros::adi::DigitalOut wingFront('A', false);
+pros::adi::DigitalOut descore('H', false);
 
 bool loaderState = false;
 bool descoreState = false;
@@ -16,9 +17,15 @@ void setLoader(bool state) {
     }
 }
 
-void setWing(bool state) {
+void setWingBack(bool state) {
     if (curMatchState != DISABLED) {
-        wing.set_value(state);
+        wingBack.set_value(state);
+    }
+}
+
+void setWingFront(bool state) {
+    if (curMatchState != DISABLED) {
+        wingFront.set_value(state);
     }
 }
 
@@ -35,10 +42,13 @@ void miscControl() {
         setLoader(loaderState);
     }
     if (controlla.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-        setWing(true);
+        setWingFront(false);
+        setWingBack(true);
     } else {
-        setWing(false);
+        setWingFront(true);
+        setWingBack(false);
     }
+
     if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
         descoreState = !descoreState;
         setDescore(descoreState);

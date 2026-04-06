@@ -7,9 +7,9 @@
 pros::Motor intake1(4, pros::v5::MotorGears::blue);
 pros::Motor intake2(2, pros::v5::MotorGears::blue);
 
-pros::adi::DigitalOut hoodDown('E', false);
-pros::adi::DigitalOut stopper('B', false);
-pros::adi::DigitalOut intakeLift('G', false);
+pros::adi::DigitalOut hoodDown('C', false);
+pros::adi::DigitalOut stopper('D', false);
+pros::adi::DigitalOut intakeLift('B', false);
 
 bool midSlow = false;
 
@@ -19,7 +19,6 @@ void intake() {
         intake2.move(127);
         hoodDown.set_value(true);
         stopper.set_value(true);
-        //intakeLift.set_value(false);
     }
 }
 
@@ -44,7 +43,6 @@ void score() {
         intake2.move(127);
         hoodDown.set_value(false);
         stopper.set_value(false);
-        //intakeLift.set_value(false);
     }
 }
 
