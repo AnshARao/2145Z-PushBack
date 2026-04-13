@@ -30,11 +30,12 @@ inline int currentField = Fields::MATCH;
 // Auton selector
 void angleCheckTask();
 void pathViewerTask();
+void controllerTask();
 
 class AutonObj {
     public:
         std::function<void()> callback = doNothing;
-        std::string name = "no name";
+        std::string name = "2145Z";
         lv_color_t color = pink;
 };
 
@@ -42,7 +43,7 @@ class AutonSel {
     public:
         std::vector<AutonObj> autons = {};
         std::function<void()> selector_callback = doNothing; // make this doNothing
-        std::string selector_name = "no name";
+        std::string selector_name = "2145Z";
         void selector_populate(std::vector<AutonObj> auton_list);
 };
 
@@ -81,3 +82,5 @@ void print(const std::string& msg);
 void print(int line, const std::string& msg);
 
 void colorSet(Alliances color, lv_obj_t* object);
+
+extern std::string errormsg;

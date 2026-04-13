@@ -26,7 +26,7 @@ void outtake() {
     if (curMatchState != DISABLED) {
         if (midSlow) {
             intakeLift.set_value(true);
-            intake1.move_velocity(-51);
+            intake1.move_velocity(-64);
             intake2.move(-127);
         } else {
             intakeLift.set_value(false);
@@ -77,7 +77,7 @@ void intakeControl() {
         score();
     } else if (controlla.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
         scoreMiddle();
-    } else if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+    } else if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
         midSlow = !midSlow;
     } else {
         stop();

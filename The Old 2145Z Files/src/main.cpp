@@ -1,11 +1,29 @@
 #include "main.h"
 #include "autos.hpp"
+#include "pros/device.hpp"
+#include "pros/distance.hpp"
 #include "pros/misc.h"
+#include "pros/rtos.hpp"
 #include "screen.hpp"
 #include "subsystems/misc.hpp"
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "subsystems/chassis.hpp"
 #include "subsystems/intake.hpp"
+
+void checkSensor(pros::Distance d) {
+	float dist = d.get_distance() / 25.4f; 
+
+	if (dist < 0 || dist > 200)	{
+		errormsg = "Sensor NOT Working";
+	}
+}
+
+void checkAllSensors() {
+	checkSensor(distanceFront);
+	checkSensor(distanceLeft);
+	checkSensor(distanceBack);
+	checkSensor(distanceBack);
+}
 
 void initialize() {
 	curMatchState = DISABLED;
@@ -15,19 +33,23 @@ void initialize() {
 		{doNothing, "2145Z"},
 		{sawp, "Solo Awp", green},
 		{left7, "Left 7"},
-		{left43mid, "Left 4+3 Middle"},
-		{left43long, "Left 4+3 Long"},
+		{left43mid, "Left 43 Mid"},
+		{left43long, "Left 43 Long"},
+		//{left63, "Left 63"},
 		{right7, "Right 7"},
-		{right43, "Right 4+3"},
+		{right43mid, "Right 43 Mid"},
+		{right43long, "Right 43 Long"},
 		{skills, "Skills", black},
 	});
 
 	uiInit();
-	auton_sel.selector_callback = left43mid;
+	auton_sel.selector_callback =sawp;
+	auton_sel.selector_name = "Sawp";
 
 
 	pros::Task angleCheck(angleCheckTask);
 	pros::Task pathViewer(pathViewerTask);
+	pros::Task contrSel(controllerTask);
 
 	intake1.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	intake2.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -35,20 +57,18 @@ void initialize() {
 	setWingFront(false);
 	setWingBack(false);
 
-	controlla.clear();
-
 	bool drifting = false;
 	double initial = chassis.getPose().theta;
 	wait(500);
 	if(std::abs(chassis.getPose().theta - initial) > 1) drifting = true;
 
 	controlla.rumble(!imu.is_calibrating() && !drifting ? "." : "---");
-	controlla.set_text(0, 0, "2145Z");
 	if (!imu.is_calibrating() && !drifting) {
-		controlla.print(1, 0, "Imu is chilling");
+		errormsg = "IMU is chilling";
 	} else {
-		controlla.print(1, 0, "Imu is NOT chilling");
+		errormsg = "IMU is NOT chilling";
 	}
+	//checkAllSensors();
 }
 
 void disabled() {
@@ -81,7 +101,7 @@ void opcontrol() {
 			resetLeft();
 			resetBack();
 		}
-		if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_UP)) {
+		if (controlla.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
 			resetFront();
 			resetRight();
 		}

@@ -2,8 +2,12 @@
 #include <string>
 #include "autos.hpp"
 //#include "liblvgl/core/lv_obj_style_gen.h"
+#include "liblvgl/core/lv_obj_event.h"
 #include "liblvgl/display/lv_display.h"
+#include "liblvgl/misc/lv_event.h"
+#include "liblvgl/misc/lv_types.h"
 #include "liblvgl/widgets/image/lv_image.h"
+#include "pros/misc.h"
 #include "subsystems/chassis.hpp"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
@@ -71,20 +75,12 @@ std::string controllerInput = "";
 bool aligning = false;
 bool playing = true;
 bool showConsole = true;
-static const char* allianceColorNames[] = {"Blue", "None", "Red"};
+static const char* allianceColorNames[] = {"None", "Red", "Blue"};
 
 AutonSel auton_sel;
 
 // SD card file path for selected auton
 constexpr const char* SD_SELECTED_AUTON_FILE = "/usd/selected_auton.txt";
-
-// Helper: Find AutonObj by name
-AutonObj* find_auton_by_name(const std::string& name) {
-    for (auto& auton : auton_sel.autons) {
-        if (auton.name == name) return &auton;
-    }
-    return nullptr;
-}
 
 // Load selected auton from SD card (if present)
 void load_selected_auton_from_sd() {
@@ -107,16 +103,8 @@ void load_selected_auton_from_sd() {
     std::string auton_name(buffer);
     // Remove trailing newline
     auton_name.erase(auton_name.find_last_not_of("\r\n") + 1);
-    AutonObj* found = find_auton_by_name(auton_name);
-    if (found) {
-        auton_sel.selector_callback = found->callback;
-        auton_sel.selector_name = found->name;
-        print(1, "Loaded auton: " + found->name);
-    } else {
-        auton_sel.selector_callback = doNothing;
-        auton_sel.selector_name = "no name";
-        print(1, "Auton not found. Defaulting to doNothing.");
-    }
+    auton_sel.selector_name = auton_name;
+    print(1, "Loaded auton: " + auton_name);
 }
 
 // Save selected auton to SD card
@@ -203,9 +191,12 @@ void pathViewerTask() {
             pros::delay(1000);
             resetViewer(false);
         }
+        float theta = chassis.getPose().theta;
+        while (theta < 0.0f) theta += 360.0f;
+        theta = fmod(theta, 360.0f);
         print(1, "X: " + std::to_string(chassis.getPose().x));
         print(2, "Y: " + std::to_string(chassis.getPose().y));
-        print(3, "A: " + std::to_string(chassis.getPose().theta));
+        print(3, "A: " + std::to_string(theta));
         print(4, "Forward Distance: " + fmt::to_string(distanceFront.get_distance() / 25.4f));
         print(5, "Backward Distance: " + fmt::to_string(distanceBack.get_distance() / 25.4f));
         print(6, "Left Distance: " + fmt::to_string(distanceLeft.get_distance() / 25.4f));
@@ -360,9 +351,18 @@ static void pauseEvent(lv_event_t* e) {
 static void colorEvent(lv_event_t* e) {
     curAlliance = (Alliances)(((int)curAlliance + 1) % 3);
     colorSet(curAlliance, allianceInd);
-    if (curAlliance == RED) chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta + 90);
-    if (curAlliance == BLUE) chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta + 180);
-    if (curAlliance == NONE) chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta - 270);
+    if (curAlliance == RED) {
+        chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta + 90);
+        pros::c::controller_print(pros::E_CONTROLLER_MASTER, 1, 0, "Alliance: Red");
+    }
+    if (curAlliance == BLUE) {
+        chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta + 180);
+        pros::c::controller_print(pros::E_CONTROLLER_MASTER, 1, 0, "Alliance: Blue");
+    }
+    if (curAlliance == NONE) {
+        chassis.setPose(chassis.getPose().x, chassis.getPose().y, chassis.getPose().theta - 270);
+        pros::c::controller_print(pros::E_CONTROLLER_MASTER, 1, 0, "Alliance: None");
+    }
     resetViewer(true);
     print(2, std::string("Alliance: ") + allianceColorNames[(int)curAlliance]);
 }
@@ -557,4 +557,22 @@ void autoSelectorInit() {
 
     // Load selected auton from SD card (if present)
     load_selected_auton_from_sd();
+}
+
+std::string errormsg = "";
+
+void controllerTask() {
+    controlla.clear();
+    while (true) {
+        controlla.clear();
+        pros::delay(50);
+        controlla.print(0, 0, "Auto: %s", auton_sel.selector_name.c_str());
+        pros::delay(50);
+        controlla.print(1, 0, "Alliance: %s", allianceColorNames[(int)curAlliance]);
+        pros::delay(50);
+        controlla.print(2, 0, errormsg.c_str());
+        if (midSlow) {
+			controlla.rumble(".");
+		}
+    }
 }

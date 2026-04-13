@@ -112,13 +112,15 @@ void reset(pros::Distance sensor, float sensorOffset, float headingOffset) {
 	// get distance and convert mm to inches
 	float dist = sensor.get_distance() / 25.4f; 
 
-	if (dist < 0 || dist > 150) return; // check if the distance is valid
+	if (dist < 0 || dist > 200) return; // check if the distance is valid
 
-	// get heading and convert degrees to radians
-	float heading = (chassis.getPose().theta * 0.0174533f); // deg→rad, abs
+	// Fold robot θ to [0°, 360°) before rad math (same as sensorHeading; avoids negative rad heading).
+	float thetaDegForCos = static_cast<float>(chassis.getPose().theta);
+	while (thetaDegForCos < 0.0f) thetaDegForCos += 360.0f;
+	while (thetaDegForCos >= 360.0f) thetaDegForCos -= 360.0f;
 
-	// if heading is greater than 45 degrees, subtract 45 degrees for cos function
-    while (heading > (1.57079632679f / 2.0f)) heading -= 1.57079632679f; // ≤ 45°
+	float heading = thetaDegForCos * 0.0174533f;
+	while (heading > (1.57079632679f / 2.0f)) heading -= 1.57079632679f;
 
 	// calculate the distance to reset
 	float resetDist = (dist + sensorOffset) * cosf(heading);
@@ -126,8 +128,11 @@ void reset(pros::Distance sensor, float sensorOffset, float headingOffset) {
 	// Direction the sensor is pointing in world frame (0=+Y/top, 90=+X/right, 180=-Y/bottom, 270=-X/left).
 	// Use signed angle so quadrant is correct (no fabs).
 	float sh = chassis.getPose().theta + headingOffset;
-	int sensorHeading = (int)sh;
-	sensorHeading = (sensorHeading % 360 + 360) % 360;
+	float sensorHeading = sh;
+	// Fold into [0, 360). Do not use fmod here: fmod copies the sign of the dividend, so negative
+	// angles stay negative; -0.0f also skips a plain "while (x < 0)" loop. While-loops are exact.
+	while (sensorHeading < 0.0f) sensorHeading += 360.0f;
+	while (sensorHeading >= 360.0f) sensorHeading -= 360.0f;
 
 	// determine which wall we're facing and which axis to reset
     bool resettingX = false;
