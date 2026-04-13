@@ -61,34 +61,43 @@ void sawp() {
     resetLeft();
     resetBack();
     intake();
-    set_point(-23.0, -24.0, 3000);
-    set_point(-23.5, 22.0, 3000, {}, false);
+    set_point(-23.5, -24.0, 3000);
+    set_point(-23.5, 23.0, 3000, {}, false);
     wait(750);
     setLoader(true);
     wait();
     set_turn(315.0, 800, {.minSpeed = 80});
 
     //score 2nd long goal
-    set_point(-48.0, 43.5, 2000);
+    set_point(-48.0, 45.0, 2000);
+    wait(50);
     set_turn(270.0, 550);
-    //resetFront();
-    set_point(-28.0, 43.70, 600, {.forwards = false, .minSpeed = 127});
-    set_raw(-64.0);
-    outtake();
-    wait(200);
+    resetFront();
+    resetRight();
+    // score long goal
+    set_point(-30, 47.0, 1000, {.forwards = false, .minSpeed = 127});
     score();
-    wait(800);
-    
-    // load and score middle goal
+    set_raw(-127);
+    wait(150);
+    set_raw(0);
+    wait(50);
+    resetFront();
+    resetRight();
+    wait(600);
     intake();
-    set_point(-64.0, chassis.getPose().y-1, 1750, {.maxSpeed = 55, .minSpeed = 30});
-    set_point(-3.0, 1.0, 1700, {.forwards = false,.maxSpeed = 100, .minSpeed = 40}, false);
-    wait(1250);
+
+    //matchload and score middle
+    set_point(-66.0, 45.5, 1500, {.maxSpeed = 60});
+    wait(50);
+    resetFront();
+    resetRight();
+    set_pose(-12, 11, 315.0, 2000, {.forwards = false, .minSpeed = 90});
+    scoreMiddle();
+    wait(1000);
     setLoader(false);
-    midSlow = false;
-    scoreMiddle();
-    wait();
-    scoreMiddle();
+    setDescore(true);
+    set_drive(8.0, 1000, {.minSpeed = 127});
+    set_drive(-10.0, 1000, {.forwards = false, .minSpeed = 127});
 }
 
 void left4() {
@@ -289,62 +298,65 @@ void left63() {
 }
 
 void right7() {
-    // start
-    set_position(-48, -12, 90.0);
-    resetRight();
-    resetBack();
-    intake();
-
-    pros::Task driveAtEnd([] {
-        if (curMatchState == AUTO) {
-            pros::delay(14750);
-            set_drive(-2.0, 1000, {.forwards = false, .minSpeed = 90});
-        }
-    });
-
-    // intake 3 stack 
-    //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
-    set_point(-24, -23, 1000, {.minSpeed = 90}, false);
-    wait_until(9.0);
-    setLoader(true);
-    wait();
-
-    // get matchloader
-    set_turn(235, 600);
-    setWingFront(true);
-    setWingBack(true);
-    set_drive(36.0, 2000, {.minSpeed = 60});
-    set_turn(270.0, 300);
-    wait(50);
-    resetFront();
-    resetLeft();
-    set_point(-66.0, -45.5, 1100, {.maxSpeed = 60});
-
-    // score long goal
-    set_point(-30, -47.0, 1000, {.forwards = false, .minSpeed = 127}, false);
-    wait(400);
-    outtake();
-    wait(200);
-    score();
-    wait();
-    set_raw(-127);
-    wait(150);
-    set_raw(0);
-    wait(50);
-    resetFront();
-    resetLeft();
-    wait(1100);
-    intake();
-
-    // wing
-    setWingFront(false);
-    setWingBack(false);
-    set_turn(220.0, 500, {.minSpeed = 127});
-    set_swing(270.0, lemlib::DriveSide::RIGHT, 500);
-    wait(50);
-    resetFront();
-    resetLeft();
-    set_point(-11, -60, 1000, {.forwards = false});
+        // start
+        set_position(-48, -12, 90.0);
+        resetRight();
+        resetBack();
+        intake();
+    
+        pros::Task driveAtEnd([] {
+            if (curMatchState == AUTO) {
+                pros::delay(14750);
+                set_drive(2.0, 1000, {.minSpeed = 90});
+            }
+        });
+    
+        // intake 3 stack 
+        //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
+        set_point(-24, -23, 1000, {.minSpeed = 90}, false);
+        wait_until(9.0);
+        setLoader(true);
+        wait();
+    
+        // get matchloader
+        set_turn(230.0, 600);
+        // setWingFront(true);
+        // setWingBack(true);
+        set_drive(32.0, 2000, {.minSpeed = 80});
+        set_turn(270.0, 500);
+        wait(50);
+        resetFront();
+        resetLeft();
+        set_point(-66.0, -47.0, 1100, {.maxSpeed = 60});
+        wait(50);
+        resetFront  ();
+        resetLeft();
+    
+        // score long goal
+        set_point(-30, -48.0, 1000, {.forwards = false, .minSpeed = 80}, false);
+        wait(400);
+        outtake();
+        wait(200);
+        score();
+        wait();
+        set_raw(-127);
+        wait(250);
+        set_raw(0);
+        wait(50);
+        resetFront();
+        resetLeft();
+        wait(1000);
+        intake();
+    
+        // wing
+        setWingFront(false);
+        setWingBack(false);
+        set_turn(220.0, 500, {.minSpeed = 127});
+        set_swing(270.0, lemlib::DriveSide::RIGHT, 500);
+        wait(50);
+        resetFront();
+        resetLeft();
+        set_point(-11, -56, 1000, {.forwards = false});
 }
 
 void right43mid() {

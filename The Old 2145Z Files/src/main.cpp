@@ -43,8 +43,8 @@ void initialize() {
 	});
 
 	uiInit();
-	auton_sel.selector_callback =sawp;
-	auton_sel.selector_name = "Sawp";
+	auton_sel.selector_callback =right7;
+	auton_sel.selector_name = "Right 7";
 
 
 	pros::Task angleCheck(angleCheckTask);
