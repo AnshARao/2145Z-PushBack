@@ -15,3 +15,4 @@ void right43mid();
 void right43long();
 void skills2();
 void doubleMid();
+void techRush();

@@ -31,20 +31,21 @@ void initialize() {
 
 	auton_sel.selector_populate({
 		{doNothing, "2145Z"},
-		{sawp, "Solo Awp", green},
-		{left7, "Left 7"},
-		{left43mid, "Left 43 Mid"},
-		{left43long, "Left 43 Long"},
-		//{left63, "Left 63"},
-		{right7, "Right 7"},
-		{right43mid, "Right 43 Mid"},
-		{right43long, "Right 43 Long"},
+		{sawp, "Sawp", green},
+		{left7, "L7"},
+		{left43mid, "L4+3 Mid"},
+		{left43long, "L4+3 Long"},
+		{right7, "R7"},
+		{right43mid, "R4+3 Mid"},
+		{right43long, "R4+3 Long"},
+		{techRush, "Tch Rsh"},
+		{doubleMid, "Dbl Mid"},
 		{skills, "Skills", black},
 	});
 
 	uiInit();
-	auton_sel.selector_callback =right7;
-	auton_sel.selector_name = "Right 7";
+	auton_sel.selector_callback =doubleMid;
+	auton_sel.selector_name = "Dbl Mid";
 
 
 	pros::Task angleCheck(angleCheckTask);
@@ -64,9 +65,9 @@ void initialize() {
 
 	controlla.rumble(!imu.is_calibrating() && !drifting ? "." : "---");
 	if (!imu.is_calibrating() && !drifting) {
-		errormsg = "IMU is chilling";
+		errormsg = "IMU good";
 	} else {
-		errormsg = "IMU is NOT chilling";
+		errormsg = "IMU BAD";
 	}
 	//checkAllSensors();
 }

@@ -26,7 +26,7 @@ void outtake() {
     if (curMatchState != DISABLED) {
         if (midSlow) {
             intakeLift.set_value(true);
-            intake1.move_velocity(-64);
+            intake1.move_velocity(-300);
             intake2.move(-127);
         } else {
             intakeLift.set_value(false);
@@ -50,7 +50,7 @@ void scoreMiddle() {
     if (curMatchState != DISABLED) {
         if (midSlow) {
             intake1.move(127);
-            intake2.move_velocity(100);
+            intake2.move_velocity(200);
         } else {
             intake1.move(127);
             intake2.move(127);

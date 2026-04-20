@@ -19,6 +19,13 @@ pros::MotorGroup left_motor_group({-18, 19, -20}, pros::MotorGears::blue);
 // right motor group
 pros::MotorGroup right_motor_group({15, -16, 17}, pros::MotorGears::blue);
 
+pros::Motor left1(-18, pros::MotorGears::blue);
+pros::Motor left2(19, pros::MotorGears::blue);
+pros::Motor left3(-20, pros::MotorGears::blue);
+pros::Motor right1(15, pros::MotorGears::blue);
+pros::Motor right2(-16, pros::MotorGears::blue);
+pros::Motor right3(17, pros::MotorGears::blue);
+
 // drivetrain settings
 lemlib::Drivetrain drivetrain(&left_motor_group, // left motor group
                               &right_motor_group, // right motor group

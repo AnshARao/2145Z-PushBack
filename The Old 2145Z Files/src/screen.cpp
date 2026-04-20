@@ -7,7 +7,10 @@
 #include "liblvgl/misc/lv_event.h"
 #include "liblvgl/misc/lv_types.h"
 #include "liblvgl/widgets/image/lv_image.h"
+#include "pros/device.hpp"
 #include "pros/misc.h"
+#include "pros/motors.hpp"
+#include "pros/rtos.hpp"
 #include "subsystems/chassis.hpp"
 #include "liblvgl/core/lv_obj.h"
 #include "liblvgl/core/lv_obj_pos.h"
@@ -559,6 +562,46 @@ void autoSelectorInit() {
     load_selected_auton_from_sd();
 }
 
+std::vector<pros::Motor> drivetrainMotors ={left1, left2, left3, right1, right2, right3};
+std::vector<pros::Motor> intakeMotors ={intake1, intake2};
+
+double getDtTemps() {
+
+        double totalTemp = 0.0;
+        int count = 0;
+
+        for (auto& motor : drivetrainMotors) {
+            double temp = motor.get_temperature();
+            if (temp == PROS_ERR_F) { // PROS_ERR_F is returned when the motor is unplugged
+                //errormsg = std::to_string(motor.get_port()) + " Unplugged";
+                pros::delay(250);
+            }
+            if (count < 6) {
+                totalTemp += temp;
+            }
+            ++count;
+        }
+
+        double averageTempCelsius = totalTemp / 6;
+        double averageTempFahrenheit = averageTempCelsius * 9.0 / 5.0 + 32.0;
+        return averageTempFahrenheit;
+}
+
+double getIntakeTemps() {
+    double totalTemp = 0.0;
+    int count = 0;
+    for (auto& motor : intakeMotors) {
+        double temp = motor.get_temperature();
+        if (temp == PROS_ERR_F) {
+            //errormsg = std::to_string(motor.get_port()) + " Unplugged";
+        }
+    }
+    double averageTempCelsius = totalTemp / 6;
+    double averageTempFahrenheit = averageTempCelsius * 9.0 / 5.0 + 32.0;
+    return averageTempFahrenheit;
+}
+
+
 std::string errormsg = "";
 
 void controllerTask() {
@@ -566,9 +609,17 @@ void controllerTask() {
     while (true) {
         controlla.clear();
         pros::delay(50);
-        controlla.print(0, 0, "Auto: %s", auton_sel.selector_name.c_str());
+        controlla.clear_line(0);
         pros::delay(50);
-        controlla.print(1, 0, "Alliance: %s", allianceColorNames[(int)curAlliance]);
+        controlla.print(0, 0, "Atn: %s", auton_sel.selector_name.c_str());
+        pros::delay(50);
+        controlla.print(0, 12, "Btry: %.4g%%", pros::battery::get_capacity());
+        pros::delay(50);
+        controlla.print(1, 0, "Clr: %s", allianceColorNames[(int)curAlliance]);
+        pros::delay(50);
+        //controlla.print(1, 11, "Dt: %.1f°F", getDtTemps());
+        pros::delay(50);
+        //controlla.print(2, 11, "Intk: %.1f°F", getIntakeTemps());
         pros::delay(50);
         controlla.print(2, 0, errormsg.c_str());
         if (midSlow) {

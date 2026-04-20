@@ -70,6 +70,13 @@ void resetRight();
 void resetBack();
 void resetFront();
 
+extern pros::Motor left1;
+extern pros::Motor left2;
+extern pros::Motor left3;
+extern pros::Motor right1;
+extern pros::Motor right2;
+extern pros::Motor right3;
+
 extern pros::Distance distanceFront;
 extern pros::Distance distanceBack;
 extern pros::Distance distanceLeft;
