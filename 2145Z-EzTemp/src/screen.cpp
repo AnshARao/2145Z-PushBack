@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <string>
 #include "autons.hpp"
-#include "controls.hpp"
 #include "drive.hpp"
 #include "liblvgl/core/lv_event.h"
 #include "liblvgl/core/lv_obj.h"
@@ -102,12 +101,12 @@ vector<Coordinate> pathDisplay;
 
 void resetViewer(bool full) {
     if(full) {
-        auto preference = matchState;
-        matchState = MatchStates::DISABLED;
+        auto preference = curMatchState;
+        curMatchState = MatchStates::DISABLED;
         autonPath = {};
         auton_sel.selector_callback();
         pathDisplay = injectPath(autonPath, 1);
-        matchState = preference;
+        curMatchState = preference;
         lv_img_set_src(autonField, &(currentField == Fields::MATCH ? matchField : skillsField));
     }
     pathIter = 0;
@@ -487,7 +486,4 @@ void autoSelectorInit() {
 
     // Set color for allianceInd
     colorSet(allianceColor, allianceInd);
-
-    // Load selected auton from SD card (if present)
-    load_selected_auton_from_sd();
 }

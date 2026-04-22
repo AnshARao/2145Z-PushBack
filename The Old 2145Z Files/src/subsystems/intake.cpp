@@ -14,12 +14,23 @@ pros::adi::DigitalOut intakeLift('B', false);
 bool midSlow = false;
 
 void intake() {
-    if (curMatchState != DISABLED) {
-        intake1.move(127);
-        intake2.move(127);
-        hoodDown.set_value(true);
-        stopper.set_value(true);
-    }
+    if (curMatchState == DISABLED) return;
+
+    intake1.move(127);
+    hoodDown.set_value(true);
+    stopper.set_value(true);
+
+    static int stallTicks = 0;
+
+    bool highCurrent = intake2.get_current_draw() > 9000;
+    bool lowSpeed = std::abs(intake2.get_actual_velocity()) < 20;
+    bool stalled = highCurrent && lowSpeed;
+
+    if (stalled) stallTicks++;
+    else stallTicks = 0;
+
+    if (stallTicks >= 6) intake2.move(15);   // or 0
+    else intake2.move(127);
 }
 
 void outtake() {

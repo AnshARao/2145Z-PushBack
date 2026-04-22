@@ -3,8 +3,9 @@
 #include "EZ-Template/api.hpp"  // IWYU pragma: keep
 #include "api.h"    // IWYU pragma: keep
 #include "autons.hpp"
-#include "intake.hpp'
+#include "controls.hpp"
 #include "misc.hpp"
+#include "subsystems.hpp"
 
 const lv_color32_t theme_color = lv_color_hex(0xffade7);
 const lv_color32_t theme_accent = lv_color_hex(0xffffff);
@@ -76,5 +77,9 @@ inline static std::vector<std::string> unstructured_log;
 void refresh_console_label();
 void print(const std::string& msg);
 void print(int line, const std::string& msg);
+
+
+enum Alliances {RED = 0, BLUE = 1, NONE = 2};
+Alliances allianceColor = RED;
 
 void colorSet(Alliances color, lv_obj_t* object);

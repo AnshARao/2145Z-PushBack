@@ -17,16 +17,19 @@
 #include "EZ-Template/api.hpp"  // IWYU pragma: keep
 #pragma region constants
 
+
+enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
+inline MatchStates curMatchState = DISABLED;
 // Defining drive motor ports
-#define PORT_LF -11
-#define PORT_LM -12
-#define PORT_LB -13
-#define PORT_RF 18
-#define PORT_RM -19
-#define PORT_RB 20
+#define PORT_LF -18
+#define PORT_LM 19
+#define PORT_LB -20
+#define PORT_RF 15
+#define PORT_RM -16
+#define PORT_RB 17
 
 // Defining smartwire device ports
-#define PORT_IMU            10
+#define PORT_IMU            9
 #define PORT_ODOM_HORIZ     
 #define PORT_ODOM_VERT      
 #define PORT_OPTICAL        

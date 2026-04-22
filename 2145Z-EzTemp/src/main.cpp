@@ -3,7 +3,6 @@
 #include "EZ-Template/sdcard.hpp"
 #include "EZ-Template/util.hpp"
 #include "autons.hpp"
-#include "controls.hpp"
 #include "liblvgl/llemu.hpp"
 #include "pros/misc.h"
 #include "pros/motors.h"
