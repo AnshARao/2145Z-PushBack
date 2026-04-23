@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "name": "PROS Project",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "c:\\2145Z-PushBack\\2145Z-Ruigoon\\include",
+        "c:\\2145Z-PushBack\\2145Z-EzTemp\\include"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerPath": "c:\\Users\\anshr\\AppData\\Roaming\\Cursor\\User\\globalStorage\\sigbots.pros\\install\\pros-toolchain-windows\\usr\\bin\\arm-none-eabi-g++",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++20",
+      "intelliSenseMode": "gcc-arm",
+      "browse": {
+        "path": [
+          "c:\\2145Z-PushBack\\2145Z-EzTemp"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    }
+  ],
+  "version": 4
+}

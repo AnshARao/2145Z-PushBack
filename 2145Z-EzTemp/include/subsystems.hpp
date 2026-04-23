@@ -21,6 +21,7 @@
 enum MatchStates {DISABLED = 0, AUTO = 1, DRIVER = 2};
 inline MatchStates curMatchState = DISABLED;
 // Defining drive motor ports
+<<<<<<< Updated upstream:2145Z-EzTemp/include/subsystems.hpp
 #define PORT_LF -18
 #define PORT_LM 19
 #define PORT_LB -20
@@ -28,6 +29,20 @@ inline MatchStates curMatchState = DISABLED;
 #define PORT_RM -16
 #define PORT_RB 17
 
+=======
+#define PORT_LF 15
+#define PORT_LM -16
+#define PORT_LB 17
+#define PORT_RF -18
+#define PORT_RM 19
+#define PORT_RB -20
+
+// Defining subsystem motor ports
+#define PORT_INTAKE         2
+#define PORT_INTAKE2        10
+#define PORT_INTAKE3        4
+
+>>>>>>> Stashed changes:2145Z-Ruigoon/include/subsystems.hpp
 // Defining smartwire device ports
 #define PORT_IMU            9
 #define PORT_ODOM_HORIZ     

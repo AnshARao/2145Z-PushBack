@@ -426,7 +426,11 @@
     "upload_options": {
       "description": "Javi but Italian",
       "icon": "X",
+<<<<<<< Updated upstream:2145Z-EzTemp/project.pros
       "slot": 3
+=======
+      "slot": 2
+>>>>>>> Stashed changes:2145Z-Ruigoon/project.pros
     },
     "use_early_access": false
   }
