@@ -90,12 +90,12 @@ void sawp() {
 
     //matchload and score middle
     set_point(-66.0, 45.5, 450, {.minSpeed = 127});
-    set_point(-66.0, 45.5, 1150, {.maxSpeed = 55, .minSpeed = 50});
+    set_point(-66.0, 45.5, 1000, {.maxSpeed = 55, .minSpeed = 50});
     resetFront();
     resetRight();
-    set_pose(-9.5, 7.5, 315.0, 1000, {.forwards = false, .minSpeed = 127});
+    set_pose(-9.5, 7.5, 315.0, 1100, {.forwards = false, .minSpeed = 127});
     outtake();
-    set_pose(-9.5, 7.5, 315.0, 750, {.forwards = false});
+    set_pose(-9.5, 7.5, 315.0, 100, {.forwards = false});
     scoreMiddle();
     wait(100);
     intake2.move(76);
@@ -649,7 +649,7 @@ void skillsFirstHalf() {
     setLoader(false);
     wait();
     resetRight();
-    resetFront();
+    resetBack();
     set_point(36, 48.5, 1000, {.forwards = false, .minSpeed = 25});
     set_turn(90.0, 600);
     resetLeft();

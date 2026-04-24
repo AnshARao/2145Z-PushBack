@@ -93,6 +93,7 @@ void autonomous() {
 }
 
 void opcontrol() {
+	//autonomous();
 	curMatchState = DRIVER;
 	chassis.setBrakeMode(MOTOR_BRAKE_COAST);
 	while (true) {
