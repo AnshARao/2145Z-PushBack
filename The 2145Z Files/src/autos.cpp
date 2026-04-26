@@ -128,8 +128,8 @@ void left4() {
     set_turn(320.0, 600);
     setWingFront(true);
     setWingBack(true);
-    set_drive(26.0, 300, {.minSpeed = 127});
-    set_drive(26.0, 500);
+    set_drive(22.0, 400, {.minSpeed = 127});
+    set_drive(22.5, 600);
     set_turn(270.0, 350);
     resetFront();
     resetRight();
@@ -182,8 +182,8 @@ void left7() {
     set_turn(315.0, 600);
     setWingFront(true);
     setWingBack(true);
-    set_drive(27.0, 400, {.minSpeed = 127});
-    set_drive(27.0, 500);
+    set_drive(26.0, 400, {.minSpeed = 127});
+    set_drive(26.5, 500);
     set_turn(270.0, 350);
     resetFront();
     resetRight();
@@ -207,17 +207,17 @@ void left7() {
     // wing
     setWingFront(false);
     setWingBack(false);
-    set_turn(220.0, 500, {.minSpeed = 127});
+    set_turn(217.5, 500, {.minSpeed = 127});
     set_swing(270.0, lemlib::DriveSide::RIGHT, 500, {.minSpeed = 127});
     wait(50);
     resetFront();
     resetRight();
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-    set_point(-12.5, 36.5, 1000, {.forwards = false, .minSpeed = 80});
+    set_point(-13.5, 36.5, 1000, {.forwards = false, .minSpeed = 80});
 }
 
 void left43mid() {
-    int waittime = 1000;
+    int waittime = 875;
     // start
     set_position(-48, 12, 90.0);
     resetLeft();
@@ -226,8 +226,9 @@ void left43mid() {
 
     pros::Task driveAtEnd([] {
         if (curMatchState == AUTO) {
-            pros::delay(14850);
-            set_drive(1.0, 200, {.minSpeed = 127});
+            pros::delay(14800);
+            set_drive(-1.0, 150, {.forwards = false,.minSpeed = 127});
+            set_drive(1.0, 100, {.minSpeed = 127});
         }
     });
 
@@ -243,69 +244,8 @@ void left43mid() {
     set_turn(320.0, 600);
     setWingFront(true);
     setWingBack(true);
-    set_drive(26.0, 300, {.minSpeed = 127});
-    set_drive(26.0, 500);
-    set_turn(270.0, 350);
-    resetFront();
-    resetRight();
-
-    // score long goal
-    set_point(-30, 47.0, 1000, {.forwards = false, .minSpeed = 127});
-    score();
-    set_raw(-127);
-    wait(150);
-    resetFront();
-    resetRight();
-    wait(600);
-    intake();
-
-    //matchload and score middle
-    set_point(-66.0, 45.5, 400, {.minSpeed = 127});
-    set_point(-66.0, 45.5, 800, {.maxSpeed = 60, .minSpeed = 55});
-    resetFront();
-    resetRight();
-    set_pose(-8.5, 8.5, 315.0, 1000, {.forwards = false, .minSpeed = 127});
-    set_pose(-8.5, 8.5, 315.0, 1000, {.forwards = false});
-    scoreMiddle();
-    wait(100);
-    intake2.move(64);
-    set_turn(0,0, 500, {.forwards = false});
-    wait(waittime);
-    setLoader(false);
-    setDescore(true);
-    set_drive(8.0, 1000, {.minSpeed = 127});
-    set_drive(-12.0, 1000, {.forwards = false, .minSpeed = 60});
-}
-
-void left43long() {
-    int waittime = 300;
-    // start
-    set_position(-48, 12, 90.0);
-    resetLeft();
-    resetBack();
-    intake();
-
-    pros::Task driveAtEnd([] {
-        if (curMatchState == AUTO) {
-            pros::delay(14850);
-            set_drive(1.0, 200, {.minSpeed = 127});
-        }
-    });
-
-    // intake 3 stack 
-    //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
-    set_point(-24, 22, 400, {.minSpeed = 127});
-    set_point(-24, 22, 600, {}, false);
-    wait_until(9.0);
-    setLoader(true);
-    wait();
-
-    // get matchloader
-    set_turn(320.0, 600);
-    setWingFront(true);
-    setWingBack(true);
-    set_drive(26.0, 400, {.minSpeed = 127});
-    set_drive(26.0, 600);
+    set_drive(22.0, 400, {.minSpeed = 127});
+    set_drive(22.5, 600);
     set_turn(270.0, 400);
     resetFront();
     resetRight();
@@ -317,27 +257,93 @@ void left43long() {
     wait(150);
     resetFront();
     resetRight();
-    wait(600);
+    wait(700);
     intake();
 
     //matchload and score middle
-    set_point(-66.0, 45.5, 500, {.minSpeed = 127});
-    set_point(-66.0, 45.5, 700, {.maxSpeed = 55, .minSpeed = 50});
+    set_point(-68.0, 45.5, 400, {.minSpeed = 127});
+    set_point(-68.0, 45.5, 950, {.maxSpeed = 55, .minSpeed = 50});
     resetFront();
     resetRight();
-    set_pose(-8.5, 8.5, 315.0, 1100, {.forwards = false, .minSpeed = 127});
-    set_pose(-8.5, 8.5, 315.0, 400, {.forwards = false});
+    set_pose(-7.5, 6.5, 315.0, 1100, {.forwards = false, .minSpeed = 127});
+    set_pose(-7.5, 6.5, 315.0, 400, {.forwards = false});
     scoreMiddle();
     wait(100);
-    intake2.move(72);
+    intake2.move(69);
     set_turn(0,0, 500, {.forwards = false});
     wait(waittime);
     setLoader(false);
-    setDescore(true);
+    //setDescore(true);
+    intake();
     set_drive(8.0, 1000, {.minSpeed = 127});
-    set_drive(-12.0, 1000, {.forwards = false, .minSpeed = 60});
+    setDescore(true);
+    set_drive(-11.0, 1000, {.forwards = false, .minSpeed = 60});
+}
 
-    set_drive(20.0, 1000, {.minSpeed = 127});
+void left43long() {
+    int waittime = 2000;
+    // start
+    set_position(-48, 12, 90.0);
+    resetLeft();
+    resetBack();
+    intake();
+
+    pros::Task driveAtEnd([] {
+        if (curMatchState == AUTO) {
+            pros::delay(14850);
+            set_drive(1.0, 200, {.minSpeed = 127});
+        }
+    });
+
+    // intake 3 stack 
+    //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
+    set_point(-24, 22, 400, {.minSpeed = 127});
+    set_point(-24, 22, 600, {}, false);
+    wait_until(9.0);
+    setLoader(true);
+    wait();
+
+    // get matchloader
+    set_turn(320.0, 600);
+    setWingFront(true);
+    setWingBack(true);
+    set_drive(23.0, 400, {.minSpeed = 127});
+    set_drive(23.0, 600);
+    set_turn(270.0, 400);
+    resetFront();
+    resetRight();
+
+    // score long goal
+    set_point(-30, 47.0, 1000, {.forwards = false, .minSpeed = 127});
+    score();
+    set_raw(-127);
+    wait(150);
+    resetFront();
+    resetRight();
+    wait(700);
+    intake();
+
+    //matchload and score middle
+    set_point(-68.0, 45.5, 400, {.minSpeed = 127});
+    set_point(-68.0, 45.5, 975, {.maxSpeed = 55, .minSpeed = 50});
+    resetFront();
+    resetRight();
+    set_pose(-7.5, 6.5, 315.0, 1100, {.forwards = false, .minSpeed = 127});
+    set_pose(-7.5, 6.5, 315.0, 400, {.forwards = false});
+    scoreMiddle();
+    wait(100);
+    intake2.move(69);
+    set_turn(0,0, 500, {.forwards = false});
+    wait(waittime);
+    setLoader(false);
+    //setDescore(true);
+    intake();
+    set_drive(8.0, 1000, {.minSpeed = 127});
+    //set_drive(20.0, 2000, {.minSpeed = 127});
+    setDescore(true);
+    set_drive(-11.0, 1000, {.forwards = false, .minSpeed = 60});
+
+    set_drive(23.5, 1500, {.minSpeed = 127});
     set_swing(270, lemlib::DriveSide::LEFT, 500);
     resetFront();
     resetRight();
@@ -345,11 +351,64 @@ void left43long() {
     setWingBack(false);
 
     chassis.setBrakeMode(pros::E_MOTOR_BRAKE_HOLD);
-    set_point(-12.5, 36.5, 1000, {.forwards = false, .minSpeed = 80});
+    set_point(-13.0, 37.5, 2000, {.forwards = false, .minSpeed = 80});
+    //set_raw(-64);
 }
 
 void right4() {
+    // start
+    set_position(-48, -12, 90.0);
+    resetRight();
+    resetBack();
+    intake();
 
+    pros::Task driveAtEnd([] {
+        if (curMatchState == AUTO) {
+            pros::delay(14800);
+            set_drive(-1.0, 150, {.forwards = false,.minSpeed = 127});
+            set_drive(1.0, 100, {.minSpeed = 127});
+        }
+    });
+
+    // intake 3 stack 
+    //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
+    set_point(-23.75, -22.5, 300, {.minSpeed = 127});
+    set_point(-23.75, -22.5, 700, {}, false);
+    wait_until(9.0);
+    setLoader(true);
+    wait();
+
+    // get matchloader
+    set_turn(225.0, 650);
+    set_drive(23.0, 300, {.minSpeed = 127});
+    set_drive(23.5, 500);
+    resetFront();
+    resetLeft();
+    set_turn(270.0, 500);
+
+    // score long goal
+    set_point(-30, -48.0, 1000, {.forwards = false, .minSpeed = 127}, false);
+    wait(350);
+    score();
+    outtake();
+    wait(200);
+    score();
+    wait();
+    set_raw(-127);
+    wait(100);
+    resetFront();
+    resetLeft();
+    wait(750);
+    intake();
+
+    // wing
+    setWingFront(false);
+    setWingBack(false);
+    set_turn(217.5, 500, {.minSpeed = 127});
+    set_swing(270.0, lemlib::DriveSide::RIGHT, 500, {.minSpeed = 127});
+    resetFront();
+    resetLeft();
+    set_point(-14.5, -56, 1000, {.forwards = false, .minSpeed = 60});
 }
 
 void right7() {
@@ -368,16 +427,16 @@ void right7() {
 
     // intake 3 stack 
     //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
-    set_point(-24, -22.5, 500, {.minSpeed = 127});
-    set_point(-24, -22.5, 500, {}, false);
+    set_point(-23.75, -22.5, 300, {.minSpeed = 127});
+    set_point(-23.75, -22.5, 700, {}, false);
     wait_until(9.0);
     setLoader(true);
     wait();
 
     // get matchloader
-    set_turn(225.0, 700, {.minSpeed = 10});
-    set_drive(29.0, 350, {.minSpeed = 127});
-    set_drive(29.0, 500);
+    set_turn(225.0, 650);
+    set_drive(28.0, 300, {.minSpeed = 127});
+    set_drive(28.5, 500);
     resetFront();
     resetLeft();
     set_turn(270.0, 500);
@@ -405,7 +464,7 @@ void right7() {
     // wing
     setWingFront(false);
     setWingBack(false);
-    set_turn(220.0, 500, {.minSpeed = 127});
+    set_turn(217.5, 500, {.minSpeed = 127});
     set_swing(270.0, lemlib::DriveSide::RIGHT, 500, {.minSpeed = 127});
     resetFront();
     resetLeft();
@@ -418,24 +477,32 @@ void right43() {
     resetRight();
     resetBack();
     intake();
+
+    pros::Task driveAtEnd([] {
+        if (curMatchState == AUTO) {
+            pros::delay(14850);
+            set_raw(127);
+        }
+    });
+
     // intake 3 stack 
     //set_point(-28, 19, 1000, {.minSpeed = 110, .earlyExitRange = 1.0}, false);
-    set_point(-24, -22.5, 400, {.minSpeed = 127});
-    set_point(-24, -22.5, 600, {}, false);
+    set_point(-23.75, -22.5, 300, {.minSpeed = 127});
+    set_point(-23.75, -22.5, 700, {}, false);
     wait_until(9.0);
     setLoader(true);
     wait();
 
     // get matchloader
-    set_turn(225.0, 700);
-    set_drive(29.0, 350, {.minSpeed = 127});
-    set_drive(29.0, 500);
+    set_turn(225.0, 650);
+    set_drive(28.0, 300, {.minSpeed = 127});
+    set_drive(28.5, 500);
     resetFront();
     resetLeft();
     set_turn(270.0, 500);
     resetFront();
     resetLeft();
-    set_point(-66.0, -47.0, 1050, {.maxSpeed = 60});
+    set_point(-66.0, -47.0, 1050, {.maxSpeed = 55, .minSpeed = 55});
     resetLeft();
     resetFront();
 
@@ -451,21 +518,23 @@ void right43() {
     wait(100);
     resetFront();
     resetLeft();
-    wait(650);
+    wait(750);
     intake();
 
     setTech(true);
-    set_turn(0.0, 700, {.minSpeed = 60});
+    set_turn(0.0, 1000, {.minSpeed = 90});
     resetLeft();
     resetBack();
     setLoader(false);
-    set_pose(-9, -8, 45.0, 500, {.minSpeed = 127});
-    set_pose(-9, -8, 45.0, 500);
+    //set_pose(-9, -8, 45.0, 500, {.minSpeed = 127});
+    set_pose(-9, -8.5, 45.0, 1500);
     outtake();
-    intake1.move_velocity(-400);
+    //intake1.move_velocity(-225);
+    intake1.move(-60);
     set_turn(45.0, 300);
     wait(2000);
-    set_raw(127);
+    outtake();
+
 }
 
 void doubleMid() {

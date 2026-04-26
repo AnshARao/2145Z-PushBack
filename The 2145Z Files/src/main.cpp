@@ -31,7 +31,6 @@ void initialize() {
 
 	auton_sel.selector_populate({
 		{doNothing, "2145Z"},
-		{sawp, "Sawp", green},
 		{left43mid, "L43M"},
 		{left43long, "L43L"},
 		{right43, "R4+3"},
@@ -40,13 +39,14 @@ void initialize() {
 		{left4, "L4"},
 		{right4, "R4"},
 		{techRush, "Tch Rsh"},
+		{sawp, "Sawp", green},
 		{doubleMid, "Dbl Mid"},
 		{skills, "Skills", black},
 	});
 
 	uiInit();
-	auton_sel.selector_callback =sawp;
-	auton_sel.selector_name = "sawp";
+	auton_sel.selector_callback =left43long;
+	auton_sel.selector_name = "L43L";
 
 
 	pros::Task angleCheck(angleCheckTask);
